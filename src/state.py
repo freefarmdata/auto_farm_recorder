@@ -20,13 +20,16 @@ services = {
 
 def start_services():
   for service_name in services:
-    services[service_name]['instance'] = services[service_name]['create']()
-    services[service_name]['instance'].start()
+    if services[service_name]['instance'] is None:
+      services[service_name]['instance'] = services[service_name]['create']()
+      services[service_name]['instance'].start()
 
 def stop_services():
   for service_name in services:
-    services[service_name]['instance'].stop()
+    if services[service_name]['instance'] is not None:
+      services[service_name]['instance'].stop()
   for service_name in services:
-    while not services[service_name]['instance'].is_stopped():
-      time.sleep(0.1)
+    if services[service_name]['instance'] is not None:
+      while not services[service_name]['instance'].is_stopped():
+        time.sleep(0.1)
     services[service_name]['instance'] = None
