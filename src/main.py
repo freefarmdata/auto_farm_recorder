@@ -5,8 +5,6 @@ import state
 import api
 import database
 
-run_program = True
-
 def signal_handler(sig, frame):
   state.stop_services()
   sys.exit(0)
@@ -14,6 +12,9 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
   signal.signal(signal.SIGINT, signal_handler)
+
+  print("Ten second delay startup...")
+  time.sleep(10)
 
   database.initialize()
   state.start_services()

@@ -14,15 +14,27 @@ class Board(Service):
 
   def run_start(self):
     self.set_interval(0.5E9)
-    self.serial = self.get_serial_port()
+    self.connect_to_board()
+
+  def connect_to_board(self):
+    try:
+      self.serial = self.get_serial_port()
+    except Exception as e:
+      self.serial = None
 
   def run_loop(self):
+    if self.serial is None:
+      self.connect_to_board()
+      return
+
     readings = self.read_sensors()
+    self.save_sensor_data(readings)
+
+  def save_sensor_data(self, readings):
     soil = []
     for reading in readings:
       for i,v in enumerate(reading.get('soil')):
         soil.append({'pin': i, 'value': v})
-    print(soil)
     database.insert_soil(soil)
 
   def read_sensors(self):
