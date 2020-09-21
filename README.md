@@ -1,13 +1,5 @@
 # auto_farm_recorder
 
-sudo apt install postgresql libpq-dev postgresql-client
-postgresql-client-common -y
-
-sudo su postgres
-createuser pi -P --interactive
-psql
-create database farmdata;
-
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 sudo usermod -aG docker $USER
