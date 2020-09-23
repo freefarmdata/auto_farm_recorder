@@ -18,6 +18,15 @@ services = {
   }
 }
 
+def get_services_status():
+  status = {}
+  for service_name in services:
+    status[service_name] = False
+    if services[service_name]['instance'] is not None:
+      if not services[service_name]['instance'].is_stopped():
+        status[service_name] = True
+  return status
+
 def start_services():
   for service_name in services:
     if services[service_name]['instance'] is None:

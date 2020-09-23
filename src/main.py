@@ -4,6 +4,7 @@ import signal
 import state
 import api
 import database
+import logger
 
 def signal_handler(sig, frame):
   state.stop_services()
@@ -13,10 +14,11 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
   signal.signal(signal.SIGINT, signal_handler)
 
-  print("Ten second delay startup...")
-  time.sleep(10)
+  # Twenty second delay start up for postgres
+  # time.sleep(20)
 
-  database.initialize()
+  logger.setup_logger()
+  #database.initialize()
   state.start_services()
   api.start()
   while True:

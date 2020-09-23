@@ -12,15 +12,6 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: farmdata
-  recorder:
-    container_name: recorder
-    build:
-      context: .
-      dockerfile: ./dockerfile
-    depends_on: 
-      - postgres
-    links:
-      - postgres:postgres
   grafana:
     container_name: grafana
     image: grafana/grafana:7.1.5

@@ -1,7 +1,10 @@
 import serial
 import json
 import database
+import logging
 from service import Service
+
+logger = logging.getLogger(__name__)
 
 class Board(Service):
 
@@ -20,6 +23,7 @@ class Board(Service):
     try:
       self.serial = self.get_serial_port()
     except Exception as e:
+      logger.error(f'Failed to connect to board: {str(e)}')
       self.serial = None
 
   def run_loop(self):
@@ -29,13 +33,20 @@ class Board(Service):
 
     readings = self.read_sensors()
     self.save_sensor_data(readings)
+    logger.info(f'Board Readings: {readings}')
 
-  def save_sensor_data(self, readings):
+  def save_soil_data(self, readings):
     soil = []
+    temp = []
     for reading in readings:
-      for i,v in enumerate(reading.get('soil')):
-        soil.append({'pin': i, 'value': v})
+      if 'soil' in reading:
+        for i,v in enumerate(reading.get('soil')):
+          soil.append({'pin': i, 'value': v})
+      if 'temp' in reading:
+        for i,v in enumerate(reading.get('temp')):
+          temp.append({'pin': i, 'value': v})
     database.insert_soil(soil)
+    database.insert_temp(temp)
 
   def read_sensors(self):
     output = self.serial.read_until('\n').decode("utf-8")

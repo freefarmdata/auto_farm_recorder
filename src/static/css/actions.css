@@ -1,0 +1,13 @@
+.actions {
+  padding: 0px var(--space) 0px var(--space);
+  background-color: coral;
+  grid-column: span 2;
+}
+
+.actions > .video {
+  margin-top: calc(var(--space) * 2);
+}
+
+.actions > .board {
+  margin-top: calc(var(--space) * 2);
+}

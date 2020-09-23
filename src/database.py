@@ -22,7 +22,7 @@ def initialize():
         id SERIAL PRIMARY KEY,
         sensor INT NOT NULL,
         value INT NOT NULL,
-        timestamp TEXT NOT NULL
+        timestamp DATE NOT NULL
       );
       '''
     )
@@ -32,7 +32,7 @@ def initialize():
         id SERIAL PRIMARY KEY,
         sensor INT NOT NULL,
         value REAL NOT NULL,
-        timestamp TEXT NOT NULL
+        timestamp DATE NOT NULL
       );
       '''
     )
@@ -43,7 +43,7 @@ def initialize():
         sensor INT NOT NULL,
         temp REAL NOT NULL,
         humid REAL NOT NULL,
-        timestamp TEXT NOT NULL
+        timestamp DATE NOT NULL
       );
       '''
     )
@@ -62,4 +62,15 @@ def insert_soil(readings):
       )
     connection.commit()
     
-
+def insert_temp(readings):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    for reading in readings:
+      cursor.execute(
+        '''
+        INSERT INTO ds18b20 (sensor, value, timestamp) 
+        VALUES (?, ?, ?)
+        ''',
+        (reading.get("pin"), reading.get("value"), iso_now())
+      )
+    connection.commit()

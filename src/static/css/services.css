@@ -1,0 +1,51 @@
+.services {
+  padding: 0px var(--space) 0px var(--space);
+  background-color: blueviolet;
+}
+
+.services > .labels {
+  margin-top: calc(var(--space) * 2);
+}
+
+.services > .labels > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hspace);
+}
+
+.services > .labels > div > div {
+  display: inline-block;
+  padding: var(--hspace);
+  background-color: #fff;
+  color: #000;
+  font-size: var(--space);
+  border-radius: var(--hspace);
+  display: flex;
+  align-items: center;
+}
+
+.services > .labels > div > div > span {
+  display: inline-block;
+  border-radius: 50%;
+  width: var(--space);
+  height: var(--space);
+  background-color: gray;
+  margin-right: var(--hspace);
+}
+
+.services > .labels > div > div > span.true {
+  background-color: lime;
+}
+
+.services > .labels > div > div > span.false {
+  background-color: red;
+}
+
+.services > .data {
+  margin-top: calc(var(--space) * 2);
+}
+
+.services > .status {
+  margin-top: calc(var(--space) * 2);
+}

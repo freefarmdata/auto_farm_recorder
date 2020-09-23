@@ -1,0 +1,53 @@
+@import 'layout.css';
+@import 'stream.css';
+@import 'services.css';
+@import 'actions.css';
+
+:root {
+  --space: 10px;
+  --hspace: 5px;
+  --border: 1px solid #f2f2f2;
+}
+
+* {
+  font-family: sans-serif;
+}
+
+html, body {
+  margin: 0px;
+  padding: 0px;
+  color: #fff;
+  background-color: #333;
+}
+
+body {
+  padding: 0px var(--space) 0px var(--space);
+}
+
+body > h1 {
+  background-color: brown;
+  padding: var(--space);
+  margin-bottom: var(--hspace);
+}
+
+h1, h2, h3 {
+  margin-top: var(--space);
+  margin-bottom: var(--space);
+}
+
+button {
+  outline: none;
+  background-color: #fff;
+  border: var(--border);
+  padding: var(--hspace);
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: #f2f2f2;
+}
+
+button:active {
+  outline: none;
+  background-color: #ccc;
+}
