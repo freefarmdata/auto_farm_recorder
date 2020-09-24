@@ -4,6 +4,7 @@ services:
   postgres:
     container_name: 'postgres'
     image: 'postgres:13'
+    restart: always
     ports:
       - 5432:5432
     volumes:
@@ -15,6 +16,7 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana:7.1.5
+    restart: always
     ports:
       - 3000:3000
     volumes:

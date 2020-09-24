@@ -3,7 +3,7 @@ Description=Auto Farm Recorder
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 -u /home/pi/auto_farm_recorder/src/main.py
+ExecStart=/usr/local/opt/python-3.8.0/bin/python3.8 -u /home/pi/auto_farm_recorder/src/main.py
 WorkingDirectory=/home/pi
 StandardOutput=syslog
 StandardError=syslog
