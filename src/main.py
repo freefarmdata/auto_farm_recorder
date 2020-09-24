@@ -15,10 +15,10 @@ if __name__ == "__main__":
   signal.signal(signal.SIGINT, signal_handler)
 
   # Twenty second delay start up for postgres
-  # time.sleep(20)
+  time.sleep(20)
 
   logger.setup_logger()
-  #database.initialize()
+  database.initialize()
   state.start_services()
   api.start()
   while True:

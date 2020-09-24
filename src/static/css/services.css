@@ -1,6 +1,7 @@
 .services {
   padding: 0px var(--space) 0px var(--space);
   background-color: blueviolet;
+  border-radius: var(--bradius);
 }
 
 .services > .labels {
@@ -20,7 +21,7 @@
   background-color: #fff;
   color: #000;
   font-size: var(--space);
-  border-radius: var(--hspace);
+  border-radius: var(--bradius);
   display: flex;
   align-items: center;
 }
@@ -32,6 +33,9 @@
   height: var(--space);
   background-color: gray;
   margin-right: var(--hspace);
+  border: var(--border);
+  animation: blink 0.7s;
+  animation-iteration-count: infinite;
 }
 
 .services > .labels > div > div > span.true {
@@ -48,4 +52,16 @@
 
 .services > .status {
   margin-top: calc(var(--space) * 2);
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
