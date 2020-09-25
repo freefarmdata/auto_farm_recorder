@@ -35,6 +35,8 @@ echo "static domain_name_servers=192.168.0.1 8.8.8.8 4.4.4.4" >> /etc/dhcpcd.con
 ## Setup Systemd
 ```
 cp auto_farm_recorder/bin/recorder.service /etc/systemd/system/recorder.service
+sudo systemctl enable recorder
+sudo service recorder start
 ```
 
 ## Control Motion
