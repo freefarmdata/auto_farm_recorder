@@ -23,4 +23,4 @@ services:
       - ./grafana:/var/lib/grafana:rw
     depends_on:
       - postgres
-      - recorder
+    user: "472"

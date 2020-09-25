@@ -13,11 +13,14 @@ sudo apt-get install git htop screen motion libffi-dev libssl-dev python3 python
 cd ~
 git clone https://github.com/freefarmdata/auto_farm_recorder
 cd auto_farm_recorder
+sudo su
 pip3 install -r requirements.txt
 
+mkdir grafana
+sudo chown 472:472 grafana
+
 sudo pip3 install docker-compose
-docker-compose -f docker-compose.yml build
-docker-compose -f docker-compose.yml up
+docker-compose -f docker-compose.yml up -d
 ```
 
 ## Set Static IP

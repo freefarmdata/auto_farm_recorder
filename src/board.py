@@ -10,7 +10,9 @@ class Board(Service):
 
   def __init__(self):
     super().__init__()
-    self.port = '/dev/cu.usbserial-14130' #'/dev/cu.usbserial-A94JZL1H'
+    self.port = '/dev/ttyUSB0'
+    #self.port = '/dev/cu.usbserial-14130'
+    #self.port = '/dev/cu.usbserial-A94JZL1H'
     self.baud_rate = 9600
     self.timeout = 1
     self.serial = None
