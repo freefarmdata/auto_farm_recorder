@@ -38,7 +38,7 @@ class Camera(Service):
 
   def is_motion_active(self):
     try:
-      command = ['sudo', 'service', 'motion', 'status', '|', 'grep', 'Active']
+      command = 'sudo service motion status | grep Active'
       output = subprocess.check_output(command, shell=True).decode("utf-8").strip()
       if re.match(MOTION_IS_ACTIVE, output):
         return True
@@ -48,18 +48,18 @@ class Camera(Service):
 
   def start_motion(self):
     try:
-      subprocess.run('sudo service motion start')
+      subprocess.run('sudo service motion start', shell=True)
     except Exception as e:
       logger.error(f'Failed to start motion: {str(e)}')
 
   def stop_motion(self):
     try:
-      subprocess.run('sudo service motion stop')
+      subprocess.run('sudo service motion stop', shell=True)
     except Exception as e:
       logger.error(f'Failed to stop motion: {str(e)}')
 
   def restart_motion(self):
     try:
-      subprocess.run('sudo service motion restart')
+      subprocess.run('sudo service motion restart', shell=True)
     except Exception as e:
       logger.error(f'Failed to restart motion: {str(e)}')
