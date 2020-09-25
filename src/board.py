@@ -37,7 +37,7 @@ class Board(Service):
     self.save_sensor_data(readings)
     logger.info(f'Board Readings: {readings}')
 
-  def save_soil_data(self, readings):
+  def save_sensor_data(self, readings):
     soil = []
     temp = []
     for reading in readings:
