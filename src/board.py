@@ -65,6 +65,7 @@ class Board(Service):
     messages = []
     for line in output:
       try:
+        logger.info(f'Board Line: {line}')
         messages.append(json.loads(line))
       except Exception as e:
         pass

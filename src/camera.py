@@ -9,7 +9,7 @@ MOTION_IS_ACTIVE = re.compile(r'^Active: active (running)')
 logger = logging.getLogger(__name__)
 
 SUNRISE = datetime.time(5, 0, 0, 0)
-SUNSET = datetime.time(19, 0, 0, 0)
+SUNSET = datetime.time(23, 0, 0, 0)
 
 class Camera(Service):
 
