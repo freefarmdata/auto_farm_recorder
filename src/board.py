@@ -15,14 +15,36 @@ class Board(Service):
     #self.port = '/dev/cu.usbserial-A94JZL1H'
     self.baud_rate = 9600
     self.timeout = 2
+    self.serial = None
 
   def run_start(self):
     self.set_interval(0.5E9)
+    self.connect_to_board()
+
+  def connect_to_board(self):
+    try:
+      self.serial = self.get_serial_port()
+    except Exception as e:
+      logger.error(f'Failed to connect to board: {str(e)}')
+      self.serial = None
+
+  def close_connection(self):
+    if self.serial:
+      self.serial.close()
+    self.serial = None
 
   def run_loop(self):
-    readings = self.read_sensors()
-    self.save_sensor_data(readings)
-    logger.info(f'Board Readings: {readings}')
+    if self.serial is None:
+      self.connect_to_board()
+      return
+
+    try:
+      readings = self.read_sensors()
+      self.save_sensor_data(readings)
+      logger.info(f'Board Readings: {readings}')
+    except Exception as e:
+      logger.error(f'Failed to read from board: {str(e)}')
+      self.close_connection()
 
   def save_sensor_data(self, readings):
     soil = []
@@ -38,16 +60,15 @@ class Board(Service):
     database.insert_temp(temp)
 
   def read_sensors(self):
-    with usb as self.get_serial_port():
-      output = usb.read(1000).decode("utf-8")
-      output = list(map(lambda l: l.strip(), output.split('\n')))
-      messages = []
-      for line in output:
-        try:
-          messages.append(json.loads(line))
-        except Exception as e:
-          pass
-      return messages
+    output = self.serial.read(1000).decode("utf-8")
+    output = list(map(lambda l: l.strip(), output.split('\n')))
+    messages = []
+    for line in output:
+      try:
+        messages.append(json.loads(line))
+      except Exception as e:
+        pass
+    return messages
 
   def get_serial_port(self):
     return serial.Serial(self.port, baudrate=self.baud_rate, timeout=self.timeout)
