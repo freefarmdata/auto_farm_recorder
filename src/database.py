@@ -1,9 +1,6 @@
 import psycopg2 as postgres
 import datetime
 
-def iso_now():
-  return datetime.datetime.now().isoformat()
-
 def get_connection():
   return postgres.connect(
     database="farmdata",
@@ -56,7 +53,7 @@ def insert_soil(readings):
     for reading in readings:
       cursor.execute(
         "INSERT INTO soil (sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (reading.get("pin"), reading.get("value"), iso_now())
+        (reading.get("pin"), reading.get("value"), datetime.datetime.utcnow())
       )
     connection.commit()
 
@@ -67,6 +64,6 @@ def insert_temp(readings):
     for reading in readings:
       cursor.execute(
         "INSERT INTO ds18b20 (sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (reading.get("pin"), reading.get("value"), iso_now())
+        (reading.get("pin"), reading.get("value"), datetime.datetime.utcnow())
       )
     connection.commit()
