@@ -25,7 +25,6 @@ class Camera(Service):
   def run_start(self):
     self.set_interval(30E9)
     self.setup_data_dirs()
-    self.setup_camera()
 
 
   def setup_data_dirs(self):
@@ -45,7 +44,7 @@ class Camera(Service):
         return
 
       self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-      self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 720)
+      self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 
   def shutdown_camera(self):
