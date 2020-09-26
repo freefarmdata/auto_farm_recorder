@@ -27,11 +27,13 @@ def get_services_status():
         status[service_name] = True
   return status
 
+
 def start_services():
   for service_name in services:
     if services[service_name]['instance'] is None:
       services[service_name]['instance'] = services[service_name]['create']()
       services[service_name]['instance'].start()
+
 
 def stop_services():
   for service_name in services:

@@ -8,7 +8,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 sudo usermod -aG docker $USER
 
-sudo apt-get install git htop screen motion libffi-dev libssl-dev python3 python3-pip python3-dev
+sudo apt-get install git htop screen motion libffi-dev libssl-dev python3 python3-pip python3-dev python3-opencv
 
 cd ~
 git clone https://github.com/freefarmdata/auto_farm_recorder
