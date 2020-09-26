@@ -8,10 +8,10 @@ from service import Service
 logger = logging.getLogger(__name__)
 
 SUNRISE = datetime.time(5, 0, 0, 0)
-SUNSET = datetime.time(23, 0, 0, 0)
+SUNSET = datetime.time(19, 0, 0, 0)
 
 def now_ms():
-  return time.time()*1E3
+  return int(time.time()*1E3)
 
 class Camera(Service):
 
