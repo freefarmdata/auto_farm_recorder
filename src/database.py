@@ -16,6 +16,7 @@ def get_connection():
 def initialize():
   with get_connection() as connection:
     cursor = connection.cursor()
+    cursor.execute(
       '''
       CREATE TABLE IF NOT EXISTS soil (
         id SERIAL PRIMARY KEY,
