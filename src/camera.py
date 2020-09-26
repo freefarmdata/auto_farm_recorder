@@ -69,11 +69,12 @@ class Camera(Service):
 
 
   def capture_image(self):
-    ret, frame = self.camera.read()
-    if ret is True:
-      file_name = f'{now_ms()}.png'
-      file_path = os.path.join(self.image_dir, file_name)
-      cv2.imwrite(file_path, frame)
+    if self.camera:
+      ret, frame = self.camera.read()
+      if ret is True:
+        file_name = f'{now_ms()}.png'
+        file_path = os.path.join(self.image_dir, file_name)
+        cv2.imwrite(file_path, frame)
 
 
   def is_motion_active(self):
