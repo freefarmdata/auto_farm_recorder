@@ -54,6 +54,7 @@ class Board(Service):
   def save_sensor_data(self, readings):
     soil = []
     temp = []
+    dht11 = []
     for reading in readings:
       if 'soil' in reading:
         for i,v in enumerate(reading.get('soil')):
@@ -61,8 +62,12 @@ class Board(Service):
       if 'temp' in reading:
         for i,v in enumerate(reading.get('temp')):
           temp.append({'pin': i, 'value': v})
+      if 'humid' in reading:
+        h = reading.get('humid')
+        humid.append({'pin': i, 'humid': h[0], 'temp': h[1]})
     database.insert_soil(soil)
     database.insert_temp(temp)
+    database.insert_dht11(dht11)
 
 
   def read_sensors(self):

@@ -67,3 +67,14 @@ def insert_temp(readings):
         (reading.get("pin"), reading.get("value"), datetime.datetime.utcnow())
       )
     connection.commit()
+
+
+def insert_dht11(readings):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    for reading in readings:
+      cursor.execute(
+        "INSERT INTO dht11 (sensor, temp, humid, timestamp) VALUES (%s, %s, %s, %s)",
+        (reading.get("pin"), reading.get("temp"), reading.get("humid"), datetime.datetime.utcnow())
+      )
+    connection.commit()
