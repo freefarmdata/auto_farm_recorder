@@ -64,7 +64,7 @@ class Board(Service):
           temp.append({'pin': i, 'value': v})
       if 'humid' in reading:
         h = reading.get('humid')
-        humid.append({'pin': i, 'humid': h[0], 'temp': h[1]})
+        dht11.append({'pin': i, 'humid': h[0], 'temp': h[1]})
     database.insert_soil(soil)
     database.insert_temp(temp)
     database.insert_dht11(dht11)
