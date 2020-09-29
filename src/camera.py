@@ -55,11 +55,13 @@ class Camera(Service):
 
   def run_loop(self):
     if not self.is_daytime():
-      self.shutdown_camera()
       return
 
-    self.setup_camera()
-    self.capture_image()
+    try:
+      self.setup_camera()
+      self.capture_image()
+    except Exception as e:
+      self.shutdown_camera()
 
 
   def is_daytime(self):
