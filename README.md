@@ -82,3 +82,12 @@ webcontrol_localhost off
 videodevice /dev/video0
 ```
 
+### Backup Postgres
+```
+docker exec -t postgres pg_dump farmdata -U admin > ./backup.sql
+```
+
+### Backup Images
+```
+scp -r pi@192.168.0.100:/etc/recorder/images ./
+```

@@ -20,7 +20,7 @@ class Board(Service):
 
 
   def run_start(self):
-    self.set_interval(0.5E9)
+    self.set_interval(1E9)
     self.connect_to_board()
 
   def connect_to_board(self):
