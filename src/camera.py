@@ -38,13 +38,15 @@ class Camera(Service):
   def setup_camera(self):
     if self.camera is None:
       self.camera = cv2.VideoCapture(0)
+      time.sleep(5)
 
       if not self.camera.isOpened():
+        logger.info('Camera could not be opened')
         self.camera = None
         return
 
-      self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-      self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+      self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+      self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 
   def shutdown_camera(self):
@@ -62,6 +64,7 @@ class Camera(Service):
     try:
       self.capture_image()
     except Exception as e:
+      logger.error(e)
       self.shutdown_camera()
 
 
