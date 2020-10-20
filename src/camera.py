@@ -7,8 +7,8 @@ from service import Service
 
 logger = logging.getLogger(__name__)
 
-SUNRISE = datetime.time(5, 0, 0, 0)
-SUNSET = datetime.time(19, 0, 0, 0)
+SUNRISE = datetime.time(6, 0, 0, 0)
+SUNSET = datetime.time(18, 0, 0, 0)
 
 def now_ms():
   return int(time.time()*1E3)
@@ -23,7 +23,7 @@ class Camera(Service):
 
 
   def run_start(self):
-    self.set_interval(30E9)
+    self.set_interval(60E9)
     self.setup_data_dirs()
 
 

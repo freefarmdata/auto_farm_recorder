@@ -7,4 +7,4 @@ camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
 ret, frame = camera.read()
 if ret is True:
-  cv2.imwrite('test_camera.png', frame)
+    cv2.imwrite('test_camera.png', frame)
