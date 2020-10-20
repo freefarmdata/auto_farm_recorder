@@ -15,12 +15,15 @@ def get_connection():
 connection = get_connection()
 cursor = connection.cursor()
 
-tables = ['soil', 'ds18b20', 'dht11']
+tables = {
+    'soil': 'SELECT id, sensor, value, timestamp FROM soil',
+    'ds18b20': 'SELECT id, sensor, value, timestamp FROM ds18b20',
+    'dht11': 'SELECT id, sensor, temp, humid, timestamp from dht11'
+}
 
 for table in tables:
-    select = f'SELECT id, sensor, value, timestamp FROM {table}'
+    select = tables[table]
     cursor.execute(select)
-    results = cursor.fetchall()
     headers = [i[0] for i in cursor.description]
 
     now_ms = int(time.time()*1000)
@@ -36,6 +39,12 @@ for table in tables:
     )
 
     csv_file.writerow(headers)
-    csv_file.writerows(results)
+
+    n = 100
+    while True:
+        results = cursor.fetchmany(n)
+        if len(results) <= 0:
+            break
+        csv_file.writerows(results)
 
 connection.close()
