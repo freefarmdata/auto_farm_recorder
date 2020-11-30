@@ -13,13 +13,16 @@ class Video(Service):
 
     def __init__(self):
         super().__init__()
+        self.resolution = (1920, 1080)
+        self.sunrise = datetime.time(6, 0, 0, 0)
+        self.sunset = datetime.time(18, 0, 0, 0)
         self.data_dir = '/etc/recorder'
         self.image_dir = os.path.join(self.data_dir, 'images')
         self.video_dir = os.path.join(self.data_dir, 'videos')
 
 
     def run_start(self):
-        self.set_interval(30E9)
+        self.set_interval(120E9)
         self.setup_data_dirs()
 
 
@@ -29,10 +32,15 @@ class Video(Service):
 
 
     def run_loop(self):
-        images = os.listdir(self.image_dir)
-        # 720 = 60 minutes * 12 frames per minute. So 720 frames per hour
-        if len(images) >= 720:
-            self.make_video(images)
+        if not self.is_daytime():
+            images = os.listdir(self.image_dir)
+            if len(images) >= 0:
+                self.make_video(images)
+
+
+    def is_daytime(self):
+        current_time = datetime.datetime.now().time()
+        return current_time >= self.sunrise and current_time <= self.sunset
 
 
     def make_video(self, images):
@@ -46,7 +54,7 @@ class Video(Service):
         timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
 
         encoder = cv2.VideoWriter_fourcc(*'FFV1')
-        writer = cv2.VideoWriter(video_path, encoder, 15, (1920, 1080))
+        writer = cv2.VideoWriter(video_path, encoder, 1, self.resolution)
         timestamps = []
 
         logger.info(f'Creating video {video_path}')
@@ -55,7 +63,7 @@ class Video(Service):
             image_path = os.path.join(self.image_dir, image)
             frame = cv2.imread(image_path)
 
-            if frame is None
+            if frame is None:
                 logger.error(f'Cannot write {image_path} to video')
                 continue
 

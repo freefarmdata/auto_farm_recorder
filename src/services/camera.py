@@ -13,25 +13,19 @@ def now_ms():
     return int(time.time() * 1e3)
 
 class Camera(Service):
-    """
-    8640 images per day 1 / 5 seconds.
-    520 bytes per image.
-
-    4.4928 MB per day? That's... crazy....
-    """
 
     def __init__(self):
         super().__init__()
         self.camera = None
         self.resolution = (1920, 1080)
         self.sunrise = datetime.time(6, 0, 0, 0)
-        self.sunset = datetime.time(23, 0, 0, 0)
+        self.sunset = datetime.time(18, 0, 0, 0)
         self.data_dir = '/etc/recorder'
         self.image_dir = os.path.join(self.data_dir, 'images')
 
 
     def run_start(self):
-        self.set_interval(5E9)
+        self.set_interval(30E9)
         self.setup_data_dirs()
 
 
@@ -79,5 +73,5 @@ class Camera(Service):
             if ret is True and frame is not None:
                 file_name = f'{now_ms()}.png'
                 file_path = os.path.join(self.image_dir, file_name)
-                cv2.imwrite(file_path, frame, [cv2.IMWRITE_PNG_COMPRESSION, 0])
+                cv2.imwrite(file_path, frame)
                 api.set_latest_image(frame)
