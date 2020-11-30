@@ -38,7 +38,6 @@ class Video(Service):
 
     def make_video(self, images):
         images = sorted(images, key=lambda f: int(f.split('.')[0]))
-        ffv1_encoder = cv2.VideoWriter_fourcc(*'FFV1')
 
         first_time = int(images[0].split('.')[0])
         last_time = int(images[-1].split('.')[0])
@@ -46,10 +45,12 @@ class Video(Service):
         video_name = f'{first_time}_{last_time}_{len(images)}'
         video_path = os.path.join(self.video_dir, f"{video_name}.avi")
         timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
-        writer = cv2.VideoWriter(video_path, ffv1_encoder, 15, self.resolution)
+
+        xvid_encoder = cv2.VideoWriter_fourcc(*'FFV1')
+        writer = cv2.VideoWriter(video_path, xvid_encoder, 15, self.resolution)
         timestamps = []
 
-        logger.error(f'Creating video {video_path}')
+        logger.info(f'Creating video {video_path}')
         for image in images:
             image_time = int(image.split('.')[0])
             image_path = os.path.join(self.image_dir, image)
@@ -64,11 +65,11 @@ class Video(Service):
             writer.write(frame)
         writer.release()
 
-        logger.error(f'Creating json timestamps for {video_path}')
+        logger.info(f'Creating json timestamps for {timestamp_path}')
         with open(timestamp_path, 'w') as f:
             json.dump(timestamps, f)
 
-        logger.error(f'Removing {len(images)} images')
+        logger.info(f'Removing {len(images)} images')
         for image in images:
             image_path = os.path.join(self.image_dir, image)
             if os.path.isfile(image_path):

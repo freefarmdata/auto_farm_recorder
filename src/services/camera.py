@@ -12,8 +12,14 @@ import api
 def now_ms():
     return int(time.time() * 1e3)
 
-
 class Camera(Service):
+    """
+    8640 images per day 1 / 5 seconds.
+    520 bytes per image.
+
+    4.4928 MB per day? That's... crazy....
+    """
+
     def __init__(self):
         super().__init__()
         self.camera = None
