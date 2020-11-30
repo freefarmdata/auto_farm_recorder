@@ -1,11 +1,9 @@
 import time
 import threading
 
-from board import Board
-from camera import Camera
-
-_data_lock = threading.Lock()
-_service_lock = threading.Lock()
+from services.board import Board
+from services.camera import Camera
+from services.video import Video
 
 services = {
   'board': {
@@ -14,6 +12,10 @@ services = {
   },
   'camera': {
     'create': Camera,
+    'instance': None
+  },
+  'video': {
+    'create': Video,
     'instance': None
   }
 }
@@ -42,5 +44,5 @@ def stop_services():
   for service_name in services:
     if services[service_name]['instance'] is not None:
       while not services[service_name]['instance'].is_stopped():
-        time.sleep(0.1)
+        time.sleep(0.01)
     services[service_name]['instance'] = None

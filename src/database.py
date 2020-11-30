@@ -25,7 +25,7 @@ def initialize():
     )
     cursor.execute(
       '''
-      CREATE TABLE IF NOT EXISTS ds18b20 (
+      CREATE TABLE IF NOT EXISTS temp (
         id SERIAL PRIMARY KEY,
         sensor INT NOT NULL,
         value REAL NOT NULL,
@@ -35,46 +35,32 @@ def initialize():
     )
     cursor.execute(
       '''
-      CREATE TABLE IF NOT EXISTS dht11 (
+      CREATE TABLE IF NOT EXISTS light (
         id SERIAL PRIMARY KEY,
         sensor INT NOT NULL,
-        temp REAL NOT NULL,
-        humid REAL NOT NULL,
+        value REAL NOT NULL,
+        timestamp TIMESTAMP NOT NULL
+      );
+      '''
+    )
+    cursor.execute(
+      '''
+      CREATE TABLE IF NOT EXISTS pressure (
+        id SERIAL PRIMARY KEY,
+        sensor INT NOT NULL,
+        value REAL NOT NULL,
         timestamp TIMESTAMP NOT NULL
       );
       '''
     )
     connection.commit()
 
-
-def insert_soil(readings):
+def insert_timeseries(table, readings):
   with get_connection() as connection:
     cursor = connection.cursor()
     for reading in readings:
       cursor.execute(
-        "INSERT INTO soil (sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (reading.get("pin"), reading.get("value"), datetime.datetime.utcnow())
-      )
-    connection.commit()
-
-
-def insert_temp(readings):
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    for reading in readings:
-      cursor.execute(
-        "INSERT INTO ds18b20 (sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (reading.get("pin"), reading.get("value"), datetime.datetime.utcnow())
-      )
-    connection.commit()
-
-
-def insert_dht11(readings):
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    for reading in readings:
-      cursor.execute(
-        "INSERT INTO dht11 (sensor, temp, humid, timestamp) VALUES (%s, %s, %s, %s)",
-        (reading.get("pin"), reading.get("temp"), reading.get("humid"), datetime.datetime.utcnow())
+        "INSERT INTO %s (sensor, value, timestamp) VALUES (%s, %s, %s)",
+        (table, reading.get('pin'), reading.get('value'), datetime.datetime.utcnow())
       )
     connection.commit()

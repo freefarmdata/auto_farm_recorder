@@ -18,7 +18,7 @@ if __name__ == "__main__":
   time.sleep(20)
 
   logger.setup_logger()
-  database.initialize()
+  # database.initialize()
   state.start_services()
   api.start()
   while True:

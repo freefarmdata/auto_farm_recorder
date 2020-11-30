@@ -17,15 +17,10 @@ class Service(threading.Thread):
         self._interval = interval
         self._stopped = False
         self._has_started = False
-        self._tick = 0
 
 
     def set_interval(self, interval):
         self._interval = interval
-
-
-    def get_tick(self):
-        return self._tick
 
 
     def run_start(self):
@@ -76,7 +71,7 @@ class Service(threading.Thread):
 
 
     def try_sleep(self, start):
-        # sleep for 100 ms but constantly check if
+        # sleep for 10 ms but constantly check if
         # service would like to stop
         elapsed = now_ns() - start
         sleep_time = self._interval - elapsed
@@ -85,7 +80,7 @@ class Service(threading.Thread):
         while now_ns() - start_sleep <= sleep_time:
             if self._stop_event.is_set():
                 break
-            time.sleep(0.1)
+            time.sleep(0.01)
 
 
     def try_end(self):
@@ -107,7 +102,6 @@ class Service(threading.Thread):
                 break
             self.try_update()
             self.try_sleep(start)
-            self._tick += 1
         self.try_end()
 
 

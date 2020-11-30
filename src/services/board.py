@@ -20,8 +20,9 @@ class Board(Service):
 
 
   def run_start(self):
-    self.set_interval(1E9)
+    self.set_interval(5E9)
     self.connect_to_board()
+
 
   def connect_to_board(self):
     try:
@@ -52,9 +53,7 @@ class Board(Service):
 
 
   def save_sensor_data(self, readings):
-    soil = []
-    temp = []
-    dht11 = []
+    soil, light, temp, pressure = [], [], [], []
     for reading in readings:
       if 'soil' in reading:
         for i,v in enumerate(reading.get('soil')):
@@ -62,12 +61,17 @@ class Board(Service):
       if 'temp' in reading:
         for i,v in enumerate(reading.get('temp')):
           temp.append({'pin': i, 'value': v})
-      if 'humid' in reading:
-        h = reading.get('humid')
-        dht11.append({'pin': i, 'humid': h[0], 'temp': h[1]})
-    database.insert_soil(soil)
-    database.insert_temp(temp)
-    database.insert_dht11(dht11)
+      if 'light' in reading:
+        for i,v in enumerate(reading.get('light')):
+          light.append({'pin': i, 'value': v})
+      if 'pressure' in reading:
+        for i,v in enumerate(reading.get('pressure')):
+          light.append({'pin': i, 'value': v})
+  
+    database.insert_timeseries('soil', soil)
+    database.insert_timeseries('temp', temp)
+    database.insert_timeseries('light', light)
+    database.insert_timeseries('pressure', pressure)
 
 
   def read_sensors(self):
