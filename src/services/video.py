@@ -13,7 +13,6 @@ class Video(Service):
 
     def __init__(self):
         super().__init__()
-        self.resolution = (1080, 1920)
         self.data_dir = '/etc/recorder'
         self.image_dir = os.path.join(self.data_dir, 'images')
         self.video_dir = os.path.join(self.data_dir, 'videos')
@@ -46,8 +45,8 @@ class Video(Service):
         video_path = os.path.join(self.video_dir, f"{video_name}.avi")
         timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
 
-        xvid_encoder = cv2.VideoWriter_fourcc(*'FFV1')
-        writer = cv2.VideoWriter(video_path, xvid_encoder, 15, self.resolution)
+        encoder = cv2.VideoWriter_fourcc(*'FFV1')
+        writer = cv2.VideoWriter(video_path, encoder, 15, (1920, 1080))
         timestamps = []
 
         logger.info(f'Creating video {video_path}')
@@ -56,9 +55,8 @@ class Video(Service):
             image_path = os.path.join(self.image_dir, image)
             frame = cv2.imread(image_path)
 
-            if frame is None or frame.shape[:2] != self.resolution:
-                shape = frame.shape if frame is not None else None
-                logger.error(f'Cannot write {image_path} to video. Shape: {shape}. Resolution: {self.resolution}')
+            if frame is None
+                logger.error(f'Cannot write {image_path} to video')
                 continue
 
             timestamps.append(image_time)

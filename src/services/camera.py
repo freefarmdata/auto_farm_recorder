@@ -79,5 +79,5 @@ class Camera(Service):
             if ret is True and frame is not None:
                 file_name = f'{now_ms()}.png'
                 file_path = os.path.join(self.image_dir, file_name)
-                cv2.imwrite(file_path, frame)
+                cv2.imwrite(file_path, frame, [cv2.IMWRITE_PNG_COMPRESSION, 0])
                 api.set_latest_image(frame)
