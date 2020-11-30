@@ -44,8 +44,8 @@ class Video(Service):
         last_time = int(images[-1].split('.')[0])
 
         video_name = f'{first_time}_{last_time}_{len(images)}'
-        video_path = os.path.join(self.video_dir, video_name)
-        timestamp_path = os.path.join(self.video_dir, video_name)
+        video_path = os.path.join(self.video_dir, f"{video_name}.avi")
+        timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
         writer = cv2.VideoWriter(video_path, ffv1_encoder, 15, self.resolution)
         timestamps = []
 
@@ -71,5 +71,6 @@ class Video(Service):
         logger.error(f'Removing {len(images)} images')
         for image in images:
             image_path = os.path.join(self.image_dir, image)
-            os.remove(image)
+            if os.path.isfile(image_path):
+                os.remove(image_path)
 
