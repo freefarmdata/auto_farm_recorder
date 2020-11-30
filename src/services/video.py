@@ -25,11 +25,8 @@ class Video(Service):
 
 
     def setup_data_dirs(self):
-        if not os.path.isdir(self.data_dir):
-            os.mkdir(self.data_dir)
-
-        if not os.path.isdir(self.image_dir):
-            os.mkdir(self.image_dir)
+        os.makedirs(self.image_dir, exist_ok=True)
+        os.makedirs(self.video_dir, exist_ok=True)
 
 
     def run_loop(self):
@@ -43,7 +40,10 @@ class Video(Service):
         images = sorted(images, key=lambda f: int(f.split('.')[0]))
         ffv1_encoder = cv2.VideoWriter_fourcc(*'FFV1')
 
-        video_name = f'{images[0]}_{images[-1]}_{len(images)}'
+        first_time = int(images[0].split('.')[0])
+        last_time = int(images[-1].split('.')[0])
+
+        video_name = f'{first_time}_{last_time}_{len(images)}'
         video_path = os.path.join(self.video_dir, video_name)
         timestamp_path = os.path.join(self.video_dir, video_name)
         writer = cv2.VideoWriter(video_path, ffv1_encoder, 15, self.resolution)
@@ -55,8 +55,9 @@ class Video(Service):
             image_path = os.path.join(self.image_dir, image)
             frame = cv2.imread(image_path)
 
-            if frame is None or frame.shape[:2] is not self.resolution:
-                logger.error(f'Cannot write {image_path} to video')
+            if frame is None or frame.shape[:2] != self.resolution:
+                shape = frame.shape if frame is not None else None
+                logger.error(f'Cannot write {image_path} to video. Shape: {shape}. Resolution: {self.resolution}')
                 continue
 
             timestamps.append(image_time)

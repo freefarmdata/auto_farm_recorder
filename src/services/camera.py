@@ -23,16 +23,15 @@ class Camera(Service):
         self.data_dir = '/etc/recorder'
         self.image_dir = os.path.join(self.data_dir, 'images')
 
+
     def run_start(self):
         self.set_interval(5E9)
         self.setup_data_dirs()
 
-    def setup_data_dirs(self):
-        if not os.path.isdir(self.data_dir):
-            os.mkdir(self.data_dir)
 
-        if not os.path.isdir(self.image_dir):
-            os.mkdir(self.image_dir)
+    def setup_data_dirs(self):
+        os.makedirs(self.image_dir, exist_ok=True)
+
 
     def setup_camera(self):
         if self.camera is None:
@@ -51,7 +50,6 @@ class Camera(Service):
         if self.camera:
             self.camera.release()
         self.camera = None
-        self.video = None
 
     def run_loop(self):
         self.setup_camera()
@@ -70,7 +68,7 @@ class Camera(Service):
         return current_time >= self.sunrise and current_time <= self.sunset
 
     def capture_image(self):
-        if self.camera and self.video:
+        if self.camera:
             ret, frame = self.camera.read()
             if ret is True and frame is not None:
                 file_name = f'{now_ms()}.png'
