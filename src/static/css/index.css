@@ -23,6 +23,8 @@ html, body {
 
 body {
   padding: 0px var(--space) 0px var(--space);
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 body > h1 {

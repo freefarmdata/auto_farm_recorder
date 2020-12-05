@@ -9,12 +9,12 @@ async function getLatestImage() {
 }
 
 async function pollData() {
-  await Promise.all([this.getServiceStatus()])
+  await Promise.all([this.getServiceStatus(), this.getLatestImage()])
     .catch(console.log);
 }
 
 async function startPolling() {
-  setInterval(this.pollData, 3000);
+  setInterval(this.pollData, 5000);
 }
 
 function ViewModel() {
