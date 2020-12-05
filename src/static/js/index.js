@@ -4,7 +4,7 @@ async function getServiceStatus() {
 }
 
 async function getLatestImage() {
-  const data = await $.getJSON('/api/latest_image');
+  const data = await $.get('/api/latest_image');
   this.latestImage(`data:image/png;base64,${data}`);
 }
 
@@ -22,6 +22,7 @@ function ViewModel() {
   this.latestImage = ko.observable("");
 
   this.getServiceStatus = getServiceStatus.bind(this);
+  this.getLatestImage = getLatestImage.bind(this);
   this.pollData = pollData.bind(this);
   this.startPolling = startPolling.bind(this);
 
