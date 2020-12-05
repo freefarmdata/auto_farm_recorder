@@ -53,6 +53,14 @@ class Video(Service):
         video_path = os.path.join(self.video_dir, f"{video_name}.avi")
         timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
 
+        if os.path.isfile(video_path):
+            logger.info(f'{video_path} already exists. Removing...')
+            os.remove(video_path)
+        
+        if os.path.isfile(timestamp_path):
+            logger.info(f'{timestamp_path} already exists. Removing...')
+            os.remove(timestamp_path)
+
         encoder = cv2.VideoWriter_fourcc(*'FFV1')
         writer = cv2.VideoWriter(video_path, encoder, 1, self.resolution)
         timestamps = []

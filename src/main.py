@@ -1,5 +1,6 @@
 import time
 import sys
+import datetime
 import signal
 import state
 import api
@@ -18,8 +19,22 @@ if __name__ == "__main__":
   time.sleep(20)
 
   logger.setup_logger()
-  # database.initialize()
+  database.initialize()
   state.start_services()
   api.start()
+
+  sunrise = datetime.time(6, 0, 0, 0)
+  sunset = datetime.time(18, 0, 0, 0)
+  resolution = (1920, 1080)
+  camera_interval = 30E9
+
+  state.set_on_service('camera', 'sunrise', sunrise)
+  state.set_on_service('camera', 'sunset', sunset)
+  state.set_on_service('camera', 'resolution', resolution)
+  state.set_on_service('camera', '_interval', camera_interval)
+  state.set_on_service('video', 'sunrise', sunrise)
+  state.set_on_service('video', 'sunset', sunset)
+  state.set_on_service('video', 'resolution', resolution)
+
   while True:
     time.sleep(100)

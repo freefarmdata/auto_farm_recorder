@@ -46,3 +46,7 @@ def stop_services():
       while not services[service_name]['instance'].is_stopped():
         time.sleep(0.01)
     services[service_name]['instance'] = None
+
+def set_on_service(service_name, key, value):
+  if service_name in services and services[service_name]['instance'] is not None:
+    services[service_name]['instance'][key] = value
