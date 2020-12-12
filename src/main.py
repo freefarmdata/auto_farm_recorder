@@ -21,8 +21,6 @@ if __name__ == "__main__":
   logger.setup_logger()
   database.initialize()
   state.init_services()
-  state.start_services()
-  api.start()
 
   upload_path = 'datasets/auto_farm/experiment_hawaii_2021/images/'
   sunrise = datetime.time(6, 0, 0, 0)
@@ -38,6 +36,9 @@ if __name__ == "__main__":
   state.set_on_service('video', 'sunset', sunset)
   state.set_on_service('video', 'resolution', resolution)
   state.set_on_service('uploader', 'upload_path', upload_path)
+
+  state.start_services()
+  api.start()
 
   while True:
     time.sleep(100)
