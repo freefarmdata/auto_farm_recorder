@@ -28,7 +28,7 @@ class Uploader(Service):
 
 
     def run_start(self):
-        self.set_interval(300E9)
+        self.set_interval(10E9)
         self.setup_data_dirs()
 
 
@@ -69,6 +69,7 @@ class Uploader(Service):
                 Key=object_key,
                 Filename=file_path
             )
+            logger.info(f'Successfully uploaded {file_path} to {object_key}')
             return True
         except Exception as e:
             logger.error(f'Failed to upload file {e}')

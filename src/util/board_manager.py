@@ -56,6 +56,7 @@ class BoardManager():
         devs = [os.path.join('/dev', d) for d in os.listdir('/dev')]
         devs = list(filter(lambda d: re.search('ttyUSB', d), devs))
         devices = []
+        logger.info(f'usb devices found: {devs}')
         for dev_path in devs:
             messages = self.test_read_retry(dev_path, retry=3)
             if messages and len(messages) > 0:
@@ -77,7 +78,7 @@ class BoardManager():
             messages = self.test_read(dev_path)
             if len(messages) > 0:
                 return messages
-            time.sleep(1000)
+            time.sleep(1)
     
     def test_read(self, dev_path):
         messages = []
@@ -85,6 +86,7 @@ class BoardManager():
         try:
             board = serial.Serial(dev_path, baudrate=9600, timeout=2)
             output = board.read(1000).decode("utf-8")
+            logger.info(f'usb device {dev_path} read {output}')
             splits = list(map(lambda l: l.strip(), output.split('\n')))
             for line in splits:
                 try:
