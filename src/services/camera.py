@@ -3,7 +3,7 @@ import os
 import datetime
 import time
 import logging
-from service import Service
+from util.service import Service
 
 logger = logging.getLogger(__name__)
 

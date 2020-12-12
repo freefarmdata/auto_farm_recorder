@@ -4,7 +4,7 @@ import json
 import datetime
 import time
 import logging
-from service import Service
+from util.service import Service
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,7 @@ class Video(Service):
         self.sunset = datetime.time(18, 0, 0, 0)
         self.data_dir = '/etc/recorder'
         self.image_dir = os.path.join(self.data_dir, 'images')
+        self.temp_dir = os.path.join(self.data_dir, 'temp')
         self.video_dir = os.path.join(self.data_dir, 'videos')
 
 
@@ -29,6 +30,7 @@ class Video(Service):
     def setup_data_dirs(self):
         os.makedirs(self.image_dir, exist_ok=True)
         os.makedirs(self.video_dir, exist_ok=True)
+        os.makedirs(self.temp_dir, exist_ok=True)
 
 
     def run_loop(self):
@@ -50,16 +52,16 @@ class Video(Service):
         last_time = int(images[-1].split('.')[0])
 
         video_name = f'{first_time}_{last_time}_{len(images)}'
-        video_path = os.path.join(self.video_dir, f"{video_name}.avi")
-        timestamp_path = os.path.join(self.video_dir, f"{video_name}.json")
+        video_path = os.path.join(self.temp_dir, f"{video_name}.avi")
+        times_path = os.path.join(self.temp_dir, f"{video_name}.json")
 
         if os.path.isfile(video_path):
             logger.info(f'{video_path} already exists. Removing...')
             os.remove(video_path)
         
-        if os.path.isfile(timestamp_path):
-            logger.info(f'{timestamp_path} already exists. Removing...')
-            os.remove(timestamp_path)
+        if os.path.isfile(times_path):
+            logger.info(f'{times_path} already exists. Removing...')
+            os.remove(times_path)
 
         encoder = cv2.VideoWriter_fourcc(*'FFV1')
         writer = cv2.VideoWriter(video_path, encoder, 1, self.resolution)
@@ -79,8 +81,8 @@ class Video(Service):
             writer.write(frame)
         writer.release()
 
-        logger.info(f'Creating json timestamps for {timestamp_path}')
-        with open(timestamp_path, 'w') as f:
+        logger.info(f'Creating json timestamps for {times_path}')
+        with open(times_path, 'w') as f:
             json.dump(timestamps, f)
 
         logger.info(f'Removing {len(images)} images')
@@ -88,4 +90,9 @@ class Video(Service):
             image_path = os.path.join(self.image_dir, image)
             if os.path.isfile(image_path):
                 os.remove(image_path)
+
+        new_video_path = os.path.join(self.video_dir, f"{video_name}.avi")
+        new_times_path = os.path.join(self.video_dir, f"{video_name}.json")
+        os.rename(video_path, new_video_path)
+        os.rename(times_path, new_times_path)
 

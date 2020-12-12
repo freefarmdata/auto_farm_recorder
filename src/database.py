@@ -17,6 +17,7 @@ def initialize():
       '''
       CREATE TABLE IF NOT EXISTS soil (
         id SERIAL PRIMARY KEY,
+        board_id INT NOT NULL,
         sensor INT NOT NULL,
         value INT NOT NULL,
         timestamp TIMESTAMP NOT NULL
@@ -27,6 +28,7 @@ def initialize():
       '''
       CREATE TABLE IF NOT EXISTS temp (
         id SERIAL PRIMARY KEY,
+        board_id INT NOT NULL,
         sensor INT NOT NULL,
         value REAL NOT NULL,
         timestamp TIMESTAMP NOT NULL
@@ -37,6 +39,7 @@ def initialize():
       '''
       CREATE TABLE IF NOT EXISTS light (
         id SERIAL PRIMARY KEY,
+        board_id INT NOT NULL,
         sensor INT NOT NULL,
         value REAL NOT NULL,
         timestamp TIMESTAMP NOT NULL
@@ -47,6 +50,7 @@ def initialize():
       '''
       CREATE TABLE IF NOT EXISTS pressure (
         id SERIAL PRIMARY KEY,
+        board_id INT NOT NULL,
         sensor INT NOT NULL,
         value REAL NOT NULL,
         timestamp TIMESTAMP NOT NULL
@@ -60,7 +64,7 @@ def insert_timeseries(table, readings):
     cursor = connection.cursor()
     for reading in readings:
       cursor.execute(
-        "INSERT INTO %s (sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (table, reading.get('pin'), reading.get('value'), datetime.datetime.utcnow())
+        "INSERT INTO %s (board_id, sensor, value, timestamp) VALUES (%s, %s, %s)",
+        (table, reading['board_id'], reading['sensor'], reading['value'], datetime.datetime.utcnow())
       )
     connection.commit()
