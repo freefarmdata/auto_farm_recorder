@@ -17,7 +17,7 @@ class Board():
     def read(self):
         messages = []
         self.reconnect()
-        try
+        try:
             if self.serial:
                 output = self.serial.read(1000).decode("utf-8")
                 output = list(map(lambda l: l.strip(), output.split('\n')))
@@ -59,8 +59,12 @@ class BoardManager():
             messages = self.test_read_retry(dev_path, retry=3)
             if messages and len(messages) > 0:
                 if 'id' in messages[0]:
+                    logger.info(f"Board at {dev_path} with id {messages[0]['id']} detected!")
                     devices.append(Board(messages[0]['id'], dev_path))
         self.boards = devices
+
+        if len(self.boards) <= 0:
+            logger.error('No auto farm boards detected!')
 
     def reset(self):
         for board in self.boards:

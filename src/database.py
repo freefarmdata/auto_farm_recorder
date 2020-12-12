@@ -10,6 +10,17 @@ def get_connection():
     port="5432"
   )
 
+
+def reset():
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute('DROP TABLE soil;')
+    cursor.execute('DROP TABLE temp;')
+    cursor.execute('DROP TABLE light;')
+    cursor.execute('DROP TABLE pressure;')
+    connection.commit()
+
+
 def initialize():
   with get_connection() as connection:
     cursor = connection.cursor()
@@ -58,6 +69,7 @@ def initialize():
       '''
     )
     connection.commit()
+
 
 def insert_timeseries(table, readings):
   with get_connection() as connection:

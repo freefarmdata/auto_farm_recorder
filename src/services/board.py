@@ -17,10 +17,13 @@ class Board(Service):
 
   def run_start(self):
     self.set_interval(1E9)
-    self.board_manager.detect()
 
 
   def run_loop(self):
+    if len(self.board_manager.boards) <= 0:
+      self.board_manager.detect()
+      return
+
     messages = self.board_manager.read()
     self.save_sensor_data(messages)
 
