@@ -37,8 +37,6 @@ if __name__ == "__main__":
   state.set_on_service('video', 'sunrise', sunrise)
   state.set_on_service('video', 'sunset', sunset)
   state.set_on_service('video', 'resolution', resolution)
-  state.set_on_service('uploader', 'sunrise', sunrise)
-  state.set_on_service('uploader', 'sunset', sunset)
   state.set_on_service('uploader', 'upload_path', upload_path)
 
   while True:

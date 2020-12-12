@@ -16,8 +16,6 @@ class Uploader(Service):
 
     def __init__(self):
         super().__init__()
-        self.sunrise = datetime.time(6, 0, 0, 0)
-        self.sunset = datetime.time(18, 0, 0, 0)
         self.data_dir = '/etc/recorder'
         self.video_dir = os.path.join(self.data_dir, 'videos')
         self.bucket_name = 'jam-general-storage'
@@ -44,11 +42,6 @@ class Uploader(Service):
     def setup_data_dirs(self):
         os.makedirs(self.image_dir, exist_ok=True)
         os.makedirs(self.video_dir, exist_ok=True)
-
-
-    def is_daytime(self):
-        current_time = datetime.datetime.now().time()
-        return current_time >= self.sunrise and current_time <= self.sunset
 
 
     def get_finished_files(self):
