@@ -72,8 +72,8 @@ def stop_service(service_name):
 
 def set_on_service(service_name, key, value):
   if service_name in services and services[service_name]['instance'] is not None:
-    services[service_name]['instance'][key] = value
+    setattr(services[service_name]['instance'], key, value)
 
 def get_on_service(service_name, key):
   if service_name in services and services[service_name]['instance'] is not None:
-    return services[service_name]['instance'][key]
+    return getattr(services[service_name]['instance'], key)
