@@ -40,7 +40,6 @@ class Uploader(Service):
 
 
     def setup_data_dirs(self):
-        os.makedirs(self.image_dir, exist_ok=True)
         os.makedirs(self.video_dir, exist_ok=True)
 
 
