@@ -78,15 +78,15 @@ class BoardManager():
             messages = self.test_read(dev_path)
             if len(messages) > 0:
                 return messages
-            time.sleep(1)
     
     def test_read(self, dev_path):
         messages = []
         board = None
         try:
             board = serial.Serial(dev_path, baudrate=9600, timeout=2)
+            time.sleep(3)
             output = board.read(1000).decode("utf-8")
-            logger.info(f'usb device {dev_path} read {output}')
+            logger.info(f'usb device {dev_path} read "{output}"')
             splits = list(map(lambda l: l.strip(), output.split('\n')))
             for line in splits:
                 try:
@@ -106,5 +106,3 @@ class BoardManager():
         for board in self.boards:
             messages += board.read()
         return messages
-
-        

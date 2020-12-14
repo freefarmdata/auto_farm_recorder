@@ -36,7 +36,7 @@ class Video(Service):
     def run_loop(self):
         if not self.is_daytime():
             images = os.listdir(self.image_dir)
-            if len(images) >= 0:
+            if len(images) > 0:
                 self.make_video(images)
 
 

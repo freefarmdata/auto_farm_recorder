@@ -74,9 +74,10 @@ def initialize():
 def insert_timeseries(table, readings):
   with get_connection() as connection:
     cursor = connection.cursor()
+    now = datetime.datetime.utcnow()
     for reading in readings:
       cursor.execute(
-        "INSERT INTO %s (board_id, sensor, value, timestamp) VALUES (%s, %s, %s)",
-        (table, reading['board_id'], reading['sensor'], reading['value'], datetime.datetime.utcnow())
+        f"INSERT INTO {table} (board_id, sensor, value, timestamp) VALUES (%s, %s, %s, %s)",
+        (reading['board_id'], reading['sensor'], reading['value'], now)
       )
     connection.commit()
