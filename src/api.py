@@ -1,36 +1,49 @@
 from flask import Flask, redirect, render_template, request, jsonify, send_from_directory
-import base64
-import cv2
 
 import state
 
-latest_image = None
+import controllers.watering as watering_controller
+import controllers.image as image_controller
+
 app = Flask(__name__)
 
+
 def start():
-  app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
+
+
+@app.route('/api/reset/<service_name>', methods=['GET'])
+def reset_service(service_name):
+    state.stop_service(service_name)
+    state.start_service(service_name)
+    return 'OK', 200
 
 
 @app.route('/api/status', methods=['GET'])
 def status():
-  return jsonify(state.get_services_status()), 200
-
-
-def set_latest_image(image):
-  global latest_image
-  _, buffer = cv2.imencode('.png', image)
-  latest_image = str(base64.b64encode(buffer), 'utf-8')
-
-
-@app.route('/api/latest_image', methods=['GET'])
-def image():
-  return latest_image, 200
+    return jsonify(state.get_services_status()), 200
 
 
 @app.route('/', methods=['GET'])
 def index():
-  return render_template('index.html')
-  
+    return render_template('index.html')
 
 
+@app.route('/api/get/latest_image', methods=['GET'])
+def get_latest_image():
+    return image_controller.get_latest_image()
 
+
+@app.route('/api/get/water', methods=['GET'])
+def get_water_time():
+    return watering_controller.get_water_time()
+
+
+@app.route('/api/set/water', methods=['GET'])
+def set_water_time():
+    return watering_controller.set_water_time()
+
+
+@app.route('/api/clear/water', methods=['GET'])
+def clear_water_time():
+    watering_controller.clear_water_time()

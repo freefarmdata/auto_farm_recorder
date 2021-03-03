@@ -18,6 +18,10 @@ class Board(Service):
   def run_start(self):
     self.set_interval(1E9)
 
+  
+  def run_end(self):
+    self.board_manager.reset()
+
 
   def run_loop(self):
     if len(self.board_manager.boards) <= 0:

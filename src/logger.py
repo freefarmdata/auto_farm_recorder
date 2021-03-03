@@ -3,7 +3,7 @@ import logging
 
 def setup_logger():
   logger = logging.getLogger()
-  logger.setLevel(logging.INFO)
+  logger.setLevel(logging.DEBUG)
 
   formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s - %(message)s', datefmt="%Y-%m-%dT%H:%M:%S%z")
   stream_handler = logging.StreamHandler(sys.stdout)

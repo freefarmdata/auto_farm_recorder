@@ -12,12 +12,21 @@ class Service(threading.Thread):
 
     def __init__(self, interval=1E9):
         super().__init__(daemon=True)
+        self.settings = {}
         self._stop_event = threading.Event()
         self._update_event = threading.Event()
         self._interval = interval
         self._stopped = False
         self._has_started = False
 
+    def set_setting(self, key, value):
+        self.settings[key] = value
+
+    def get_setting(self, key):
+        if key in self.settings:
+            return self.settings[key]
+
+        raise Exception(f'Setting {key} not found in service')
 
     def set_interval(self, interval):
         self._interval = interval
@@ -44,8 +53,8 @@ class Service(threading.Thread):
         try:
             self.run_start()
             return True
-        except Exception as e:
-            logger.error(f'Unexpected error in start: {str(e)}')
+        except:
+            logger.exception('Unexpected error in start')
             self._stopped = True
             return False
 
@@ -54,8 +63,8 @@ class Service(threading.Thread):
         try:
             self.run_loop()
             return True
-        except Exception as e:
-            logger.error(f'Unexpected error in loop: {str(e)}')
+        except:
+            logger.exception('Unexpected error in loop')
             return False
 
 
@@ -65,8 +74,8 @@ class Service(threading.Thread):
                 self.run_update()
                 self._update_event.clear()
             return True
-        except Exception as e:
-            logger.error(f'Unexpected error in update: {str(e)}')
+        except:
+            logger.exception('Unexpected error in update')
             return False
 
 
@@ -86,8 +95,8 @@ class Service(threading.Thread):
     def try_end(self):
         try:
             self.run_end()
-        except Exception as e:
-            logger.error(f'Unexpected error in end: {str(e)}')
+        except:
+            logger.exception('Unexpected error in end')
         self._stopped = True
 
 

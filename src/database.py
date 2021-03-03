@@ -1,4 +1,4 @@
-import psycopg2 as postgres
+#import psycopg2 as postgres
 import datetime
 
 def get_connection():
@@ -24,6 +24,15 @@ def reset():
 def initialize():
   with get_connection() as connection:
     cursor = connection.cursor()
+    cursor.execute(
+      '''
+      CREATE TABLE IF NOT EXISTS water (
+        id SERIAL PRIMARY KEY,
+        start TIMESTAMP NOT NULL,
+        end TIMESTAMP NOT NULL
+      );
+      '''
+    )
     cursor.execute(
       '''
       CREATE TABLE IF NOT EXISTS soil (
@@ -67,6 +76,16 @@ def initialize():
         timestamp TIMESTAMP NOT NULL
       );
       '''
+    )
+    connection.commit()
+
+
+def insert_watertime(start, end):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      "INSERT INTO water (start, end) VALUES (%s, %s)",
+      (start, end)
     )
     connection.commit()
 

@@ -15,13 +15,14 @@ class Board():
         self.timeout = 2
         self.serial = None
 
+
     def read(self):
         messages = []
         self.reconnect()
         try:
             if self.serial:
                 output = self.serial.read(1000).decode("utf-8")
-                output = list(map(lambda l: l.strip(), output.split('\n')))
+                output = [l.strip() for l in output.split('\n')]
                 for line in output:
                     try:
                         messages.append(json.loads(line))
@@ -31,7 +32,8 @@ class Board():
             logger.error(f'Failed to read from board {self.path}. Error: {e}')
             self.disconnect()
         return messages
-    
+
+
     def reconnect(self):
         try:
             if self.serial is None:
@@ -39,6 +41,7 @@ class Board():
         except Exception as e:
             logger.error(f'Failed to connect to board: {str(e)}')
             self.disconnect()
+
 
     def disconnect(self):
         if self.serial:
@@ -48,8 +51,10 @@ class Board():
 
 class BoardManager():
 
+
     def __init__(self):
         self.boards = []
+
 
     def detect(self):
         self.reset()
@@ -68,17 +73,20 @@ class BoardManager():
         if len(self.boards) <= 0:
             logger.error('No auto farm boards detected!')
 
+
     def reset(self):
         for board in self.boards:
             board.disconnect()
         self.boards = []
+
 
     def test_read_retry(self, dev_path, retry=1):
         for _ in range(retry):
             messages = self.test_read(dev_path)
             if len(messages) > 0:
                 return messages
-    
+
+
     def test_read(self, dev_path):
         messages = []
         board = None
@@ -100,6 +108,7 @@ class BoardManager():
                 board.close()
 
         return messages
+
 
     def read(self):
         messages = []

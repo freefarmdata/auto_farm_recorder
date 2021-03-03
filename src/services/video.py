@@ -5,6 +5,7 @@ import datetime
 import time
 import logging
 from util.service import Service
+from util.file_util import file_is_being_accessed
 
 logger = logging.getLogger(__name__)
 
@@ -13,86 +14,98 @@ class Video(Service):
 
     def __init__(self):
         super().__init__()
-        self.resolution = (1920, 1080)
-        self.sunrise = datetime.time(6, 0, 0, 0)
-        self.sunset = datetime.time(18, 0, 0, 0)
-        self.data_dir = '/etc/recorder'
-        self.image_dir = os.path.join(self.data_dir, 'images')
-        self.temp_dir = os.path.join(self.data_dir, 'temp')
-        self.video_dir = os.path.join(self.data_dir, 'videos')
-
-
-    def run_start(self):
         self.set_interval(120E9)
-        self.setup_data_dirs()
-
-
-    def setup_data_dirs(self):
-        os.makedirs(self.image_dir, exist_ok=True)
-        os.makedirs(self.video_dir, exist_ok=True)
-        os.makedirs(self.temp_dir, exist_ok=True)
 
 
     def run_loop(self):
         if not self.is_daytime():
-            images = os.listdir(self.image_dir)
-            if len(images) > 0:
+            images = self.get_finished_images()
+            if len(images) > 2:
                 self.make_video(images)
+
+    
+    def get_finished_images(self):
+        image_files = os.listdir( self.get_setting('image_dir'))
+        image_files = list(filter(lambda f: f.endswith('.png'), image_files))
+        image_files = list(filter(lambda f: not file_is_being_accessed(f), image_files))
+        return image_files
 
 
     def is_daytime(self):
+        if self.get_setting('devmode'):
+            return False
         current_time = datetime.datetime.now().time()
-        return current_time >= self.sunrise and current_time <= self.sunset
+        return current_time >= self.get_setting('sunrise') and current_time <= self.set_setting('sunset')
 
 
     def make_video(self, images):
+        # sort the provided images by timestamp
         images = sorted(images, key=lambda f: int(f.split('.')[0]))
 
+        # build the video name from the first and last times
         first_time = int(images[0].split('.')[0])
         last_time = int(images[-1].split('.')[0])
-
+        temp_dir = self.get_setting('temp_dir')
         video_name = f'{first_time}_{last_time}_{len(images)}'
-        video_path = os.path.join(self.temp_dir, f"{video_name}.avi")
-        times_path = os.path.join(self.temp_dir, f"{video_name}.json")
+        temp_video_path = os.path.join(temp_dir, f"{video_name}.avi")
+        temp_times_path = os.path.join(temp_dir, f"{video_name}.json")
 
-        if os.path.isfile(video_path):
-            logger.info(f'{video_path} already exists. Removing...')
-            os.remove(video_path)
+        # remove the video if already exists
+        if os.path.isfile(temp_video_path):
+            logger.info(f'{temp_video_path} already exists. Removing...')
+            os.remove(temp_video_path)
         
-        if os.path.isfile(times_path):
-            logger.info(f'{times_path} already exists. Removing...')
-            os.remove(times_path)
+        # remove the json if already exists
+        if os.path.isfile(temp_times_path):
+            logger.info(f'{temp_times_path} already exists. Removing...')
+            os.remove(temp_times_path)
 
+        # set up the video writer
+        image_dir = self.get_setting('image_dir')
+        resolution = self.get_setting('resolution')
+        if self.get_setting('devmode'):
+            first_image = cv2.imread(os.path.join(image_dir, images[0]), cv2.IMREAD_COLOR)
+            height, width, _ = first_image.shape
+            resolution = (width, height)
+        
         encoder = cv2.VideoWriter_fourcc(*'FFV1')
-        writer = cv2.VideoWriter(video_path, encoder, 1, self.resolution)
+        writer = cv2.VideoWriter(temp_video_path, encoder, 1, resolution)
         timestamps = []
 
-        logger.info(f'Creating video {video_path}')
+        # from all the frames listed and sorted, create the video
+        logger.info(f'Creating video {temp_video_path}')
         for image in images:
             image_time = int(image.split('.')[0])
-            image_path = os.path.join(self.image_dir, image)
-            frame = cv2.imread(image_path)
+            image_path = os.path.join(image_dir, image)
+            frame = cv2.imread(image_path, cv2.IMREAD_COLOR)
 
             if frame is None:
                 logger.error(f'Cannot write {image_path} to video')
                 continue
 
+            logger.debug(f'Writing {image_path} to {temp_video_path}')
+            logger.debug(f'{image_path} shape: {frame.shape}')
+
             timestamps.append(image_time)
             writer.write(frame)
         writer.release()
 
-        logger.info(f'Creating json timestamps for {times_path}')
-        with open(times_path, 'w') as f:
+        # dump the timestamps to a json file
+        logger.info(f'Creating json timestamps for {temp_times_path}')
+        with open(temp_times_path, 'w') as f:
             json.dump(timestamps, f)
 
+        # move temp video and json to video directory to be uploaded
+        video_dir = self.get_setting('video_dir')
+        new_video_path = os.path.join(video_dir, f"{video_name}.avi")
+        new_times_path = os.path.join(video_dir, f"{video_name}.json")
+        os.rename(temp_video_path, new_video_path)
+        os.rename(temp_times_path, new_times_path)
+
+        # if all that is successful, remove images
         logger.info(f'Removing {len(images)} images')
         for image in images:
-            image_path = os.path.join(self.image_dir, image)
+            image_path = os.path.join(image_dir, image)
             if os.path.isfile(image_path):
                 os.remove(image_path)
-
-        new_video_path = os.path.join(self.video_dir, f"{video_name}.avi")
-        new_times_path = os.path.join(self.video_dir, f"{video_name}.json")
-        os.rename(video_path, new_video_path)
-        os.rename(times_path, new_times_path)
 

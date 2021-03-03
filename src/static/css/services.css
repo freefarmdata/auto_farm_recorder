@@ -1,5 +1,5 @@
 .services {
-  padding: 0px var(--space) 0px var(--space);
+  padding: 0px var(--space) var(--space) var(--space);
   background-color: blueviolet;
   border-radius: var(--bradius);
 }

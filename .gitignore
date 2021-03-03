@@ -3,4 +3,5 @@ __pycache__
 database.db
 grafana
 postgres
+bin/recorder
 .DS_Store
