@@ -100,3 +100,75 @@ def insert_timeseries(table, readings):
         (reading['board_id'], reading['sensor'], reading['value'], now)
       )
     connection.commit()
+
+
+def series_dict(tupl):
+  if tupl:
+    id, board_id, sensor, value, timestamp = tupl
+    return {
+      'id': id,
+      'board_id': board_id,
+      'sensor': sensor,
+      'value': value,
+      'timestamp': timestamp,
+    }
+
+
+def water_dict(tupl):
+  if tupl:
+    id, start, end = tupl
+    return {
+      'id': id,
+      'start': start,
+      'end': end,
+    }
+
+
+def query_latest_watering(amount=1):
+  records = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      f"SELECT * FROM watering ORDER BY end LIMIT %s",
+      (amount)
+    )
+    records = cursor.fetchall()
+    records = [water_dict(r) for r in records]
+  return records
+
+
+def query_for_first_soil():
+  record = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      f"SELECT * FROM soil ORDER BY timestamp LIMIT 1"
+    )
+    record = series_dict(cursor.fetchone())
+  return record
+
+
+def query_for_latest_soil(amount=1):
+  records = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      f"SELECT * FROM soil ORDER BY timestamp LIMIT %s",
+      (amount)
+    )
+    records = cursor.fetchall()
+    records = [series_dict(r) for r in records]
+  return records
+
+
+def query_for_soil(start_time, end_time):
+  records = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      f"SELECT * FROM soil WHERE timestamp BETWEEN %s AND %s",
+      (start_time, end_time)
+    )
+    records = cursor.fetchall()
+    records = [series_dict(r) for r in records]
+  return records

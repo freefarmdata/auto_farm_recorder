@@ -12,21 +12,13 @@ class Service(threading.Thread):
 
     def __init__(self, interval=1E9):
         super().__init__(daemon=True)
-        self.settings = {}
         self._stop_event = threading.Event()
         self._update_event = threading.Event()
+        self._update_message = None
         self._interval = interval
         self._stopped = False
         self._has_started = False
 
-    def set_setting(self, key, value):
-        self.settings[key] = value
-
-    def get_setting(self, key):
-        if key in self.settings:
-            return self.settings[key]
-
-        raise Exception(f'Setting {key} not found in service')
 
     def set_interval(self, interval):
         self._interval = interval
@@ -71,12 +63,14 @@ class Service(threading.Thread):
     def try_update(self):
         try:
             if self._update_event.is_set():
-                self.run_update()
+                self.run_update(self._update_message)
                 self._update_event.clear()
             return True
         except:
             logger.exception('Unexpected error in update')
             return False
+        finally:
+            self._update_message = None
 
 
     def try_sleep(self, start):
@@ -114,8 +108,9 @@ class Service(threading.Thread):
         self.try_end()
 
 
-    def update(self):
+    def update(self, message):
         self._update_event.set()
+        self._update_message = message
 
 
     def stop(self):

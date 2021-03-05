@@ -33,30 +33,35 @@ if __name__ == "__main__":
   image_directory = os.path.join(data_directory, 'images')
   video_directory = os.path.join(data_directory, 'videos')
   temp_directory = os.path.join(data_directory, 'temp')
+  model_directory = os.path.join(data_directory, 'model')
 
   bucket_name = 'jam-general-storage'
   upload_path = 'datasets/auto_farm/experiment_hawaii_2021/images/'
   sunrise = datetime.time(6, 0, 0, 0)
   sunset = datetime.time(18, 0, 0, 0)
   resolution = (1920, 1080)
+  soil_threshold = 500
   camera_interval = 30E9
 
   os.makedirs(data_directory, exist_ok=True)
   os.makedirs(image_directory, exist_ok=True)
   os.makedirs(video_directory, exist_ok=True)
   os.makedirs(temp_directory, exist_ok=True)
+  os.makedirs(model_directory, exist_ok=True)
 
-  state.set_all_setting('sunrise', sunrise)
-  state.set_all_setting('sunset', sunset)
-  state.set_all_setting('devmode', args.get('local'))
-  state.set_all_setting('image_dir', image_directory)
-  state.set_all_setting('video_dir', video_directory)
-  state.set_all_setting('temp_dir', temp_directory)
+  state.set_global_setting('sunrise', sunrise)
+  state.set_global_setting('sunset', sunset)
+  state.set_global_setting('devmode', args.get('local'))
+  state.set_global_setting('image_dir', image_directory)
+  state.set_global_setting('video_dir', video_directory)
+  state.set_global_setting('temp_dir', temp_directory)
+  state.set_global_setting('model_dir', model_directory)
 
   state.set_service_setting('camera', 'resolution', resolution)
   state.set_service_setting('video', 'resolution', resolution)
   state.set_service_setting('uploader', 'upload_path', upload_path)
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
+  state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
 
   state.start_services()
   api.start()

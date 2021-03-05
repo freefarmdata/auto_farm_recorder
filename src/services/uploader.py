@@ -34,7 +34,7 @@ class Uploader(Service):
 
 
     def get_finished_videos(self):
-        video_dir = self.get_setting('video_dir')
+        video_dir = state.get_global_setting('video_dir')
         video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir)]
         video_files = list(filter(lambda f: f.endswith('.json') or f.endswith('.avi'), video_files))
         video_files = list(filter(lambda f: not file_is_being_accessed(f), video_files))
@@ -42,15 +42,15 @@ class Uploader(Service):
 
 
     def upload(self, file_path):
-        bucket_name = self.get_setting('bucket_name')
-        upload_path = self.get_setting('upload_path')
+        bucket_name = state.get_service_setting('uploader', 'bucket_name')
+        upload_path = state.get_service_setting('uploader', 'upload_path')
         file_name = os.path.basename(file_path)
         object_key = os.path.join(upload_path, file_name)
 
         try:
             logger.info(f'Uploading {file_path} to {object_key}')
 
-            if not self.get_setting('devmode'):
+            if not state.get_global_setting('devmode'):
                 self.s3_client.upload_file(
                     Bucket=bucket_name,
                     Config=self.s3_config,

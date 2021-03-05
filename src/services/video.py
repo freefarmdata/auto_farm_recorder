@@ -4,6 +4,8 @@ import json
 import datetime
 import time
 import logging
+
+import state
 from util.service import Service
 from util.file_util import file_is_being_accessed
 
@@ -18,24 +20,24 @@ class Video(Service):
 
 
     def run_loop(self):
-        if not self.is_daytime():
+        if state.get_global_setting('devmode') or not self.is_daytime():
             images = self.get_finished_images()
             if len(images) > 2:
                 self.make_video(images)
 
     
     def get_finished_images(self):
-        image_files = os.listdir( self.get_setting('image_dir'))
+        image_files = os.listdir(state.get_global_setting('image_dir'))
         image_files = list(filter(lambda f: f.endswith('.png'), image_files))
         image_files = list(filter(lambda f: not file_is_being_accessed(f), image_files))
         return image_files
 
 
     def is_daytime(self):
-        if self.get_setting('devmode'):
-            return False
         current_time = datetime.datetime.now().time()
-        return current_time >= self.get_setting('sunrise') and current_time <= self.set_setting('sunset')
+        later = current_time >= state.get_global_setting('sunrise')
+        early = current_time <= state.get_global_setting('sunset')
+        return later and early
 
 
     def make_video(self, images):
@@ -45,7 +47,7 @@ class Video(Service):
         # build the video name from the first and last times
         first_time = int(images[0].split('.')[0])
         last_time = int(images[-1].split('.')[0])
-        temp_dir = self.get_setting('temp_dir')
+        temp_dir = state.get_global_setting('temp_dir')
         video_name = f'{first_time}_{last_time}_{len(images)}'
         temp_video_path = os.path.join(temp_dir, f"{video_name}.avi")
         temp_times_path = os.path.join(temp_dir, f"{video_name}.json")
@@ -61,9 +63,9 @@ class Video(Service):
             os.remove(temp_times_path)
 
         # set up the video writer
-        image_dir = self.get_setting('image_dir')
-        resolution = self.get_setting('resolution')
-        if self.get_setting('devmode'):
+        image_dir = state.get_global_setting('image_dir')
+        resolution = state.get_service_setting('camera', 'resolution')
+        if state.get_global_setting('devmode'):
             first_image = cv2.imread(os.path.join(image_dir, images[0]), cv2.IMREAD_COLOR)
             height, width, _ = first_image.shape
             resolution = (width, height)
@@ -96,7 +98,7 @@ class Video(Service):
             json.dump(timestamps, f)
 
         # move temp video and json to video directory to be uploaded
-        video_dir = self.get_setting('video_dir')
+        video_dir = state.get_global_setting('video_dir')
         new_video_path = os.path.join(video_dir, f"{video_name}.avi")
         new_times_path = os.path.join(video_dir, f"{video_name}.json")
         os.rename(temp_video_path, new_video_path)

@@ -4,6 +4,7 @@ import datetime
 import time
 import logging
 
+import state
 from util.service import Service
 import controllers.image as image_controller
 
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Camera(Service):
+
 
     def __init__(self):
         super().__init__()
@@ -21,7 +23,7 @@ class Camera(Service):
     def run_loop(self):
         self.setup_camera()
 
-        if not self.is_daytime():
+        if not state.get_global_setting('devmode') and not self.is_daytime():
             return
 
         try:
@@ -45,7 +47,7 @@ class Camera(Service):
                 self.camera = None
                 return
 
-            resolution = self.get_setting('resolution')
+            resolution = state.get_service_setting('camera', 'resolution')
             self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, resolution[0])
             self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution[1])
 
@@ -57,10 +59,10 @@ class Camera(Service):
 
 
     def is_daytime(self):
-        if self.get_setting('devmode'):
-            return True
         current_time = datetime.datetime.now().time()
-        return current_time >= self.get_setting('sunrise') and current_time <= self.set_setting('sunset')
+        later = current_time >= state.get_global_setting('sunrise')
+        early = current_time <= state.get_global_setting('sunset')
+        return later and early
 
 
     def capture_image(self):
@@ -68,7 +70,7 @@ class Camera(Service):
             ret, frame = self.camera.read()
             if ret is True and frame is not None:
                 file_name = f'{int(time.time() * 1e3)}.png'
-                file_path = os.path.join(self.get_setting('image_dir'), file_name)
+                file_path = os.path.join(state.get_global_setting('image_dir'), file_name)
                 logger.info(f'Saving {file_path} image')
                 cv2.imwrite(file_path, frame)
                 image_controller.set_latest_image(frame)

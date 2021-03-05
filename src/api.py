@@ -1,15 +1,23 @@
 from flask import Flask, redirect, render_template, request, jsonify, send_from_directory
+from flask_socketio import SocketIO, emit
 
 import state
 
 import controllers.watering as watering_controller
 import controllers.image as image_controller
+import controllers.heartbeat as heart_controller
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 
 def start():
-    app.run(host='0.0.0.0', port=5000)
+    socketio.run(app)
+
+
+@socketio.on('data')
+def fetch_data():
+    emit('data', heart_controller.get_web_data())
 
 
 @app.route('/api/reset/<service_name>', methods=['GET'])
