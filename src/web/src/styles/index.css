@@ -1,0 +1,32 @@
+body {
+  margin: 0;
+  padding: 10px;
+  font-family: sans-serif !important;
+}
+
+h4 {
+  margin: 0;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+.clabel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  font-variant: all-small-caps;
+  border-bottom-left-radius: 5px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.clabel.true {
+  background-color: #66ff66;
+}
+
+.clabel.false {
+  background-color: red;
+}

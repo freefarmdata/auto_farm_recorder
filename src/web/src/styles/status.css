@@ -1,0 +1,40 @@
+.status {
+
+}
+
+.status__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status__tag {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    display: grid;
+    grid-template-columns: auto auto;
+    border: 1px solid #e3e3e3;
+    gap: 5px;
+}
+
+.status__tag__name {
+    font-variant: all-small-caps;
+}
+
+.status__tag__dot {
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #e3e3e3;
+    background-color: #555;
+    align-self: center;
+}
+
+.status__tag__dot.true {
+    background-color: greenyellow;
+}
+
+.status__tag__dot.false {
+    background-color: red;
+}

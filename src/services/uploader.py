@@ -5,6 +5,7 @@ import datetime
 import time
 import logging
 
+import controllers.program as program_controller
 from util.file_util import file_is_being_accessed
 from util.service import Service
 import state
@@ -58,6 +59,10 @@ class Uploader(Service):
                     Filename=file_path
                 )
             logger.info(f'Successfully uploaded {file_path} to {object_key}')
+
+            file_bytes_size = os.stat(file_path).st_size
+            program_controller.increment_info_key('total_bytes_uploaded', file_bytes_size)
+
             return True
         except:
             logger.exception('Failed to upload file')

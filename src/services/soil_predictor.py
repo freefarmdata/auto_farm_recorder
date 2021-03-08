@@ -3,7 +3,7 @@ import os
 
 import controllers.watering as water_controller
 import controllers.soil_predictor as soil_predictor
-import controllers.heartbeat as heart_controller
+import controllers.program as program_controller
 
 from util.service import Service
 from util.time_util import min_to_nano
@@ -36,7 +36,7 @@ class SoilPredictor(Service):
             return
 
         ms_time_left = soil_predictor.predict_on_latest()
-        heart_controller.set_next_water_prediction(ms_time_left)
+        program_controller.set_next_water_prediction(ms_time_left)
 
 
     def train_new_model(self, start_time, end_time):

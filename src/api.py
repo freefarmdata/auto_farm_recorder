@@ -1,23 +1,45 @@
 from flask import Flask, redirect, render_template, request, jsonify, send_from_directory
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit
+import logging
 
 import state
 
 import controllers.watering as watering_controller
 import controllers.image as image_controller
-import controllers.heartbeat as heart_controller
+import controllers.program as program_controller
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3000"}})
+socketio = SocketIO(app, cors_allowed_origins='http://localhost:3000')
+
+logger = logging.getLogger(__name__)
 
 
 def start():
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
 
 
-@socketio.on('data')
-def fetch_data():
-    emit('data', heart_controller.get_web_data())
+@socketio.on('data', namespace='/')
+def fetch_data(message):
+    emit('data', program_controller.get_web_data(), broadcast=True)
+
+
+@socketio.on('toggle_service', namespace='/')
+def toggle_service(message):
+    logger.info(f'toggle service {message}')
+    if message['state']:
+        state.start_service(message['service'])
+    else:
+        state.stop_service(message['service'])
+
+
+@socketio.on('restart_service', namespace='/')
+def restart_service(message):
+    logger.info(f'restart service {message}')
+    state.stop_service(message['service'])
+    state.start_service(message['service'])
+
 
 
 @app.route('/api/reset/<service_name>', methods=['GET'])

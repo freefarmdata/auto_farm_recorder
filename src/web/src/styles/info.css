@@ -1,0 +1,28 @@
+.info {
+
+}
+
+.info__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.info__tag {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    display: grid;
+    grid-template-columns: auto auto;
+    border: 1px solid #e3e3e3;
+    gap: 5px;
+}
+
+.info__tag__name {
+    font-variant: all-small-caps;
+    padding: 5px;
+}
+
+.info__tag__label {
+    background-color: lightblue;
+    padding: 5px;
+}

@@ -5,3 +5,4 @@ grafana
 postgres
 bin/recorder
 .DS_Store
+node_modules

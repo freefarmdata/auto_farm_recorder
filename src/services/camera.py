@@ -6,6 +6,7 @@ import logging
 
 import state
 from util.service import Service
+import controllers.program as program_controller
 import controllers.image as image_controller
 
 logger = logging.getLogger(__name__)
@@ -73,4 +74,5 @@ class Camera(Service):
                 file_path = os.path.join(state.get_global_setting('image_dir'), file_name)
                 logger.info(f'Saving {file_path} image')
                 cv2.imwrite(file_path, frame)
+                program_controller.increment_info_key('total_bytes_taken', os.stat(file_path).st_size) 
                 image_controller.set_latest_image(frame)

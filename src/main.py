@@ -5,6 +5,8 @@ import datetime
 import signal
 import argparse
 
+import controllers.program as program_controller
+
 import state
 import api
 import database
@@ -23,8 +25,6 @@ if __name__ == "__main__":
 
   if args.get('local') is False:
     database.initialize()
-
-  state.init_services()
 
   data_directory = '/etc/recorder' 
   if args.get('local') is True:
@@ -62,6 +62,8 @@ if __name__ == "__main__":
   state.set_service_setting('uploader', 'upload_path', upload_path)
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
   state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
+
+  program_controller.set_info_key('farm_start_time', time.time())
 
   state.start_services()
   api.start()

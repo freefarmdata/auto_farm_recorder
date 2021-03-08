@@ -10,3 +10,4 @@ eventlet==0.30.2
 scikit-learn==0.24.1
 tensorflow-cpu==2.4.1
 pandas==1.2.3
+Flask-Cors==3.0.10
