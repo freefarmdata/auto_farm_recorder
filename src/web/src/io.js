@@ -45,14 +45,26 @@ function toggleService(service, state) {
   socket.emit('toggle_service', { service, state })
 }
 
+function toggleWater(state) {
+  console.log('Toggle Water', state);
+  socket.emit('toggle_water', { state });
+}
+
 function restartService(service) {
   console.log('Restart Service', service);
   socket.emit('restart_service', { service })
+}
+
+function selectModel(name) {
+  console.log('Select Model', name);
+  socket.emit('select_model', { name })
 }
 
 export default {
   start,
   requestData,
   toggleService,
-  restartService
+  restartService,
+  selectModel,
+  toggleWater,
 };

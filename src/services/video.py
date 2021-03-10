@@ -8,6 +8,7 @@ import logging
 import state
 from util.service import Service
 from util.file_util import file_is_being_accessed
+from util.time_util import profile_func
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class Video(Service):
         super().__init__()
         self.set_interval(120E9)
 
-
+    @profile_func(name='video_loop')
     def run_loop(self):
         if state.get_global_setting('devmode') or not self.is_daytime():
             images = self.get_finished_images()

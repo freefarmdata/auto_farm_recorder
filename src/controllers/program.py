@@ -1,6 +1,9 @@
 from flask_socketio import emit
 import threading
-import datetime
+import copy
+from datetime import datetime
+
+import controllers.watering as water_controller
 
 import state
 
@@ -17,8 +20,18 @@ web_data = {
         'total_bytes_uploaded': None,
         'total_bytes_taken': None,
         'disk_space_usage': None,
+        'disk_space_total': None,
+        'disk_space_free': None,
+        'watering_set': None,
+        'soil_models': [
+            {
+                'name': 'harrison ford',
+                'start': datetime.utcnow().ctime(),
+                'end': datetime.utcnow().ctime(),
+                'error': 0.024718
+            }
+        ]
     },
-    'status': None
 }
 
 
@@ -47,5 +60,9 @@ def set_info_key(key, value):
 def get_web_data():
     global web_data
     with _lock:
-        web_data['status'] = state.get_services_status()
-        return web_data
+        web_copy = copy.deepcopy(web_data)
+        web_copy['status'] = state.get_services_status()
+        web_copy['info']['farm_start_time'] = datetime.fromtimestamp(web_copy['info']['farm_start_time']).ctime()
+        web_copy['info']['farm_up_time'] = datetime.fromtimestamp(web_copy['info']['farm_up_time']).ctime()
+        web_copy['info']['watering_set'] = water_controller.get_water_time()['set']
+        return web_copy

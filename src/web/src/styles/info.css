@@ -24,5 +24,7 @@
 
 .info__tag__label {
     background-color: lightblue;
+    font-variant: all-small-caps;
+    font-weight: bold;
     padding: 5px;
 }

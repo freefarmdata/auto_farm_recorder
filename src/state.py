@@ -105,7 +105,7 @@ def stop_service(service_name):
         logger.info(f'Service {service_name} stopped!')
 
 
-def update_serivce(service_name, message):
+def update_service(service_name, message):
   global services
   logger.info(f'Update service {service_name}: {message}')
   with _service_lock:

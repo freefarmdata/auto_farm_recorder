@@ -7,6 +7,7 @@ import logging
 
 import controllers.program as program_controller
 from util.file_util import file_is_being_accessed
+from util.time_util import profile_func
 from util.service import Service
 import state
 
@@ -26,7 +27,7 @@ class Uploader(Service):
             use_threads=True
         )
 
-
+    @profile_func(name='uploader_loop')
     def run_loop(self):
         video_files = self.get_finished_videos()
         if len(video_files) > 0:

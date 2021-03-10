@@ -12,18 +12,6 @@ from sklearn.model_selection import train_test_split
 import database
 import state
 
-time_to_next_watering = None
-
-
-def set_next_prediction(prediction):
-    global time_to_next_watering
-    time_to_next_watering = prediction
-
-
-def get_next_prediction():
-    global time_to_next_watering
-    return time_to_next_watering
-
 
 def get_model_files():
     """
@@ -62,7 +50,6 @@ def get_new_model():
             activation='relu'
         ),
     ])
-
     model.compile(
         loss=keras.losses.MeanSquaredError(),
         optimizer=keras.optimizers.Adam(
@@ -70,6 +57,7 @@ def get_new_model():
         ),
         metrics=['mse']
     )
+    return model
 
 
 def train_new_model(data):

@@ -6,6 +6,7 @@ import logging
 
 import state
 from util.service import Service
+from util.time_util import profile_func
 import controllers.program as program_controller
 import controllers.image as image_controller
 
@@ -20,7 +21,7 @@ class Camera(Service):
         self.set_interval(30E9)
         self.camera = None
 
-
+    @profile_func(name='camera_loop')
     def run_loop(self):
         self.setup_camera()
 

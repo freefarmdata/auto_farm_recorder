@@ -2,8 +2,10 @@ import logging
 import shutil
 import time
 
+import controllers.soil_predictor as soil_controller
 import controllers.program as program_controller
 from util.service import Service
+from util.time_util import profile_func
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,7 @@ class Heartbeat(Service):
         super().__init__()
         self.set_interval(10e9)
 
-
+    @profile_func(name='heartbeat_loop')
     def run_loop(self):
         total, used, free = shutil.disk_usage("/")
 

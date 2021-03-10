@@ -1,9 +1,9 @@
 import base64
-
 import cv2
 
 # the last image that was taken
 latest_image = None
+
 
 def set_latest_image(image):
     global latest_image

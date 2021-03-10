@@ -2,6 +2,7 @@ import serial
 import json
 import database
 import logging
+from util.time_util import profile_func
 from util.service import Service
 from util.board_manager import BoardManager
 
@@ -13,9 +14,6 @@ class Board(Service):
   def __init__(self):
     super().__init__()
     self.board_manager = BoardManager()
-
-
-  def run_start(self):
     self.set_interval(1E9)
 
   
@@ -23,6 +21,7 @@ class Board(Service):
     self.board_manager.reset()
 
 
+  @profile_func(name='board_loop')
   def run_loop(self):
     if len(self.board_manager.boards) <= 0:
       self.board_manager.detect()

@@ -10,8 +10,8 @@ import controllers.image as image_controller
 import controllers.program as program_controller
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3000"}})
-socketio = SocketIO(app, cors_allowed_origins='http://localhost:3000')
+cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3001"}})
+socketio = SocketIO(app, cors_allowed_origins='http://localhost:3001')
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,25 @@ def start():
 @socketio.on('data', namespace='/')
 def fetch_data(message):
     emit('data', program_controller.get_web_data(), broadcast=True)
+
+
+@socketio.on('toggle_water', namespace='/')
+def toggle_water(message):
+    logger.info(f'toggle water {message}')
+    if message['state']:
+        watering_controller.set_water_time()
+    else:
+        watering_controller.clear_water_time()
+
+
+@socketio.on('select_model', namespace='/')
+def select_model(message):
+    logger.info(f'select model {message}')
+    state.update_service('soil_predictor', {
+        'action': 'select',
+        'name': message['name'],
+    })
+    
 
 
 @socketio.on('toggle_service', namespace='/')
@@ -62,18 +81,3 @@ def index():
 @app.route('/api/get/latest_image', methods=['GET'])
 def get_latest_image():
     return image_controller.get_latest_image()
-
-
-@app.route('/api/get/water', methods=['GET'])
-def get_water_time():
-    return watering_controller.get_water_time()
-
-
-@app.route('/api/set/water', methods=['GET'])
-def set_water_time():
-    return watering_controller.set_water_time()
-
-
-@app.route('/api/clear/water', methods=['GET'])
-def clear_water_time():
-    watering_controller.clear_water_time()

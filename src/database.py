@@ -1,4 +1,4 @@
-#import psycopg2 as postgres
+import psycopg2 as postgres
 import datetime
 
 def get_connection():
@@ -130,7 +130,7 @@ def query_latest_watering(amount=1):
     cursor = connection.cursor()
     cursor.execute(
       f"SELECT * FROM watering ORDER BY end LIMIT %s",
-      (amount)
+      (str(amount))
     )
     records = cursor.fetchall()
     records = [water_dict(r) for r in records]
@@ -154,7 +154,7 @@ def query_for_latest_soil(amount=1):
     cursor = connection.cursor()
     cursor.execute(
       f"SELECT * FROM soil ORDER BY timestamp LIMIT %s",
-      (amount)
+      (str(amount))
     )
     records = cursor.fetchall()
     records = [series_dict(r) for r in records]

@@ -2,9 +2,6 @@ import threading
 import logging
 import time
 
-def now_ns():
-    return time.time()*1E9
-
 logger = logging.getLogger(__name__)
 
 class Service(threading.Thread):
@@ -76,11 +73,11 @@ class Service(threading.Thread):
     def try_sleep(self, start):
         # sleep for 10 ms but constantly check if
         # service would like to stop
-        elapsed = now_ns() - start
+        elapsed = time.time_ns() - start
         sleep_time = self._interval - elapsed
         sleep_time = 0 if sleep_time < 0 else sleep_time
-        start_sleep = now_ns()
-        while now_ns() - start_sleep <= sleep_time:
+        start_sleep = time.time_ns()
+        while time.time_ns() - start_sleep <= sleep_time:
             if self._stop_event.is_set():
                 break
             time.sleep(0.01)
@@ -99,7 +96,7 @@ class Service(threading.Thread):
             return
 
         while not self._stop_event.is_set():
-            start = now_ns()
+            start = time.time_ns()
             self.try_loop()
             if self._stop_event.is_set():
                 break

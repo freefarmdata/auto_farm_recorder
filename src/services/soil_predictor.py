@@ -6,7 +6,7 @@ import controllers.soil_predictor as soil_predictor
 import controllers.program as program_controller
 
 from util.service import Service
-from util.time_util import min_to_nano
+from util.time_util import min_to_nano, profile_func
 import state
 import database
 
@@ -24,12 +24,17 @@ class SoilPredictor(Service):
     def run_start(self):
         self.model = soil_predictor.get_latest_model()
 
-
+    @profile_func(name='soil_predictor_update')
     def run_update(self, message):
         if message.get('action') == 'train':
             self.train_new_model(message.get('start_time'), message.get('end_time'))
+            return
 
+        if message.get('action') == 'select':
+            self.select_model(message.get('name'))
+            return
 
+    @profile_func(name='soil_predictor_loop')
     def run_loop(self):
         if not self.model:
             logger.info('No model to test soil moisture with')
@@ -37,6 +42,10 @@ class SoilPredictor(Service):
 
         ms_time_left = soil_predictor.predict_on_latest()
         program_controller.set_next_water_prediction(ms_time_left)
+
+
+    def select_model(self, name):
+        pass
 
 
     def train_new_model(self, start_time, end_time):

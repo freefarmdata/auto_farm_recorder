@@ -75,8 +75,15 @@ class App extends Component {
         <Info info={this.state.data.info} />
         <Actions
           status={this.state.data.status}
+          info={this.state.data.info}
+          selectModel={(name) => {
+            io.selectModel(name);
+          }}
           toggleService={(service, state) => {
             io.toggleService(service, state);
+          }}
+          toggleWater={(state) => {
+            io.toggleWater(state);
           }}
           restartService={(service) => {
             io.restartService(service);

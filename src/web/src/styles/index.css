@@ -8,8 +8,34 @@ h4 {
   margin: 0;
 }
 
+button {
+  background-color: #efefef;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #e3e3e3;
+  outline: none;
+}
+
+button:active {
+  background-color: #aaa;
+  outline: none;
+}
+
 button:hover {
   cursor: pointer;
+}
+
+td, th {
+  border: 1px solid #e3e3e3;
+  text-align: left;
+  padding: 5px;
+}
+
+table {
+  background-color: #fff;
+  border-collapse: collapse;
+  font-variant: all-small-caps;
+  width: 100%;
 }
 
 .clabel {
