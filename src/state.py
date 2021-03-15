@@ -133,4 +133,5 @@ def set_service_setting(service_name, key, value):
 def get_service_setting(service_name, key):
   global services
   if service_name in services:
-    return services[service_name]['settings'][key]
+    if key in services[service_name]['settings']:
+      return services[service_name]['settings'][key]

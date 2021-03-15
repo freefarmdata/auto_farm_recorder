@@ -5,6 +5,7 @@ import io from '../io';
 import Actions from './Actions';
 import Status from './Status';
 import Info from './Info';
+import Graph from './Graph';
 
 class App extends Component {
   constructor(props) {
@@ -73,6 +74,7 @@ class App extends Component {
         {this.renderConnectionLabel()}
         <Status status={this.state.data.status} />
         <Info info={this.state.data.info} />
+        {/* <Graph /> */}
         <Actions
           status={this.state.data.status}
           info={this.state.data.info}

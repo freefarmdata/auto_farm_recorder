@@ -6,6 +6,7 @@ import './styles/index.css';
 import './styles/status.css';
 import './styles/info.css';
 import './styles/actions.css';
+import './styles/graphs.css';
 
 import App from './app/App';
 

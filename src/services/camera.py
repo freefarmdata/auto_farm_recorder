@@ -75,5 +75,8 @@ class Camera(Service):
                 file_path = os.path.join(state.get_global_setting('image_dir'), file_name)
                 logger.info(f'Saving {file_path} image')
                 cv2.imwrite(file_path, frame)
-                program_controller.increment_info_key('total_bytes_taken', os.stat(file_path).st_size) 
+
+                file_mb = os.stat(file_path).st_size * 1E-6
+                program_controller.increment_info_key('total_mb_taken', file_mb) 
+                
                 image_controller.set_latest_image(frame)

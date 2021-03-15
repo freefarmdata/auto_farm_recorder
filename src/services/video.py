@@ -19,11 +19,17 @@ class Video(Service):
         super().__init__()
         self.set_interval(120E9)
 
+    def run_start(self):
+        if state.get_service_setting('video', 'disabled'):
+            logger.info('Video service is disabled. Shutting down.')
+            self.stop()
+
+
     @profile_func(name='video_loop')
     def run_loop(self):
         if state.get_global_setting('devmode') or not self.is_daytime():
-            images = self.get_finished_images()
-            if len(images) > 2:
+            images = self.get_finished_images()[:1000]
+            if len(images) == 1000:
                 self.make_video(images)
 
     

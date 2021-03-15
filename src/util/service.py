@@ -33,7 +33,7 @@ class Service(threading.Thread):
         pass
 
 
-    def run_update(self):
+    def run_update(self, message):
         pass
 
 
@@ -67,6 +67,7 @@ class Service(threading.Thread):
             logger.exception('Unexpected error in update')
             return False
         finally:
+            self._update_event.clear()
             self._update_message = None
 
 
@@ -78,6 +79,7 @@ class Service(threading.Thread):
         sleep_time = 0 if sleep_time < 0 else sleep_time
         start_sleep = time.time_ns()
         while time.time_ns() - start_sleep <= sleep_time:
+            self.try_update()
             if self._stop_event.is_set():
                 break
             time.sleep(0.01)
@@ -98,9 +100,6 @@ class Service(threading.Thread):
         while not self._stop_event.is_set():
             start = time.time_ns()
             self.try_loop()
-            if self._stop_event.is_set():
-                break
-            self.try_update()
             self.try_sleep(start)
         self.try_end()
 

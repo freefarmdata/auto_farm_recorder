@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime, timedelta
 
 import numpy
@@ -12,30 +13,40 @@ from sklearn.model_selection import train_test_split
 import database
 import state
 
+logger = logging.getLogger()
+
 
 def get_model_files():
     """
     Returns a list of all the soil models sorted by the timestamp
-    of the model. Looks for models in the format of:
-    `soil_1234567890_1234567890.tensorflow`
+    of the model. Looks for models in the format of: `soil_name.h5`
     """
     model_dir = state.get_global_setting('model_dir')
     model_files = [os.path.join(model_dir, f) for f in os.listdir(model_dir)]
     model_files = list(filter(lambda f: f.startswith('soil'), model_files))
-    model_files = sorted(model_files, key=lambda f: int(f.split('.')[0].split('_')[-1]))
     return model_files
 
 
-def get_latest_model():
-    model_files = get_model_files()
-    if len(model_files) > 0:
-        return keras.models.load_model(model_files[0])
+def load_best_model():
+    '''
+    Loads the active or lasted model that was trained
+    '''
+    active = database.get_active_model()
+    if len(active) > 0:
+        logger.info(f"Loading active model '{active[0]['name']}'")
+        return load_model_by_name(active[0]['name'])
+
+    models = database.query_for_models()
+    if len(models) > 0:
+        models = sorted(models, key=lambda f: f['end_time'])
+        return load_model_by_name(models[0]['name'])
 
 
 def load_model_by_name(name):
     model_dir = state.get_global_setting('model_dir')
-    model_path = os.path.join(model_dir, name)
-    return keras.models.load_model(model_path)
+    model_path = os.path.join(model_dir, f'soil_{name}')
+    if os.path.exists(model_path):
+        return keras.models.load_model(model_path)
 
 
 def get_new_model():
@@ -90,11 +101,13 @@ def train_new_model(data):
         verbose=0,
     )
 
-    return model
+    error = 1.23456
+
+    return model, error
 
 
 def predict_on_latest(model):
-    now = datetime.utcnow()
+    now = datetime.datetime.now()
     ago = now - timedelta(minutes=5)
     
     latest_soil = database.query_for_soil(ago, now)

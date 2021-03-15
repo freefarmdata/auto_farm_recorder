@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def start():
+    logger.info('Starting API')
     socketio.run(app, host='0.0.0.0', port=5000, debug=False)
 
 
@@ -41,7 +42,6 @@ def select_model(message):
         'action': 'select',
         'name': message['name'],
     })
-    
 
 
 @socketio.on('toggle_service', namespace='/')
@@ -60,8 +60,7 @@ def restart_service(message):
     state.start_service(message['service'])
 
 
-
-@app.route('/api/reset/<service_name>', methods=['GET'])
+@app.route('/api/restart/<service_name>', methods=['GET'])
 def reset_service(service_name):
     state.stop_service(service_name)
     state.start_service(service_name)
@@ -78,6 +77,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/api/get/latest_image', methods=['GET'])
+@app.route('/api/latest_image', methods=['GET'])
 def get_latest_image():
     return image_controller.get_latest_image()

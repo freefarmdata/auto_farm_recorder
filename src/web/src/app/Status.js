@@ -21,7 +21,7 @@ class Status extends Component {
   render() {
     return (
       <div className="status">
-        <h3>Service Status</h3>
+        <h2>Service Status</h2>
         <div className="status__container">
           {this.state.services.map((service, i) => {
             return (

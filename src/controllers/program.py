@@ -17,20 +17,17 @@ web_data = {
         'latest_soil_reading': None,
         'latest_pressure_reading': None,
         'latest_light_reading': None,
-        'total_bytes_uploaded': None,
-        'total_bytes_taken': None,
+        'total_mb_uploaded': None,
+        'total_mb_taken': None,
+        'cpu_usage': None,
+        'memory_usage': None,
         'disk_space_usage': None,
         'disk_space_total': None,
         'disk_space_free': None,
         'watering_set': None,
-        'soil_models': [
-            {
-                'name': 'harrison ford',
-                'start': datetime.utcnow().ctime(),
-                'end': datetime.utcnow().ctime(),
-                'error': 0.024718
-            }
-        ]
+        'watering_start': None,
+        'watering_times': [],
+        'soil_models': []
     },
 }
 
@@ -63,6 +60,4 @@ def get_web_data():
         web_copy = copy.deepcopy(web_data)
         web_copy['status'] = state.get_services_status()
         web_copy['info']['farm_start_time'] = datetime.fromtimestamp(web_copy['info']['farm_start_time']).ctime()
-        web_copy['info']['farm_up_time'] = datetime.fromtimestamp(web_copy['info']['farm_up_time']).ctime()
-        web_copy['info']['watering_set'] = water_controller.get_water_time()['set']
         return web_copy

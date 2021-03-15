@@ -1,0 +1,21 @@
+.graphs__container {
+    content-visibility: auto;
+    background-color: aliceblue;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+}
+
+.graphs__graph {
+    min-height: 400px;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+}
+
+.graphs__options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}

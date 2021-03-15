@@ -5,7 +5,10 @@
 }
 
 .actions__block {
-    padding: 20px;
+    content-visibility: auto;
+    contain-intrinsic-size: 0, 200px;
+    background-color: aliceblue;
+    padding: 10px;
     border-radius: 5px;
     border: 1px solid #e3e3e3;
     align-items: start;
@@ -34,19 +37,37 @@
 }
 
 .actions__block--tservice > span {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 5px;
-    background-color: #efefef;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #e3e3e3;
 }
 
+.actions__block--tservice > span > span {
+    margin-right: 10px;
+}
+
+.actions__block--tservice > span > div > button:first-child {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    color: #66ff66;
+    font-weight: bold;
+}
+
+.actions__block--tservice > span > div > button:last-child {
+    border-left: 0;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    color: red;
+    font-weight: bold;
+}
+
 .actions__block--sservice {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .actions__block--sservice > span {
@@ -66,6 +87,17 @@
 .actions__block--sservice > span > p {
     margin: 0px;
     font-weight: bold;
+}
+
+.actions__block--wservice > .notifier { 
+    margin-left: 10px;
+    font-variant: all-small-caps;
+}
+
+.actions__block--wservice > table {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 @media only screen and (max-width: 1000px) {

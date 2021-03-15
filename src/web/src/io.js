@@ -10,27 +10,31 @@ function start(onConnect, onDisconnect, onData) {
   socket = io(FARM_URL, {
     reconnection: true,
     reconnectionDelay: 1000,
-    reconnectionDelayMax : 5000,
-    reconnectionAttempts: Infinity
+    reconnectionDelayMax: 2000,
+    reconnectionAttempts: Infinity,
+    forceNew: true 
   });
 
   socket.on('connect', onConnect);
 
   socket.on('disconnect', () => {
     onDisconnect();
-    socket.connect();
+    socket.io.reconnect();
   });
 
   socket.on('connect_error', (err) => {
-    socket.disconnect();
+    onDisconnect();
+    socket.io.reconnect();
   });
 
   socket.on('connect_timeout', (err) => {
-    socket.disconnect();
+    onDisconnect();
+    socket.io.reconnect();
   });
 
   socket.on('uncaughtException', (err) => {
-    socket.disconnect();
+    onDisconnect();
+    socket.io.reconnect();
   });
 
   socket.on('data', onData);

@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 
+
+function isDefined(value) {
+  return value !== null && value !== undefined;
+}
+
 class Info extends Component {
   constructor(props) {
     super(props);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.info) {
-      const info = Object.keys(nextProps.info).map((key) => {
-        return { name: key, label: nextProps.info[key] };
-      });
-  
-      this.setState({ info: info });
-    }
   }
 
   renderInfo() {
@@ -24,11 +19,15 @@ class Info extends Component {
 
     return Object.keys(info)
       .map((key, i) => {
-        if (typeof info[key] !== 'object') {
+        if (!Array.isArray(info[key])) {
+
+          let label = isDefined(info[key]) ? info[key] : 'n/a';
+          label = typeof label === 'number' ? label.toFixed(4).toString() : label.toString();
+
           return (
             <span key={i} className="info__tag">
               <span className="info__tag__name">{key}</span>
-              <span className="info__tag__label">{info[key] ? info[key] : 'n/a'}</span>
+              <span className="info__tag__label">{label}</span>
             </span>
           )
         }
@@ -39,7 +38,7 @@ class Info extends Component {
   render() {
     return (
       <div className="info">
-        <h3>Info Status</h3>
+        <h2>Info Status</h2>
         <div className="info__container">
           {this.renderInfo()}
         </div>

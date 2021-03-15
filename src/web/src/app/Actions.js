@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 
 class Actions extends Component {
   constructor(props) {
@@ -37,17 +38,22 @@ class Actions extends Component {
       return (
         <span key={i}>
           <span>{serviceName}</span>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={status[serviceName]}
-              onChange={() => {}}
+          <div>
+            <button
               onClick={(event) => {
-                this.props.toggleService(serviceName, event.target.checked);
+                this.props.toggleService(serviceName, true);
               }}
-            />
-            <span className="slider"></span>
-          </label>
+            >
+              Online
+            </button>
+            <button
+              onClick={(event) => {
+                this.props.toggleService(serviceName, false);
+              }}
+            >
+              Offline
+            </button>
+          </div>
         </span>
       )
     });
@@ -60,18 +66,57 @@ class Actions extends Component {
       return;
     }
 
+    let notifier = null;
+    if (info.watering_set && info.watering_start) {
+      notifier = <span className="notifier">{moment(info.watering_start).fromNow()}</span>
+    }
+
+    let times = null;
+    if (info.watering_times && info.watering_times.length > 0) {
+      times = (
+        <table>
+          <thead>
+            <tr>
+              <th>Start</th>
+              <th>End</th>
+              <th>Elapsed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {info.watering_times.map((time, i) => {
+              const start = moment(time.start_time*1E3);
+              const end = moment(time.end_time*1E3);
+              const dur = moment.duration(end - start);
+
+              return (
+                <tr key={i}>
+                  <td>{start.format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{end.format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
+                  <td>{dur.humanize()}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      );
+    }
+
     return (
-      <label className="switch">
-        <input
-          type="checkbox"
-          checked={info.watering_set}
-          onChange={() => {}}
-          onClick={(event) => {
-            this.props.toggleWater(event.target.checked);
-          }}
-        />
-        <span className="slider"></span>
-      </label>
+      <>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={info.watering_set}
+            onChange={() => {}}
+            onClick={(event) => {
+              this.props.toggleWater(event.target.checked);
+            }}
+          />
+          <span className="slider"></span>
+        </label>
+        {notifier}
+        {times}
+      </>
     );
   }
 
@@ -82,42 +127,51 @@ class Actions extends Component {
       return;
     }
 
-    return info.soil_models.map((model, i) => {
-      return (
-        <span key={i}>
-          <p>{model.name}</p>
+    return (
+      <div className="actions__block">
+      <h4>Select A Soil Model</h4>
+      <div className="actions__block--sservice">
           <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Error</th>
+                <th>Activate</th>
+              </tr>
+            </thead>
             <tbody>
-              <tr>
-                <td>train time start</td>
-                <td>{model.start}</td>
-              </tr>
-              <tr>
-                <td>train time end</td>
-                <td>{model.start}</td>
-              </tr>
-              <tr>
-                <td>mean squared error</td>
-                <td>{model.error}</td>
-              </tr>
+              {info.soil_models.map((model, i) => {
+                return (
+                  <tr key={i} className={model.active.toString()}>
+                    <td>{model.name}</td>
+                    <td>{moment(model.start_time*1E3).format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
+                    <td>{moment(model.end_time*1E3).format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
+                    <td>{model.error}</td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          this.props.selectModel(model.name);
+                        }}
+                      >
+                        Select
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
-          <button
-            onClick={() => {
-              this.props.selectModel(model.name);
-            }}
-          >
-            Select
-          </button>
-        </span>
-      )
-    });
+        </div>
+      </div>
+    );
   }
 
   render() {
     return (
       <div className="actions">
-        <h3>Actions</h3>
+        <h2>Actions</h2>
         <div className="actions__container">
           <div className="actions__block">
             <h4>Restart Service</h4>
@@ -133,16 +187,11 @@ class Actions extends Component {
           </div>
           <div className="actions__block">
             <h4>Toggle Watering Event</h4>
-            <div>
+            <div className="actions__block--wservice">
               {this.renderWater()}
             </div>
           </div>
-          <div className="actions__block">
-            <h4>Select A Soil Model</h4>
-            <div className="actions__block--sservice">
-              {this.renderSelectModel()}
-            </div>
-          </div>
+          {this.renderSelectModel()}
         </div>
       </div>
     );

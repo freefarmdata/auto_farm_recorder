@@ -9,22 +9,22 @@
 }
 
 .info__tag {
+    display: flex;
     border-radius: 5px;
     background-color: #f2f2f2;
-    display: grid;
-    grid-template-columns: auto auto;
+    align-items: center;
     border: 1px solid #e3e3e3;
-    gap: 5px;
 }
 
 .info__tag__name {
     font-variant: all-small-caps;
-    padding: 5px;
+    padding: 2px 4px 2px 4px;
 }
 
 .info__tag__label {
     background-color: lightblue;
     font-variant: all-small-caps;
-    font-weight: bold;
-    padding: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 2px 4px 2px 4px;
 }

@@ -27,6 +27,11 @@ class Uploader(Service):
             use_threads=True
         )
 
+    def run_start(self):
+        if state.get_service_setting('uploader', 'disabled'):
+            logger.info('Uploader service is disabled. Shutting down.')
+            self.stop()
+
     @profile_func(name='uploader_loop')
     def run_loop(self):
         video_files = self.get_finished_videos()
@@ -61,8 +66,8 @@ class Uploader(Service):
                 )
             logger.info(f'Successfully uploaded {file_path} to {object_key}')
 
-            file_bytes_size = os.stat(file_path).st_size
-            program_controller.increment_info_key('total_bytes_uploaded', file_bytes_size)
+            file_bytes_size = os.stat(file_path).st_size * 1E-6
+            program_controller.increment_info_key('total_mb_uploaded', file_bytes_size)
 
             return True
         except:

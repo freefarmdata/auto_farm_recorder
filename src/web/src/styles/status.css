@@ -32,7 +32,7 @@
 }
 
 .status__tag__dot.true {
-    background-color: greenyellow;
+    background-color: #66ff66;
 }
 
 .status__tag__dot.false {

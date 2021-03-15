@@ -31,6 +31,14 @@ td, th {
   padding: 5px;
 }
 
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr.true {
+  background-color: #66ff66;
+}
+
 table {
   background-color: #fff;
   border-collapse: collapse;
@@ -39,7 +47,7 @@ table {
 }
 
 .clabel {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   padding: 5px;
