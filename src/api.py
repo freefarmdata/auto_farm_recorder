@@ -26,6 +26,13 @@ def fetch_data(message):
     emit('data', program_controller.get_web_data(), broadcast=True)
 
 
+@socketio.on('latest_image', namespace='/')
+def latest_image(message):
+    latest_image = image_controller.get_latest_image()
+    if message.get('time') != latest_image['time']:
+        emit('latest_image', latest_image, broadcast=True)
+
+
 @socketio.on('toggle_water', namespace='/')
 def toggle_water(message):
     logger.info(f'toggle water {message}')
@@ -41,6 +48,31 @@ def select_model(message):
     state.update_service('soil_predictor', {
         'action': 'select',
         'name': message['name'],
+    })
+
+
+@socketio.on('predict_model', namespace='/')
+def predict_model(message):
+    logger.info(f'predict model')
+    state.update_service('soil_predictor', { 'action': 'predict' })
+
+
+@socketio.on('delete_model', namespace='/')
+def delete_model(message):
+    logger.info(f'delete model {message}')
+    state.update_service('soil_predictor', {
+        'action': 'delete',
+        'name': message['name']
+    })
+
+
+@socketio.on('train_model', namespace='/')
+def select_model(message):
+    logger.info(f'train model {message}')
+    state.update_service('soil_predictor', {
+        'action': 'train',
+        'start_time': message['startTime'],
+        'end_time': message['endTime']
     })
 
 
@@ -75,8 +107,3 @@ def status():
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
-
-
-@app.route('/api/latest_image', methods=['GET'])
-def get_latest_image():
-    return image_controller.get_latest_image()

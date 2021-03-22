@@ -25,20 +25,10 @@ class Heartbeat(Service):
         super().__init__()
         self.set_interval(3e9)
 
-    def run_start(self):
-        if state.get_global_setting('devmode'):
-            if len(database.query_for_models()) < 5:
-                logger.info('Inserting Fake Model')
-                database.insert_model(
-                    f'demo model {random.randint(0, 100)}',
-                    datetime.datetime.now(),
-                    datetime.datetime.now(),
-                    round(random.random(), 5)
-                )
-        
+    def run_start(self):        
         soil_models = database.query_for_models()
         program_controller.set_info_key('soil_models', soil_models)
-        
+
         watering_times = database.query_for_watering()
         program_controller.set_info_key('watering_times', watering_times)
 

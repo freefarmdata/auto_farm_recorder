@@ -4,7 +4,7 @@ const FARM_URL =  process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:5000/
 
 let socket;
 
-function start(onConnect, onDisconnect, onData) {
+function start(onConnect, onDisconnect, onData, onLatestImage) {
   console.log(`socket connecting to ${FARM_URL}`);
 
   socket = io(FARM_URL, {
@@ -38,6 +38,7 @@ function start(onConnect, onDisconnect, onData) {
   });
 
   socket.on('data', onData);
+  socket.on('latest_image', onLatestImage);
 }
 
 function requestData() {
@@ -64,11 +65,28 @@ function selectModel(name) {
   socket.emit('select_model', { name })
 }
 
+function deleteModel(name) {
+  console.log('Delete Model', name);
+  socket.emit('delete_model', { name })
+}
+
+function trainModel(startTime, endTime) {
+  console.log('Train Model', startTime, endTime);
+  socket.emit('train_model', { startTime, endTime })
+}
+
+function getLatestImage(time) {
+  socket.emit('latest_image', { time })
+}
+
 export default {
   start,
   requestData,
   toggleService,
   restartService,
   selectModel,
+  deleteModel,
   toggleWater,
+  trainModel,
+  getLatestImage,
 };

@@ -10,6 +10,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
+from util.time_util import profile_func
+
 import database
 import state
 
@@ -38,18 +40,18 @@ def load_best_model():
 
     models = database.query_for_models()
     if len(models) > 0:
-        models = sorted(models, key=lambda f: f['end_time'])
+        models = sorted(models, key=lambda f: f['end_time'].timestamp())
         return load_model_by_name(models[0]['name'])
 
 
 def load_model_by_name(name):
     model_dir = state.get_global_setting('model_dir')
-    model_path = os.path.join(model_dir, f'soil_{name}')
+    model_path = os.path.join(model_dir, f'soil_{name}.h5')
     if os.path.exists(model_path):
         return keras.models.load_model(model_path)
 
 
-def get_new_model():
+def get_blank_model():
     model = keras.models.Sequential([
         keras.layers.Dense(
             units=32,
@@ -71,14 +73,16 @@ def get_new_model():
     return model
 
 
+@profile_func(name="train_new_model")
 def train_new_model(data):
-    model = get_new_model()
+    model = get_blank_model()
 
-    data = [[d['value'], d['timestamp']] for d in data]
+    data = [[d['value'], int(d['timestamp']*1E3)] for d in data]
     df = pandas.DataFrame(data, columns=['value', 'timestamp'])
+
     df.timestamp = pandas.to_datetime(df.timestamp, unit='ms')
 
-    df = df.groupby(pd.Grouper(key='timestamp', freq='5min'))['value'].agg('median')
+    df = df.groupby(pandas.Grouper(key='timestamp', freq='5min'))['value'].agg('median')
     df = df.to_frame().reset_index()
     df.timestamp = df.timestamp.astype(numpy.int64) / 1E6
     df = df.dropna()
@@ -90,48 +94,58 @@ def train_new_model(data):
     x = matrix[:, 0].reshape(-1, 1)
     y = matrix[:, 1].reshape(-1, 1)
 
-    x_train, x_val, y_train, y_val = train_test_split(x, y, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=42)
 
-    history = model.fit(
+    model.fit(
         x=x_train,
         y=y_train,
         batch_size=50,
         epochs=30,
-        validation_data=(x_val, y_val),
         verbose=0,
     )
 
-    error = 1.23456
+    y_pred = model.predict(x_test)
+    error = mean_squared_error(y_test, y_pred)
 
     return model, error
 
 
 def predict_on_latest(model):
-    now = datetime.datetime.now()
+
+    # get the last 5 minutes of soil readings
+    now = datetime.now()
     ago = now - timedelta(minutes=5)
-    
     latest_soil = database.query_for_soil(ago, now)
 
+    if len(latest_soil) <= 0:
+        logger.error('No soil data to predict on in last five minutes')
+        return
+
+    # find the median value from those readings
     median_soil = numpy.median([s['value'] for s in latest_soil])
 
-    latest_reading = [median_soil, latest_soil[-1]['timestamp']]
-    next_reading = [state.get_service_setting('soil_predictor', 'threshold'), 0]
+    # the first reading is what the soil moisture is currently at
+    # the second reading is what the soil moisture should be at
+    # when we want to water the plants again
+    soil_threshold = state.get_service_setting('soil_predictor', 'threshold')
+    matrix = [
+        [median_soil, 0],
+        [soil_threshold, 0]
+    ]
 
-    matrix = [latest_reading, next_reading]
-
+    # transform the values, scale between 0 and 1
     scaler = MinMaxScaler((0, 1)).fit()
     matrix = scaler.transform(matrix)
-
     x = matrix[:, 0].reshape(-1, 1)
-    y = matrix[:, 1].reshape(-1, 1)
 
+    # predict on both readings. This will give us the predicted
+    # times for both the start and end
     y_pred = model.predict(x)
 
     # subtract the prediction of the soil now from when the
-    # soil is predicted to be past the threshold
+    # soil is predicted to be past the threshold. Then, transform
+    # it. This should give us the value of when
     time_left = y_pred[1][0] - y_pred[0][0]
-
-    # inverse the transform to get milliseconds left before another watering
     time_left = scaler.inverse_transform([[0, time_left]])[0][-1]
 
     return time_left

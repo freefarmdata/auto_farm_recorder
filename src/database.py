@@ -133,7 +133,7 @@ def series_dict(tupl):
       'board_id': board_id,
       'sensor': sensor,
       'value': value,
-      'timestamp': timestamp,
+      'timestamp': float(timestamp.timestamp()),
     }
 
 
@@ -168,6 +168,7 @@ def query_for_watering():
     records = cursor.fetchall()
     records = [water_dict(r) for r in records]
   return records
+
 
 def query_latest_watering(amount=1):
   records = None
@@ -227,6 +228,16 @@ def query_for_models():
     records = cursor.fetchall()
     records = [model_dict(r) for r in records]
   return records
+
+
+def delete_model(name):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      "DELETE FROM models WHERE name = %s",
+      (name,)
+    )
+    connection.commit()
 
 
 def insert_model(name, start, end, error):

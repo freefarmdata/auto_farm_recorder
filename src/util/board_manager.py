@@ -12,7 +12,7 @@ class Board():
         self.id = id
         self.path = path
         self.baudrate = 9600
-        self.timeout = 2
+        self.timeout = 10
         self.serial = None
 
 

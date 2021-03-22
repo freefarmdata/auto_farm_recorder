@@ -2,8 +2,14 @@ import React, { Component } from 'react';
 import moment from 'moment';
 
 class Actions extends Component {
+
   constructor(props) {
     super(props);
+
+    this.state = {
+      modelTrainStart: '',
+      modelTrainEnd: '',
+    };
   }
 
   renderStatuses() {
@@ -139,6 +145,7 @@ class Actions extends Component {
                 <th>End</th>
                 <th>Error</th>
                 <th>Activate</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -148,7 +155,7 @@ class Actions extends Component {
                     <td>{model.name}</td>
                     <td>{moment(model.start_time*1E3).format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
                     <td>{moment(model.end_time*1E3).format('dddd, MMM Do YYYY, h:mm:ss a')}</td>
-                    <td>{model.error}</td>
+                    <td>{model.error.toFixed(5)}</td>
                     <td>
                       <button
                         onClick={() => {
@@ -158,11 +165,55 @@ class Actions extends Component {
                         Select
                       </button>
                     </td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          this.props.deleteModel(model.name);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+    );
+  }
+
+  renderTrainModel() {
+    return (
+      <div className="actions__block">
+        <h4>Train A Soil Model</h4>
+        <div className="actions__block--tservice">
+          <input
+            type="datetime-local"
+            onChange={(e) => {
+              this.setState({ modelTrainStart: moment(e.target.value) });
+            }}
+          />
+          <input
+            type="datetime-local"
+            onChange={(e) => {
+              this.setState({ modelTrainEnd: moment(e.target.value) });
+            }}
+          />
+          <button
+            onClick={() => {
+              const { modelTrainStart, modelTrainEnd } = this.state;
+              if (modelTrainStart && modelTrainEnd && modelTrainEnd.isAfter(modelTrainStart)) {
+                this.props.onTrainModel(
+                  modelTrainStart.unix(),
+                  modelTrainEnd.unix()
+                );
+              }
+            }}
+          >
+            Train
+          </button>
         </div>
       </div>
     );
@@ -192,6 +243,7 @@ class Actions extends Component {
             </div>
           </div>
           {this.renderSelectModel()}
+          {this.renderTrainModel()}
         </div>
       </div>
     );

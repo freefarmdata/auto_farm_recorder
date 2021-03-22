@@ -8,6 +8,11 @@ h4 {
   margin: 0;
 }
 
+h2 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
 button {
   background-color: #efefef;
   padding: 5px;
@@ -48,6 +53,7 @@ table {
 
 .clabel {
   position: fixed;
+  z-index: 5;
   top: 0;
   right: 0;
   padding: 5px;

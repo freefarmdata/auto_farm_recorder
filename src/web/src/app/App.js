@@ -5,7 +5,7 @@ import io from '../io';
 import Actions from './Actions';
 import Status from './Status';
 import Info from './Info';
-import Graph from './Graph';
+import Image from './Image';
 
 class App extends Component {
   constructor(props) {
@@ -13,27 +13,39 @@ class App extends Component {
 
     this.state = {
       data: {},
+      image: {},
       connected: false,
     };
 
     this.ioInterval = undefined;
     this.onConnect = this.onConnect.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
+    this.onLatestImage = this.onLatestImage.bind(this);
+    this.clearIntervals = this.clearIntervals.bind(this);
     this.onData = this.onData.bind(this);
   }
 
   componentDidMount() {
-    io.start(this.onConnect, this.onDisconnect, this.onData);
+    io.start(
+      this.onConnect,
+      this.onDisconnect,
+      this.onData,
+      this.onLatestImage
+    );
   }
 
   componentWillUnmount() {
-    if (this.ioInterval) {
-      clearInterval(this.ioInterval);
-    }
+    this.clearIntervals();
+  }
+
+  clearIntervals() {
+    clearInterval(this.ioInterval);
+    clearInterval(this.imageInterval);
   }
 
   onConnect() {
     console.log('connected')
+    this.clearIntervals();
     this.setIOInterval();
     this.setState({ connected: true });
   }
@@ -41,19 +53,25 @@ class App extends Component {
   onDisconnect() {
     console.log('disconnected')
     this.setState({ connected: false });
-    if (this.ioInterval) {
-      clearInterval(this.ioInterval);
-    }
+    this.clearIntervals();
   }
 
   setIOInterval() {
     this.ioInterval = setInterval(() => {
       io.requestData();
     }, 1000);
+    this.imageInterval = setInterval(() => {
+      const { image } = this.state;
+      io.getLatestImage(image ? image['time'] : undefined);
+    }, 10000);
   }
 
   onData(data) {
     this.setState({ data });
+  }
+
+  onLatestImage(image) {
+    this.setState({ image });
   }
 
   renderConnectionLabel() {
@@ -74,12 +92,15 @@ class App extends Component {
         {this.renderConnectionLabel()}
         <Status status={this.state.data.status} />
         <Info info={this.state.data.info} />
-        {/* <Graph /> */}
+        <Image image={this.state.image} />
         <Actions
           status={this.state.data.status}
           info={this.state.data.info}
           selectModel={(name) => {
             io.selectModel(name);
+          }}
+          deleteModel={(name) => {
+            io.deleteModel(name);
           }}
           toggleService={(service, state) => {
             io.toggleService(service, state);
@@ -89,6 +110,9 @@ class App extends Component {
           }}
           restartService={(service) => {
             io.restartService(service);
+          }}
+          onTrainModel={(startTime, endTime) => {
+            io.trainModel(startTime, endTime);
           }}
         />
       </div>

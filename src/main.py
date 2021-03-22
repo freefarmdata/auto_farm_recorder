@@ -12,6 +12,8 @@ import api
 import database
 import logger
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--local", action="store_true", default=False)

@@ -25,6 +25,7 @@ class Camera(Service):
     def run_loop(self):
         self.setup_camera()
 
+        # if devmode is not enabled and its not day time, don't take an image
         if not state.get_global_setting('devmode') and not self.is_daytime():
             return
 
@@ -71,7 +72,9 @@ class Camera(Service):
         if self.camera:
             ret, frame = self.camera.read()
             if ret is True and frame is not None:
-                file_name = f'{int(time.time() * 1e3)}.png'
+
+                image_time = int(time.time() * 1e3)
+                file_name = f'{image_time}.png'
                 file_path = os.path.join(state.get_global_setting('image_dir'), file_name)
                 logger.info(f'Saving {file_path} image')
                 cv2.imwrite(file_path, frame)
@@ -79,4 +82,4 @@ class Camera(Service):
                 file_mb = os.stat(file_path).st_size * 1E-6
                 program_controller.increment_info_key('total_mb_taken', file_mb) 
                 
-                image_controller.set_latest_image(frame)
+                image_controller.set_latest_image(frame, image_time)
