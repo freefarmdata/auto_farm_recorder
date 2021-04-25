@@ -2,19 +2,20 @@ import serial
 import json
 import database
 import logging
+
 from util.time_util import profile_func
-from util.service import Service
-from util.board_manager import BoardManager
+from util.tservice import TService
+from controllers.board_manager import BoardManager
 
 logger = logging.getLogger(__name__)
 
-class Board(Service):
+class Board(TService):
 
 
   def __init__(self):
     super().__init__()
     self.board_manager = BoardManager()
-    self.set_interval(1E9)
+    self.set_interval(5E9)
 
   
   def run_end(self):

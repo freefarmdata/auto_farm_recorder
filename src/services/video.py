@@ -6,20 +6,33 @@ import time
 import logging
 
 import state
-from util.service import Service
+from util.tservice import TService
 from util.file_util import file_is_being_accessed
 from util.time_util import profile_func
 
 logger = logging.getLogger(__name__)
 
-class Video(Service):
+def get_daynight_schedule():
+    sunrise = state.get_global_setting('sunrise').split(':')
+    sunset = state.get_global_setting('sunset').split(':')
+
+    sunrise = datetime.time(*[int(n) for n in sunrise])
+    sunset = datetime.time(*[int(n) for n in sunset])
+
+    return sunrise, sunset
+
+class Video(TService):
 
 
     def __init__(self):
         super().__init__()
         self.set_interval(120E9)
+        self.sunrise = None
+        self.sunset = None
+
 
     def run_start(self):
+        self.sunrise, self.sunset = get_daynight_schedule()
         if state.get_service_setting('video', 'disabled'):
             logger.info('Video service is disabled. Shutting down.')
             self.stop()
@@ -42,8 +55,8 @@ class Video(Service):
 
     def is_daytime(self):
         current_time = datetime.datetime.now().time()
-        later = current_time >= state.get_global_setting('sunrise')
-        early = current_time <= state.get_global_setting('sunset')
+        later = current_time >= self.sunrise
+        early = current_time <= self.sunset
         return later and early
 
 

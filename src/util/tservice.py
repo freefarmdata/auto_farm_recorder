@@ -4,7 +4,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
-class Service(threading.Thread):
+class TService(threading.Thread):
 
 
     def __init__(self, interval=1E9):
@@ -74,6 +74,9 @@ class Service(threading.Thread):
     def try_sleep(self, start):
         # sleep for 10 ms but constantly check if
         # service would like to stop
+        if self._interval is None:
+            return
+
         elapsed = time.time_ns() - start
         sleep_time = self._interval - elapsed
         sleep_time = 0 if sleep_time < 0 else sleep_time
@@ -100,6 +103,7 @@ class Service(threading.Thread):
         while not self._stop_event.is_set():
             start = time.time_ns()
             self.try_loop()
+            self.try_update()
             self.try_sleep(start)
         self.try_end()
 

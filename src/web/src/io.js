@@ -1,13 +1,13 @@
 import io from 'socket.io-client';
 
-const FARM_URL =  process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:5000/' : window.location.href;
+const IO_FARM_URL =  process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1:5000/' : window.location.href;
 
 let socket;
 
-function start(onConnect, onDisconnect, onData, onLatestImage) {
-  console.log(`socket connecting to ${FARM_URL}`);
+function start(onConnect, onDisconnect, onData) {
+  console.log(`socket connecting to ${IO_FARM_URL}`);
 
-  socket = io(FARM_URL, {
+  socket = io(IO_FARM_URL, {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionDelayMax: 2000,
@@ -38,7 +38,6 @@ function start(onConnect, onDisconnect, onData, onLatestImage) {
   });
 
   socket.on('data', onData);
-  socket.on('latest_image', onLatestImage);
 }
 
 function requestData() {
@@ -75,8 +74,19 @@ function trainModel(startTime, endTime) {
   socket.emit('train_model', { startTime, endTime })
 }
 
-function getLatestImage(time) {
-  socket.emit('latest_image', { time })
+function updateServiceSetting(service_name, key, value) {
+  console.log('Update Settings', service_name, key, value);
+  socket.emit('update_setting', {  service_name, key, value })
+}
+
+function updateService(service_name, message) {
+  console.log('Update Service', service_name, message);
+  socket.emit('update_service', { service_name, message })
+}
+
+function syncSettingsToDisk() {
+  console.log('sync settings');
+  socket.emit('sync_settings', '');
 }
 
 export default {
@@ -88,5 +98,7 @@ export default {
   deleteModel,
   toggleWater,
   trainModel,
-  getLatestImage,
+  updateServiceSetting,
+  updateService,
+  syncSettingsToDisk
 };

@@ -8,14 +8,14 @@ import logging
 import controllers.program as program_controller
 from util.file_util import file_is_being_accessed
 from util.time_util import profile_func
-from util.service import Service
+from util.tservice import TService
 import state
 
 import boto3
 
 logger = logging.getLogger(__name__)
 
-class Uploader(Service):
+class Uploader(TService):
 
 
     def __init__(self):

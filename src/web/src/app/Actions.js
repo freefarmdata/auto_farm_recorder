@@ -219,6 +219,59 @@ class Actions extends Component {
     );
   }
 
+  renderServiceSettings() {
+    const { info } = this.props;
+
+    if (!info) {
+      return;
+    }
+
+    const { interval, save_frame } = info.camera_settings;
+    const dInterval = interval / 1E9;
+    const dSaveFrame = save_frame / 1E9;
+
+    return (
+      <>
+        <div className="range">
+          <span>Camera FPS: {dInterval}s</span>
+          <input
+            type="range"
+            defaultValue={dInterval}
+            onChange={(event) => {
+              this.props.onUpdateService('camera', {
+                'action': 'set_interval',
+                'interval': event.target.value * 1E9
+              });
+            }}
+            step="0.05"
+            min="0.01"
+            max="5"
+          />
+        </div>
+        <div className="range">
+          <span>Camera Save: {dSaveFrame}s</span>
+          <input
+            type="range"
+            defaultValue={dSaveFrame}
+            onChange={(event) => {
+              this.props.onUpdateServiceSetting('camera', 'save_frame', event.target.value * 1E9);
+            }}
+            step="5"
+            min="0"
+            max="600"
+          />
+        </div>
+        <button
+          onClick={() => {
+            this.props.onSyncSettingsToDisk();
+          }}
+        >
+          Sync Settings To Disk
+        </button>
+      </>
+    );
+  }
+
   render() {
     return (
       <div className="actions">
@@ -240,6 +293,12 @@ class Actions extends Component {
             <h4>Toggle Watering Event</h4>
             <div className="actions__block--wservice">
               {this.renderWater()}
+            </div>
+          </div>
+          <div className="actions__block">
+            <h4>Service Settings</h4>
+            <div className="actions__block--stservice">
+              {this.renderServiceSettings()}
             </div>
           </div>
           {this.renderSelectModel()}

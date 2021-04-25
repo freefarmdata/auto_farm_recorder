@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 
+const HTTP_FARM_URL =  process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : window.location.href;
 class Image extends PureComponent {
   render() {
     return (
@@ -7,8 +8,8 @@ class Image extends PureComponent {
         <h2>Latest Snapshot</h2>
         <div className="image__wrapper">
           <img
-            src={`data:image/png;base64,${this.props.image['image']}`}
-            alt="latest snapshot"
+            src={`${HTTP_FARM_URL}/api/stream`}
+            alt="video stream"
           />
         </div>
       </div>

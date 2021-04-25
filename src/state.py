@@ -1,4 +1,6 @@
+import os
 import time
+import json
 import threading
 import logging
 
@@ -13,39 +15,40 @@ logger = logging.getLogger(__name__)
 
 settings = {}
 
+services = {}
+
+_setting_lock = threading.Lock()
 _service_lock = threading.Lock()
 
-services = {
-  'board': {
-    'create': Board,
-    'instance': None,
-    'settings': {}
-  },
-  'camera': {
-    'create': Camera,
-    'instance': None,
-    'settings': {}
-  },
-  'video': {
-    'create': Video,
-    'instance': None,
-    'settings': {}
-  },
-  'uploader': {
-    'create': Uploader,
-    'instance': None,
-    'settings': {}
-  },
-  'heartbeat': {
-    'create': Heartbeat,
-    'instance': None,
-    'settings': {}
-  },
-  'soil_predictor': {
-    'create': SoilPredictor,
-    'instance': None,
-    'settings': {}
-  }
+services['board'] = {
+  'create': Board,
+  'instance': None,
+  'settings': {}
+}
+services['camera'] = {
+  'create': Camera,
+  'instance': None,
+  'settings': {}
+}
+services['video'] = {
+  'create': Video,
+  'instance': None,
+  'settings': {}
+}
+services['uploader'] = {
+  'create': Uploader,
+  'instance': None,
+  'settings': {}
+}
+services['heartbeat'] = {
+  'create': Heartbeat,
+  'instance': None,
+  'settings': {}
+}
+services['soil_predictor'] = {
+  'create': SoilPredictor,
+  'instance': None,
+  'settings': {}
 }
 
 
@@ -72,7 +75,7 @@ def start_service(service_name):
   logger.info(f'Start service {service_name}')
   with _service_lock:
     if service_name in services:
-      if services[service_name]['instance'] is None:
+      if services[service_name]['instance'] is None and not services[service_name]['settings'].get('disabled'):
         services[service_name]['instance'] = services[service_name]['create']()
         services[service_name]['instance'].start()
 
@@ -116,22 +119,50 @@ def update_service(service_name, message):
 
 def set_global_setting(key, value):
   global settings
-  settings[key] = value
+  with _setting_lock:
+    settings[key] = value
 
 
 def get_global_setting(key):
   global settings
-  return settings[key]
+  with _setting_lock:
+    return settings.get(key)
 
 
 def set_service_setting(service_name, key, value):
   global services
-  if service_name in services:
-    services[service_name]['settings'][key] = value
+  with _service_lock:
+    if service_name in services:
+      services[service_name]['settings'][key] = value
 
 
 def get_service_setting(service_name, key):
   global services
-  if service_name in services:
-    if key in services[service_name]['settings']:
-      return services[service_name]['settings'][key]
+  with _service_lock:
+    if service_name in services:
+      if key in services[service_name]['settings']:
+        return services[service_name]['settings'][key]
+
+
+def get_service_settings(service_name):
+  global services
+  with _service_lock:
+    if service_name in services:
+      return services[service_name]['settings']
+
+
+def save_settings():
+  global services, settings
+  with _service_lock and _setting_lock:
+    saved = {
+      'global': settings,
+    }
+    for service_name in services:
+      saved[service_name] = services[service_name].get('settings', {})
+
+    print(saved)
+
+    settings_file = os.path.join(settings['data_dir'], 'settings.json')
+
+    with open(settings_file, 'w') as f:
+      json.dump(saved, f)

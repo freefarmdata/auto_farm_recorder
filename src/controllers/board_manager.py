@@ -8,11 +8,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Board():
+
+
     def __init__(self, id, path):
         self.id = id
         self.path = path
         self.baudrate = 9600
-        self.timeout = 10
+        self.timeout = 5
         self.serial = None
 
 
@@ -21,15 +23,16 @@ class Board():
         self.reconnect()
         try:
             if self.serial:
-                output = self.serial.read(1000).decode("utf-8")
+                self.serial.write(b'data')
+                output = self.serial.read_until(b'\n').decode("utf-8")
                 output = [l.strip() for l in output.split('\n')]
                 for line in output:
                     try:
                         messages.append(json.loads(line))
                     except Exception as e:
                         pass
-        except Exception as e:
-            logger.error(f'Failed to read from board {self.path}. Error: {e}')
+        except:
+            logger.exception(f'Failed to read from board {self.path}')
             self.disconnect()
         return messages
 
@@ -38,8 +41,8 @@ class Board():
         try:
             if self.serial is None:
                 self.serial = serial.Serial(self.path, baudrate=self.baudrate, timeout=self.timeout)
-        except Exception as e:
-            logger.error(f'Failed to connect to board: {str(e)}')
+        except:
+            logger.exception(f'Failed to connect to board {self.path}')
             self.disconnect()
 
 
@@ -59,7 +62,7 @@ class BoardManager():
     def detect(self):
         self.reset()
         devs = [os.path.join('/dev', d) for d in os.listdir('/dev')]
-        devs = list(filter(lambda d: re.search('ttyUSB', d), devs))
+        devs = list(filter(lambda d: re.search('ttyUSB', d) or re.search('cu.usbserial', d), devs))
         devices = []
         logger.info(f'usb devices found: {devs}')
         for dev_path in devs:
@@ -93,7 +96,8 @@ class BoardManager():
         try:
             board = serial.Serial(dev_path, baudrate=9600, timeout=2)
             time.sleep(3)
-            output = board.read(1000).decode("utf-8")
+            board.write(b'data')
+            output = board.read_until(b'\n').decode("utf-8")
             logger.info(f'usb device {dev_path} read "{output}"')
             splits = list(map(lambda l: l.strip(), output.split('\n')))
             for line in splits:
@@ -101,8 +105,8 @@ class BoardManager():
                     messages.append(json.loads(line))
                 except Exception as e:
                     pass
-        except Exception as e:
-            logger.error(f'Failed to test read from {dev_path}. Error: {e}')
+        except:
+            logger.exception(f'Failed to test read from {dev_path}')
         finally:
             if board:
                 board.close()

@@ -47,8 +47,13 @@ def load_best_model():
 def load_model_by_name(name):
     model_dir = state.get_global_setting('model_dir')
     model_path = os.path.join(model_dir, f'soil_{name}.h5')
-    if os.path.exists(model_path):
-        return keras.models.load_model(model_path)
+    scaler_path = os.path.join(model_dir, f'sscaler_{name}.pickle')
+    model, scaler = None
+    if os.path.exists(model_path) and os.path.exists(scaler_path):
+        model = keras.models.load_model(model_path)
+        with open(scaler_path, 'rb') as f:
+            scaler = pickle.load(f)
+        return model, scaler
 
 
 def get_blank_model():
@@ -107,11 +112,10 @@ def train_new_model(data):
     y_pred = model.predict(x_test)
     error = mean_squared_error(y_test, y_pred)
 
-    return model, error
+    return model, scaler, error
 
 
-def predict_on_latest(model):
-
+def predict_on_latest(model, scaler):
     # get the last 5 minutes of soil readings
     now = datetime.now()
     ago = now - timedelta(minutes=5)
@@ -128,24 +132,19 @@ def predict_on_latest(model):
     # the second reading is what the soil moisture should be at
     # when we want to water the plants again
     soil_threshold = state.get_service_setting('soil_predictor', 'threshold')
-    matrix = [
-        [median_soil, 0],
-        [soil_threshold, 0]
-    ]
+    matrix = [[median_soil], [soil_threshold]]
 
-    # transform the values, scale between 0 and 1
-    scaler = MinMaxScaler((0, 1)).fit()
-    matrix = scaler.transform(matrix)
-    x = matrix[:, 0].reshape(-1, 1)
+    # create a scaler from the old training scaler
+    new_scaler = MinMaxScaler((0, 1))
+    new_scaler.min_, new_scaler.scale_ = scaler.min_[0], scaler.scale_[0]
 
     # predict on both readings. This will give us the predicted
     # times for both the start and end
-    y_pred = model.predict(x)
+    y_pred = model.predict(matrix)
 
     # subtract the prediction of the soil now from when the
-    # soil is predicted to be past the threshold. Then, transform
-    # it. This should give us the value of when
+    # soil is predicted to be past the threshold.
+    y_pred = new_scaler.inverse_transform(y_pred)
     time_left = y_pred[1][0] - y_pred[0][0]
-    time_left = scaler.inverse_transform([[0, time_left]])[0][-1]
 
     return time_left

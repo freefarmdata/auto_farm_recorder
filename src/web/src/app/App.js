@@ -4,7 +4,7 @@ import io from '../io';
 
 import Actions from './Actions';
 import Status from './Status';
-import Info from './Info';
+import Tags from './Tags';
 import Image from './Image';
 
 class App extends Component {
@@ -20,7 +20,6 @@ class App extends Component {
     this.ioInterval = undefined;
     this.onConnect = this.onConnect.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
-    this.onLatestImage = this.onLatestImage.bind(this);
     this.clearIntervals = this.clearIntervals.bind(this);
     this.onData = this.onData.bind(this);
   }
@@ -30,7 +29,6 @@ class App extends Component {
       this.onConnect,
       this.onDisconnect,
       this.onData,
-      this.onLatestImage
     );
   }
 
@@ -40,7 +38,6 @@ class App extends Component {
 
   clearIntervals() {
     clearInterval(this.ioInterval);
-    clearInterval(this.imageInterval);
   }
 
   onConnect() {
@@ -60,18 +57,10 @@ class App extends Component {
     this.ioInterval = setInterval(() => {
       io.requestData();
     }, 1000);
-    this.imageInterval = setInterval(() => {
-      const { image } = this.state;
-      io.getLatestImage(image ? image['time'] : undefined);
-    }, 10000);
   }
 
   onData(data) {
     this.setState({ data });
-  }
-
-  onLatestImage(image) {
-    this.setState({ image });
   }
 
   renderConnectionLabel() {
@@ -90,11 +79,12 @@ class App extends Component {
     return (
       <div>
         {this.renderConnectionLabel()}
-        <Status status={this.state.data.status} />
-        <Info info={this.state.data.info} />
         <Image image={this.state.image} />
+        <Status status={this.state.data.status} />
+        <Tags tags={this.state.data.tags} />
         <Actions
           status={this.state.data.status}
+          tags={this.state.data.tags}
           info={this.state.data.info}
           selectModel={(name) => {
             io.selectModel(name);
@@ -113,6 +103,15 @@ class App extends Component {
           }}
           onTrainModel={(startTime, endTime) => {
             io.trainModel(startTime, endTime);
+          }}
+          onUpdateServiceSetting={(service_name, key, value) => {
+            io.updateServiceSetting(service_name, key, value);
+          }}
+          onUpdateService={(service_name, message) => {
+            io.updateService(service_name, message);
+          }}
+          onSyncSettingsToDisk={() => {
+            io.syncSettingsToDisk();
           }}
         />
       </div>

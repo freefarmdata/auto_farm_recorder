@@ -1,8 +1,14 @@
 import time
 import logging
 
-
 logger = logging.getLogger()
+
+def now_ms():
+    return time.time() * 1E3
+
+
+def now_ns():
+    return time.time_ns()
 
 
 def hour_to_nano(hours):

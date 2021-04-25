@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, jsonify, send_from_directory
+from flask import Flask, redirect, render_template, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import logging
@@ -10,27 +10,28 @@ import controllers.image as image_controller
 import controllers.program as program_controller
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3001"}})
-socketio = SocketIO(app, cors_allowed_origins='http://localhost:3001')
+cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3000"}})
+socketio = SocketIO(app, 
+    cors_allowed_origins='http://localhost:3000',
+    async_mode='threading',
+)
 
 logger = logging.getLogger(__name__)
 
 
 def start():
     logger.info('Starting API')
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=5000,
+        debug=False
+    )
 
 
 @socketio.on('data', namespace='/')
 def fetch_data(message):
     emit('data', program_controller.get_web_data(), broadcast=True)
-
-
-@socketio.on('latest_image', namespace='/')
-def latest_image(message):
-    latest_image = image_controller.get_latest_image()
-    if message.get('time') != latest_image['time']:
-        emit('latest_image', latest_image, broadcast=True)
 
 
 @socketio.on('toggle_water', namespace='/')
@@ -76,6 +77,24 @@ def select_model(message):
     })
 
 
+@socketio.on('update_setting', namespace='/')
+def update_setting(message):
+    logger.info(f'update setting {message}')
+    state.set_service_setting(message['service_name'], message['key'], message['value'])
+
+
+@socketio.on('update_service', namespace='/')
+def update_service(message):
+    logger.info(f'update service {message}')
+    state.update_service(message['service_name'], message['message'])
+
+
+@socketio.on('sync_settings', namespace='/')
+def sync_settings(message):
+    logger.info(f'sync_settings {message}')
+    state.save_settings()
+
+
 @socketio.on('toggle_service', namespace='/')
 def toggle_service(message):
     logger.info(f'toggle service {message}')
@@ -90,6 +109,14 @@ def restart_service(message):
     logger.info(f'restart service {message}')
     state.stop_service(message['service'])
     state.start_service(message['service'])
+
+
+@app.route('/api/stream')
+def stream():
+    return Response(
+        image_controller.generator(),
+		mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
 
 
 @app.route('/api/restart/<service_name>', methods=['GET'])

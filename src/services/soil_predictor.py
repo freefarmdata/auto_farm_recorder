@@ -1,6 +1,7 @@
 import logging
 import datetime
 import random
+import pickle
 import os
 
 from tensorflow import keras
@@ -9,7 +10,7 @@ import controllers.watering as water_controller
 import controllers.soil_predictor as soil_predictor
 import controllers.program as program_controller
 
-from util.service import Service
+from util.tservice import TService
 from util.names import random_name
 from util.time_util import min_to_nano, profile_func
 import state
@@ -17,13 +18,14 @@ import database
 
 logger = logging.getLogger(__name__)
 
-class SoilPredictor(Service):
+class SoilPredictor(TService):
 
 
     def __init__(self):
         super().__init__()
         self.set_interval(min_to_nano(1))
         self.model = None
+        self.scaler = None
 
 
     def run_start(self):
@@ -52,7 +54,7 @@ class SoilPredictor(Service):
         if not self.model:
             logger.info('No model to test soil moisture with')
             return
-        ms_time_left = soil_predictor.predict_on_latest(self.model)
+        ms_time_left = soil_predictor.predict_on_latest(self.model, self.scaler)
         if ms_time_left is not None:
             program_controller.set_info_key('next_water_prediction', ms_time_left)
 
@@ -72,8 +74,9 @@ class SoilPredictor(Service):
     def select_model(self, name):
         logger.info(f'Selecting a soil model with name {name}')
         database.set_model_active(name)
-        model = soil_predictor.load_model_by_name(name)
+        model, scaler = soil_predictor.load_model_by_name(name)
         self.model = model
+        self.scaler = scaler
         soil_models = database.query_for_models()
         program_controller.set_info_key('soil_models', soil_models)
 
@@ -98,15 +101,21 @@ class SoilPredictor(Service):
             return
 
         # train the new model based on the soil data
-        new_model, error = soil_predictor.train_new_model(data)
+        new_model, scaler, error = soil_predictor.train_new_model(data)
 
         # upsert the model in SQL and save it to disk
         model_dir = state.get_global_setting('model_dir')
         model_name = random_name()
         model_path = os.path.join(model_dir, f'soil_{model_name}.h5')
+        scaler_path = os.path.join(model_dir, f'sscaler_{model_name}.pickle')
         database.insert_model(model_name, start_date, end_date, error)
+
         keras.models.save_model(new_model, model_path)
+        with open(scaler_path, 'wb') as f:
+            pickle.dump(scaler, f)
+
         self.model = new_model
+        self.scaler = scaler
 
         # update the program controller soil models
         soil_models = database.query_for_models()

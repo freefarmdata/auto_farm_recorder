@@ -22,6 +22,7 @@ def reset_all():
     cursor.execute('DROP TABLE IF EXISTS pressure;')
     connection.commit()
 
+
 def reset_data():
   with get_connection() as connection:
     cursor = connection.cursor()

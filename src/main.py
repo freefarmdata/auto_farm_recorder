@@ -4,26 +4,30 @@ import sys
 import datetime
 import signal
 import argparse
+import multiprocessing
 
-import controllers.program as program_controller
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 
 import state
 import api
 import database
 import logger
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
+import controllers.program as program_controller
+
 
 if __name__ == "__main__":
+  multiprocessing.set_start_method('spawn', force=True)
   parser = argparse.ArgumentParser()
   parser.add_argument("--local", action="store_true", default=False)
+  parser.add_argument("--debug", action="store_true", default=False)
   args = parser.parse_args().__dict__
 
   # Twenty second delay start up for postgres
   if args.get('local') is False:
     time.sleep(20)
 
-  logger.setup_logger()
+  logger.setup_logger(args.get('debug'))
 
   #database.reset_all()
   database.initialize()
@@ -39,11 +43,12 @@ if __name__ == "__main__":
 
   bucket_name = 'jam-general-storage'
   upload_path = 'datasets/auto_farm/experiment_hawaii_2021/images/'
-  sunrise = datetime.time(6, 0, 0, 0)
-  sunset = datetime.time(18, 0, 0, 0)
-  resolution = (1920, 1080)
+  sunrise = '6:0:0:0' 
+  sunset = '18:0:0:0'
+  resolution = [1920, 1080]
   soil_threshold = 500
-  camera_interval = 30E9
+  camera_interval = 0.05E9
+  camera_save = 30E9
 
   os.makedirs(data_directory, exist_ok=True)
   os.makedirs(image_directory, exist_ok=True)
@@ -54,11 +59,14 @@ if __name__ == "__main__":
   state.set_global_setting('sunrise', sunrise)
   state.set_global_setting('sunset', sunset)
   state.set_global_setting('devmode', args.get('local'))
+  state.set_global_setting('data_dir', data_directory)
   state.set_global_setting('image_dir', image_directory)
   state.set_global_setting('video_dir', video_directory)
   state.set_global_setting('temp_dir', temp_directory)
   state.set_global_setting('model_dir', model_directory)
 
+  state.set_service_setting('camera', 'save_frame', camera_save)
+  state.set_service_setting('camera', 'interval', camera_interval)
   state.set_service_setting('camera', 'resolution', resolution)
   state.set_service_setting('video', 'resolution', resolution)
   state.set_service_setting('uploader', 'upload_path', upload_path)
@@ -69,7 +77,7 @@ if __name__ == "__main__":
   #state.set_service_setting('uploader', 'disabled', True)
   state.set_service_setting('soil_predictor', 'disabled', True)
 
-  program_controller.set_info_key('farm_start_time', time.time())
+  program_controller.set_tag_key('farm_start_time', time.time())
 
   state.start_services()
   api.start()
