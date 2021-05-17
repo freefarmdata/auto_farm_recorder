@@ -1,0 +1,65 @@
+.toggle-services {
+    display: grid;
+    gap: 20px;
+}
+
+.toggle-services__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toggle-services__container > span {
+    background-color: #fff;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    border-radius: 5px;
+    border: 1px solid #e3e3e3;
+}
+
+.toggle-services__container > span.true {
+    background-color: limegreen;
+}
+
+.toggle-services__container > span.false {
+    background-color: red;
+}
+
+.toggle-services__container > span > span {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.toggle-services__container > span > div > button {
+    border: none;
+    border-radius: none;
+}
+
+.toggle-services__container > span > div > button:first-child {
+    border-radius: 0px;
+    border-top-right-radius: 5px;
+    border-left: 1px solid #e3e3e3;
+    border-bottom: 1px solid #e3e3e3;
+    font-weight: bold;
+    height: 30px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-services__container > span > div > button:last-child {
+    border-left: 1px solid #e3e3e3;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    font-weight: bold;
+    height: 30px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

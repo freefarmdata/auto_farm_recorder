@@ -3,6 +3,6 @@ __pycache__
 database.db
 grafana
 postgres
-bin/recorder
+recorder/bin/recorder
 .DS_Store
-node_modules
+web/node_modules

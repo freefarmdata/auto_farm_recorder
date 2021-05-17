@@ -1,0 +1,22 @@
+.disable-services {
+    display: grid;
+    gap: 20px;
+}
+
+.disable-services__container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.disable-services__container > label {
+    background-color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px;
+    border: 1px solid #e3e3e3;
+}
+
+.disable-services__container > label > input {
+    margin-right: 5px;
+}

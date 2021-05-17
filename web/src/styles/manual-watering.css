@@ -1,0 +1,33 @@
+.manual-watering {
+    display: grid;
+    gap: 20px;
+}
+
+.manual-watering__container {
+    display: grid;
+    gap: 10px;
+}
+
+.manual-watering__container > button {
+    justify-self: flex-start;
+}
+
+.manual-watering__container__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: papayawhip;
+    border: 1px solid #e3e3e3;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.manual-watering__container__header > .notifier { 
+    margin-left: 10px;
+    font-variant: all-small-caps;
+}
+
+.manual-watering__container > table {
+    max-height: 300px;
+    overflow-y: auto;
+}

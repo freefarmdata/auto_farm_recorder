@@ -1,0 +1,73 @@
+.alarms {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    height: 100%;
+}
+
+.alarms__container {
+    display: grid;
+    gap: 5px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow-y: auto;
+    align-content: flex-start;
+}
+
+.alarm {
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+.alarm__status {
+    height: 100%;
+    width: 20px;
+}
+
+.alarm__content {
+    padding: 10px;
+}
+
+.alarm__content__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.alarm__content__title > span {
+    font-variant: all-small-caps;
+}
+
+.alarm__status.info {
+    background-color: rgb(0, 0, 255);
+}
+
+.alarm__status.warn {
+    background-color: rgb(255, 153, 0);
+}
+
+.alarm__status.danger {
+    background-color: rgb(255, 0, 0);
+}
+
+.alarm__status.critical {
+    background-color: rgb(255, 0, 255);
+}
+
+.alarm.info {
+    border: 2px solid rgb(0, 0, 255);
+}
+
+.alarm.warn {
+    border: 2px solid rgb(255, 153, 0);
+}
+
+.alarm.danger {
+    border: 2px solid rgb(255, 0, 0);
+}
+
+.alarm.critical {
+    border: 2px solid rgb(255, 0, 255);
+}
