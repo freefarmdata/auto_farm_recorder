@@ -6,7 +6,7 @@ COPY requirements.txt ./
 
 RUN apt-get update -y
 
-RUN apt-get install libgl1-mesa-glx -y
+RUN apt-get install libgl1-mesa-glx cmake -y
 
 RUN pip3 install --upgrade pip
 
