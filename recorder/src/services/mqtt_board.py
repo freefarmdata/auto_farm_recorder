@@ -14,7 +14,7 @@ logger = logging.getLogger()
 
 
 def on_message(mqtt_client, userdata, message):
-  logger.info(message)
+  logger.info(f'board message recieved: {message}')
 
 
 class MQTTBoard(TService):
@@ -29,7 +29,7 @@ class MQTTBoard(TService):
   def run_start(self):
     alarm_controller.clear_alarm('mqtt_board_service_offline')
     self.mqtt_client = mqtt.Client()
-    self.mqtt_client.connect('127.0.0.1')
+    self.mqtt_client.connect('mosquitto')
     self.mqtt_client.subscribe('board/*')
     self.mqtt_client.on_message = on_message
     self.mqtt_client.loop_start()
@@ -44,15 +44,3 @@ class MQTTBoard(TService):
   @profile_func(name='mqtt_board_loop')
   def run_loop(self):
     pass
-
-
-  def save_sensor_data(self, messages):
-    metrics = {'soil': [], 'temp': [], 'light': [], 'pressure': []}
-    for message in messages:
-      for metric in metrics:
-        if metric in message:
-          for i,v in enumerate(message[metric]):
-            metrics[metric].append({'sensor': i, 'value': v, 'board_id': message['id']})
-
-    for metric in metrics:
-      database.insert_timeseries(metric, metrics[metric])

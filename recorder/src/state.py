@@ -4,6 +4,7 @@ import json
 import threading
 import logging
 
+from services.mqtt_board import MQTTBoard
 from services.board import Board
 from services.camera import Camera
 from services.video import Video
@@ -18,8 +19,14 @@ services = {}
 
 _setting_lock = threading.Lock()
 
-services['board'] = {
-  'create': Board,
+# services['board'] = {
+#   'create': Board,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
+services['mqtt_board'] = {
+  'create': MQTTBoard,
   'instance': None,
   'settings': {},
   'lock': threading.Lock(),
