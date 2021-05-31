@@ -6,7 +6,7 @@ def get_connection():
     database="farmdata",
     user="admin",
     password="admin",
-    host="0.0.0.0",
+    host="postgres",
     port="5432"
   )
 

@@ -26,6 +26,7 @@ class Heartbeat(TService):
         super().__init__()
         self.set_interval(3e9)
 
+
     def run_start(self):        
         soil_models = database.query_for_models()
         program_controller.set_info_key('soil_models', soil_models)
@@ -35,7 +36,7 @@ class Heartbeat(TService):
 
         alarm_controller.clear_alarm('heartbeat_service_offline')
 
-    
+
     def run_end(self):
         alarm_controller.set_warn_alarm('heartbeat_service_offline', 'Heartbeat Service Is Offline')
 

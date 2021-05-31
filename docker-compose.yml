@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  recorder:
+    container_name: 'recorder'
+    build:
+      context: ./recorder
+      dockerfile: ./dockerfile
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - ./data/recorder:/usr/src/app/bin
   postgres:
     container_name: 'postgres'
     image: 'postgres:13'
@@ -8,19 +18,30 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: farmdata
+  mosquitto:
+    container_name: 'mosquitto'
+    image: 'eclipse-mosquitto:2.0.10'
+    restart: always
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    depends_on:
+      - postgres
   grafana:
     container_name: grafana
     image: grafana/grafana:7.1.5
     restart: always
     ports:
-      - 3000:3000
+      - 3002:3000
     volumes:
-      - ./grafana:/var/lib/grafana:rw
+      - ./data/grafana:/var/lib/grafana:rw
     depends_on:
       - postgres
     user: "472"

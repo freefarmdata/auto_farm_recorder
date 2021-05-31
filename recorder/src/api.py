@@ -26,7 +26,6 @@ class API(Thread):
     def __init__(self):
         super().__init__(daemon=True)
 
-
     def run(self):
         socketio.run(
             app,

@@ -25,6 +25,10 @@ cd ~
 git clone https://github.com/freefarmdata/auto_farm_recorder
 cd auto_farm_recorder
 sudo su
+
+docker-compose -f docker-compose.yml build --parallel
+docker-compose -f docker-compose.yml up
+
 pip3 install -r requirements.txt
 
 mkdir grafana

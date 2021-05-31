@@ -22,7 +22,7 @@ logger = logging.getLogger()
 
 
 def create_directories(args):
-  data_directory = '/etc/recorder' 
+  data_directory = '/usr/src/app/bin'
   if args.get('local') is True:
     data_directory = './bin/recorder' 
 
@@ -65,8 +65,10 @@ def set_default_settings(args):
   state.set_service_setting('uploader', 'upload_path', upload_path)
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
   state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
-  #state.set_service_setting('video', 'disabled', True)
-  #state.set_service_setting('uploader', 'disabled', True)
+
+  state.set_service_setting('camera', 'disabled', True)
+  state.set_service_setting('video', 'disabled', True)
+  state.set_service_setting('uploader', 'disabled', True)
   state.set_service_setting('soil_predictor', 'disabled', True)
 
 
@@ -110,12 +112,6 @@ if __name__ == "__main__":
   set_default_settings(args)
   load_settings(args)
   program_controller.set_tag_key('farm_start_time', time.time())
-
-  alarm_controller.set_warn_alarm('video_service_offline', 'Video Service Is Offline')
-  alarm_controller.set_warn_alarm('uploader_service_offline', 'Uploader Service Is Offline')
-  alarm_controller.set_warn_alarm('heartbeat_service_offline', 'Heartbeat Service Is Offline')
-  alarm_controller.set_warn_alarm('board_service_offline', 'Board Service Is Offline')
-  alarm_controller.set_warn_alarm('camera_service_offline', 'Camera Service Is Offline')
 
   API().start()
   state.start_services()

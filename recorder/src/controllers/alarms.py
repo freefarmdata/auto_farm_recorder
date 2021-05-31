@@ -6,8 +6,8 @@ import threading
 
 from api import app
 
-
 alarm_dict = {}
+
 _alarm_lock = threading.Lock()
 
 

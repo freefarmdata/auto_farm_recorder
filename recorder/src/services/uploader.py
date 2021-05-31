@@ -29,7 +29,7 @@ class Uploader(TService):
         )
 
 
-    def run_start(self):        
+    def run_start(self):
         alarm_controller.clear_alarm('uploader_service_offline')
 
 
