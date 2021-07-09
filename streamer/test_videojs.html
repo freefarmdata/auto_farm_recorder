@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test</title>
+        <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Video feed tester</h1>
+        <video id="player" class="video-js vjs-default-skin" controls preload>
+            <source src="http://localhost:5454/stream/front_box.m3u8" type="application/x-mpegURL">
+        </video>
+        <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.12.2/videojs-contrib-hls.min.js"></script> -->
+        <script src="https://unpkg.com/@videojs/http-streaming@2.9.1/dist/videojs-http-streaming.min.js"></script>
+        <script>
+            const options = {
+                width: 800,
+                height: 640,
+                muted: true,
+                preload: 'auto',
+                liveui: true,
+            };
+            const player = videojs('player', options);
+            player.play();
+        </script>
+    </body>
+</html>
