@@ -42,11 +42,10 @@ class Streamer(TService):
 
     def run_loop(self):
         for i in range(len(self.streams)):
-            stream, config = self.streams[i]
+            stream, stream_config = self.streams[i]
             if stream.is_stopped():
-                stream = Stream(config.get('ip'), config.get('name'), self.config)
-                stream.start()
-                self.streams[i] = stream
+                stream = self.start_stream(stream_config)
+                self.streams[i] = (stream, stream_config)
 
     
     def run_update(self, message):
@@ -56,11 +55,16 @@ class Streamer(TService):
     def run_end(self):
         self.stop_streams()
 
-    
+
+    def start_stream(self, stream_config):
+        stream = Stream(stream_config.get('ip'), stream_config.get('name'), self.config)
+        stream.start()
+        return stream
+
+
     def start_streams(self):
         for stream_config in self.config.get('streams'):
-            stream = Stream(stream_config.get('ip'), stream_config.get('name'), self.config)
-            stream.start()
+            stream = self.start_stream(stream_config)
             self.streams.append((stream, stream_config))
 
 

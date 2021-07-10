@@ -4,25 +4,63 @@
         <meta charset="utf-8">
         <title>Test</title>
         <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet">
+        <style>
+            body {
+                margin: 0px;
+                padding: 10px;
+                display: grid;
+                gap: 10px;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            h2 {
+                margin: 0px;
+            }
+
+            .box {
+                display: grid;
+                gap: 10px;
+            }
+        </style>
     </head>
     <body>
-        <h1>Video feed tester</h1>
-        <video id="player" class="video-js vjs-default-skin" controls preload>
-            <source src="http://localhost:5454/stream/front_box.m3u8" type="application/x-mpegURL">
-        </video>
+        <div class="box">
+            <h2>Front Box</h2>
+            <video id="front_box" class="video-js vjs-default-skin" controls preload></video>
+        </div>
+        <div class="box">
+            <h2>Back Box</h2>
+            <video id="back_box" class="video-js vjs-default-skin" controls preload></video>
+        </div>
+
         <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.12.2/videojs-contrib-hls.min.js"></script> -->
         <script src="https://unpkg.com/@videojs/http-streaming@2.9.1/dist/videojs-http-streaming.min.js"></script>
         <script>
             const options = {
-                width: 800,
-                height: 640,
                 muted: true,
-                preload: 'auto',
                 liveui: true,
+                fluid: true,
+                aspectRatio: '4:3',
+                preload: 'auto'
             };
-            const player = videojs('player', options);
-            player.play();
+            
+            const fbplayer = videojs('front_box', options);
+            const fbsrc = `http://localhost:5454/stream/front_box.m3u8?t=${new Date().getTime()}`;
+            fbplayer.src({
+                src: fbsrc,
+                type: 'application/x-mpegURL',
+                withCredentials: false
+            });
+            fbplayer.play();
+
+            const bbplayer = videojs('back_box', options);
+            const bbsrc = `http://localhost:5454/stream/back_box.m3u8?t=${new Date().getTime()}`;
+            bbplayer.src({
+                src: bbsrc,
+                type: 'application/x-mpegURL',
+                withCredentials: false
+            });
+            bbplayer.play();
         </script>
     </body>
 </html>

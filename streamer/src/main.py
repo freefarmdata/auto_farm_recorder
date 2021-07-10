@@ -1,9 +1,5 @@
 import time
 import os
-import sys
-import json
-import datetime
-import signal
 import argparse
 import multiprocessing
 import logging
@@ -15,15 +11,14 @@ import setup_log
 logger = logging.getLogger()
 
 def initialize(args):
-  sunrise = '6:0:0:0' 
+  sunrise = '6:0:0:0'
   sunset = '18:0:0:0'
-  resolution = [1920, 1080]
   data_directory = '/usr/src/app/bin'
   streams = [{
     'ip': '192.168.0.170',
     'name': 'front_box'
   }, {
-    'ip': '192.168.0.171',
+    'ip': '192.168.0.102',
     'name': 'back_box',
   }]
 
@@ -43,12 +38,12 @@ def initialize(args):
     'video_dir': video_directory,
     'sunrise': sunrise,
     'sunset': sunset,
-    'resolution': resolution,
     'streams': streams
   }
 
 if __name__ == "__main__":
   multiprocessing.set_start_method('spawn', force=True)
+
   parser = argparse.ArgumentParser()
   parser.add_argument("--local", action="store_true", default=False)
   parser.add_argument("--debug", action="store_true", default=False)

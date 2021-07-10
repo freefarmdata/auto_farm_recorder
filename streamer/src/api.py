@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins":"*"}})
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 class API(Thread):
 
@@ -21,8 +21,10 @@ class API(Thread):
         app.run(
             host='0.0.0.0',
             port=5454,
-            debug=False
+            debug=False,
+            threaded=True
         )
+
 
 @app.route('/streams', methods=['GET'])
 def streams():

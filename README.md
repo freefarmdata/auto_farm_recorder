@@ -54,49 +54,6 @@ sudo systemctl enable recorder
 sudo service recorder start
 ```
 
-## Control Motion
-```
-// to start, stop, and restart motion service
-sudo service motion start
-sudo service motion stop
-sudo service motion restart
-
-// to configure motion service
-sudo nano /etc/motion/motion.conf
-
-// Make sure to set permissions to motion user on folder
-sudo chown motion:adm /var/lib/motion
-
-// View the .avi movie files
-ls -lha /var/lib/motion
-
-// To start on reboot
-sudo nano /etc/default/motion
-start_motion_daemon=yes
-```
-
-### Custom Parameters for motion.conf
-```
-width 640
-height 480
-framerate 30
-threshold 0
-max_movie_time 300
-emulate_motion on
-output_pictures off
-quality 50
-ffmpeg_output_movies on
-ffmpeg_bps 500000
-target_dir /var/lib/motion
-stream_port 8081
-stream_quality 50
-stream_maxrate 60
-stream_localhost off
-webcontrol_port 8080
-webcontrol_localhost off
-videodevice /dev/video0
-```
-
 ### Backup Postgres
 ```
 docker exec -t postgres pg_dump farmdata -U admin > ./backup.sql
