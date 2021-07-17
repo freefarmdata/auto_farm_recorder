@@ -43,7 +43,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     return f"""\
     -vcodec h264 \
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
+    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=white@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -123,7 +123,7 @@ def launch_stream(name: str, output_directory: str):
         'fontsize': 50,
         's': resolutions[3],
         'minrate': '512k',
-        'bufsize': '512k',
+        'bufsize': '256k',
         'maxrate': '1M',
         'framerate': 15,
         'keyint_min': 30,
