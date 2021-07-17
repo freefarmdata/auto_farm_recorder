@@ -21,7 +21,7 @@ def clean_up_stream(name: str, output: str):
 
 def get_video_input():
     return f"""\
-    -i /dev/video0 \
+    -re -i /dev/video0 \
     """
 
 
@@ -125,7 +125,7 @@ def launch_stream(config: dict, output_directory: str):
         'fontsize': 50,
         's': resolutions[2],
         'minrate': '256k',
-        'bufsize': '512k',
+        'bufsize': '256k',
         'maxrate': '1M',
         'framerate': 30,
         'keyint_min': 60,
