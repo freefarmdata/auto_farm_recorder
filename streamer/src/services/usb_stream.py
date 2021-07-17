@@ -123,9 +123,9 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 40,
         'fontsize': 50,
-        's': resolutions[2],
-        'minrate': '256k',
-        'bufsize': '256k',
+        's': resolutions[3],
+        'minrate': '512k',
+        'bufsize': '512k',
         'maxrate': '1M',
         'framerate': 30,
         'keyint_min': 60,
