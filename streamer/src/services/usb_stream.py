@@ -50,7 +50,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -x264opts no-scenecut \
     -sc_threshold 0 \
     -vsync 1 \
-    -r {options.get('r')} \
+    -s {options.get('s')} \
     -bufsize {options.get('bufsize')} \
     -minrate {options.get('minrate')} \
     -maxrate {options.get('maxrate')} \
@@ -113,7 +113,7 @@ def launch_stream(name: str, output_directory: str):
         'maxrate': '1M',
         'framerate': 30,
         'keyint_min': 60,
-        'r': '1280x720',
+        's': '1280x720',
         'g': 60,
     }
     
