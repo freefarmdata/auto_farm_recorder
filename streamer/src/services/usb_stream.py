@@ -41,6 +41,10 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     # -vprofile baseline \
     # -fflags nobuffer \
     # -crf {options.get('crf')} \
+    # -framerate {options.get('framerate')} \
+    # -r {options.get('framerate')} \
+    # -keyint_min {options.get('keyint_min')} \
+    # -g {options.get('g')} \
 
     return f"""\
     -vcodec h264 \
@@ -57,10 +61,6 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -minrate {options.get('minrate')} \
     -maxrate {options.get('maxrate')} \
     -force_key_frames "expr:gte(t,n_forced*1)" \
-    -keyint_min {options.get('keyint_min')} \
-    -g {options.get('g')} \
-    -framerate {options.get('framerate')} \
-    -r {options.get('framerate')} \
     """
 
 
