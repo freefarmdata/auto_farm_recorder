@@ -104,7 +104,9 @@ def launch_stream(config: dict, output_directory: str):
     https://trac.ffmpeg.org/wiki/Creating%20multiple%20outputs
     https://hlsbook.net/category/ffmpeg/
 
-    Get USB Resolutions: lsusb -s 001:002 -v | egrep "Width|Height"
+    Get USB Resolutions:
+        - lsusb -s 001:002 -v | egrep "Width|Height"
+        - v4l2-ctl -d /dev/video0 --list-formats-ext
     """
     output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
     output_mp4_file = os.path.join(output_directory, f'{config.name}.mp4')
@@ -121,8 +123,8 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 40,
         'fontsize': 50,
-        's': resolutions[5],
-        'minrate': '512k',
+        's': resolutions[2],
+        'minrate': '256k',
         'bufsize': '512k',
         'maxrate': '1M',
         'framerate': 30,
