@@ -125,9 +125,9 @@ def launch_stream(config: dict, output_directory: str):
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 60,
-        'keyint_min': 120,
-        'g': 120,
+        'framerate': 15,
+        'keyint_min': 30,
+        'g': 30,
     }
 
     input = get_video_input()
