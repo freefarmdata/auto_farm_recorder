@@ -117,13 +117,13 @@ def launch_stream(name: str, output_directory: str):
 
     live_options = {
         'crf': 40,
-        's': resolutions[1],
+        's': resolutions[2],
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 10,
-        'keyint_min': 20,
-        'g': 20,
+        'framerate': 30,
+        'keyint_min': 60,
+        'g': 60,
     }
 
     input = get_video_input()
