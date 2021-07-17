@@ -40,6 +40,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
+    # -crf {options.get('crf')} \
 
     return f"""\
     -vcodec h264 \
@@ -55,7 +56,6 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -bufsize {options.get('bufsize')} \
     -minrate {options.get('minrate')} \
     -maxrate {options.get('maxrate')} \
-    -crf {options.get('crf')} \
     -force_key_frames "expr:gte(t,n_forced*1)" \
     -keyint_min {options.get('keyint_min')} \
     -g {options.get('g')} \
