@@ -125,7 +125,7 @@ def launch_stream(config: dict, output_directory: str):
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 30,
+        'framerate': 60,
         'keyint_min': 120,
         'g': 120,
     }
