@@ -2,8 +2,10 @@ from threading import Thread
 import logging
 import os
 
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, request
 from flask_cors import CORS
+
+from util.no_cache import no_cache
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins":"*"}})
@@ -33,10 +35,11 @@ def streams():
 
 
 @app.route('/stream/<string:file_name>', methods=['GET'])
+@no_cache
 def stream(file_name):
     config = app.config['CONFIG']
-    video_dir = os.path.abspath(config.get('video_dir'))
-    return send_from_directory(directory=video_dir, filename=file_name)
+    stream_dir = os.path.abspath(config.get('stream_dir'))
+    return send_from_directory(directory=stream_dir, filename=file_name)
 
 
 @app.route('/', methods=['GET'])

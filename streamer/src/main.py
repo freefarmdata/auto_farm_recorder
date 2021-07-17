@@ -14,27 +14,30 @@ def initialize(args):
   sunrise = '6:0:0:0'
   sunset = '18:0:0:0'
   data_directory = '/usr/src/app/bin'
-  streams = [{
-    'ip': '192.168.0.170',
-    'name': 'front_box'
-  }, {
-    'ip': '192.168.0.102',
-    'name': 'back_box',
-  }]
+  streams = [
+    {
+      'ip': '192.168.0.170',
+      'name': 'front_box'
+    },
+    # {
+    #   'ip': '192.168.0.102',
+    #   'name': 'back_box',
+    # }
+  ]
 
   if args.get('local') is True:
     data_directory = './bin'
 
-  temp_directory = os.path.join(data_directory, 'temp')
+  stream_directory = os.path.join(data_directory, 'streams')
   video_directory = os.path.join(data_directory, 'videos')
 
   os.makedirs(data_directory, exist_ok=True)
   os.makedirs(video_directory, exist_ok=True)
-  os.makedirs(temp_directory, exist_ok=True)
+  os.makedirs(stream_directory, exist_ok=True)
 
   return {
     'data_dir': data_directory,
-    'temp_dir': temp_directory,
+    'stream_dir': stream_directory,
     'video_dir': video_directory,
     'sunrise': sunrise,
     'sunset': sunset,
