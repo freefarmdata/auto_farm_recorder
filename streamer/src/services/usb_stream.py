@@ -138,8 +138,7 @@ def launch_stream(name: str, output_directory: str):
 
     logger.info(f'Running ffmpeg pipeline: {command}')
 
-    # stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-    return subprocess.Popen(command, shell=True)
+    return subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 class USBStream(TService):
