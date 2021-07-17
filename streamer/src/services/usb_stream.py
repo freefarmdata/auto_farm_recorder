@@ -108,16 +108,17 @@ def launch_stream(name: str, output_directory: str):
     output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
 
     resolutions = [
+        '1920x1080',
+        '1280x960',
         '1280x720',
-        '1138x640',
-        '1024×576',
-        '960×540',
-        '640×360'
+        '800x600',
+        '640x480',
+        '640x360'
     ]
 
     live_options = {
         'crf': 40,
-        's': resolutions[2],
+        's': resolutions[3],
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
