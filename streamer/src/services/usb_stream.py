@@ -8,6 +8,7 @@ import state
 
 logger = logging.getLogger()
 
+
 def clean_up_stream(name: str, output: str):
     """
     Removes all references to the HLS playlist for the
@@ -107,16 +108,16 @@ def launch_stream(name: str, output_directory: str):
     output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
 
     live_options = {
-        'crf': 30,
+        'crf': 40,
+        's': '1280x720',
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 30,
-        'keyint_min': 60,
-        's': '1280x720',
-        'g': 60,
+        'framerate': 10,
+        'keyint_min': 20,
+        'g': 20,
     }
-    
+
     input = get_video_input()
     encoding = get_tuned_encoding_pipeline(name, live_options)
     output_hls = get_hls_output_pipeline(output_hls_file)
