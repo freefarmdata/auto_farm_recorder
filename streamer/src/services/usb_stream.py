@@ -122,12 +122,12 @@ def launch_stream(name: str, output_directory: str):
         'crf': 40,
         'fontsize': 50,
         's': resolutions[3],
-        'minrate': '512k',
-        'bufsize': '256k',
+        'minrate': '256k',
+        'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 15,
-        'keyint_min': 30,
-        'g': 30,
+        'framerate': 30,
+        'keyint_min': 120,
+        'g': 120,
     }
 
     input = get_video_input()
