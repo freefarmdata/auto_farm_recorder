@@ -83,7 +83,7 @@ def get_mp4_output_pipeline(output_file: str):
     """
 
 
-def launch_stream(name: str, output_directory: str):
+def launch_stream(config: dict, output_directory: str):
     """
     params:
         - ip - the ip address of source video
@@ -106,8 +106,8 @@ def launch_stream(name: str, output_directory: str):
 
     Get USB Resolutions: lsusb -s 001:002 -v | egrep "Width|Height"
     """
-    output_hls_file = os.path.join(output_directory, f'{name}.m3u8')
-    output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
+    output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
+    output_mp4_file = os.path.join(output_directory, f'{config.name}.mp4')
 
     resolutions = [
         '1920x1080',
@@ -119,7 +119,7 @@ def launch_stream(name: str, output_directory: str):
     ]
 
     live_options = {
-        'crf': 23,
+        'crf': 40,
         'fontsize': 50,
         's': resolutions[4],
         'minrate': '512k',
@@ -131,7 +131,7 @@ def launch_stream(name: str, output_directory: str):
     }
 
     input = get_video_input()
-    encoding = get_tuned_encoding_pipeline(name, live_options)
+    encoding = get_tuned_encoding_pipeline(config.name, live_options)
     output_hls = get_hls_output_pipeline(output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
