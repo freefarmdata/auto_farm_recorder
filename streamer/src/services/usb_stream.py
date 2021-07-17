@@ -38,12 +38,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     """
 
     # -vprofile baseline \
-    # 
-    # 
-    # 
     # -fflags nobuffer \
-    # 
-    # 
 
     return f"""\
     -vcodec h264 \
@@ -110,7 +105,15 @@ def launch_stream(name: str, output_directory: str):
     output_hls_file = os.path.join(output_directory, f'{name}.m3u8')
     output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
 
-    live_options = { 'minrate': '512k', 'bufsize': '512k', 'maxrate': '1M', 'crf': 23, 'framerate': 60, 'keyint_min': 120, 'g': 120 }
+    live_options = {
+        'crf': 23,
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
+        'framerate': 30,
+        'keyint_min': 60,
+        'g': 60,
+    }
     
     input = get_video_input()
     encoding = get_tuned_encoding_pipeline(name, live_options)
