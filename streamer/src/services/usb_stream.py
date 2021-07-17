@@ -43,7 +43,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     return f"""\
     -vcodec h264 \
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
+    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=20:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -107,9 +107,17 @@ def launch_stream(name: str, output_directory: str):
     output_hls_file = os.path.join(output_directory, f'{name}.m3u8')
     output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
 
+    resolutions = [
+        '1280x720',
+        '1138x640',
+        '1024×576',
+        '960×540',
+        '640×360'
+    ]
+
     live_options = {
         'crf': 40,
-        's': '1280x720',
+        's': resolutions[1],
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
