@@ -119,10 +119,10 @@ def launch_stream(name: str, output_directory: str):
     ]
 
     live_options = {
-        'crf': 40,
+        'crf': 23,
         'fontsize': 50,
-        's': resolutions[3],
-        'minrate': '256k',
+        's': resolutions[4],
+        'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
         'framerate': 30,
