@@ -153,7 +153,7 @@ class USBStream(TService):
     def run_start(self):
         output_dir = state.get_global_setting('stream_dir')
         clean_up_stream(self.config.name, output_dir)
-        self.process = launch_stream(self.config.name, output_dir)
+        self.process = launch_stream(self.config, output_dir)
 
 
     def run_loop(self):
