@@ -43,7 +43,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     return f"""\
     -vcodec h264 \
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=20:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
+    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -70,7 +70,7 @@ def get_hls_output_pipeline(output_file: str):
     -hls_flags delete_segments+independent_segments \
     -hls_segment_type mpegts \
     -hls_allow_cache 0 \
-    -hls_list_size 1 \
+    -hls_list_size 2 \
     -hls_time 1 \
     {output_file} \
     """
@@ -103,6 +103,8 @@ def launch_stream(name: str, output_directory: str):
     https://sonnati.wordpress.com/2011/08/30/ffmpeg-%E2%80%93-the-swiss-army-knife-of-internet-streaming-%E2%80%93-part-iv/
     https://trac.ffmpeg.org/wiki/Creating%20multiple%20outputs
     https://hlsbook.net/category/ffmpeg/
+
+    Get USB Resolutions: lsusb -s 001:002 -v | egrep "Width|Height"
     """
     output_hls_file = os.path.join(output_directory, f'{name}.m3u8')
     output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
@@ -118,13 +120,14 @@ def launch_stream(name: str, output_directory: str):
 
     live_options = {
         'crf': 40,
+        'fontsize': 50,
         's': resolutions[3],
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 30,
-        'keyint_min': 60,
-        'g': 60,
+        'framerate': 15,
+        'keyint_min': 30,
+        'g': 30,
     }
 
     input = get_video_input()
