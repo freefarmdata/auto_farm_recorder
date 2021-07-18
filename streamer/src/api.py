@@ -2,7 +2,7 @@ from threading import Thread
 import logging
 import os
 
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, send_file, request
 from flask_cors import CORS
 
 from util.no_cache import no_cache
@@ -41,4 +41,6 @@ def stream(file_name):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    data_dir = os.path.abspath(state.get_global_setting('data_dir'))
+    stream_html = os.path.join(data_dir, 'index.html')
+    return send_file(stream_html)
