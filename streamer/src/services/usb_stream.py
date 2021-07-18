@@ -140,6 +140,9 @@ def launch_stream(config: dict, output_directory: str):
 
     logger.info(f'Running ffmpeg pipeline: {command}')
 
+    if state.get_global_setting('debug'):
+        return subprocess.Popen(command, shell=True)
+    
     return subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
