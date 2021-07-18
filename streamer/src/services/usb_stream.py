@@ -42,11 +42,10 @@ def get_tuned_encoding_pipeline(options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    # 
+    # -vcodec {options.get('vcodec')} \
 
     return f"""\
     -vf "drawtext=text='%{{localtime\: default --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
-    -vcodec {options.get('vcodec')} \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -136,9 +135,7 @@ def launch_stream(config: dict, output_directory: str):
         'g': 120,
     }
 
-    4147200
-
-    input = get_video_input(config.name)
+    input = get_video_input()
     encoding = get_tuned_encoding_pipeline(live_options)
     output_hls = get_hls_output_pipeline(output_hls_file)
 
