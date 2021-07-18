@@ -43,10 +43,6 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     # -framerate {options.get('framerate')} \
     # -keyint_min {options.get('keyint_min')} \
     # -g {options.get('g')} \
-    # -movflags +faststart \
-    # -x264opts no-scenecut \
-    # -sc_threshold 0 \
-    # -vsync 1 \
     # -bufsize {options.get('bufsize')} \
     # -minrate {options.get('minrate')} \
     # -maxrate {options.get('maxrate')} \
@@ -57,6 +53,10 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
+    -movflags +faststart \
+    -x264opts no-scenecut \
+    -sc_threshold 0 \
+    -vsync 1 \
     -video_size {options.get('video_size')} \
     -force_key_frames "expr:gte(t,n_forced*1)" \
     -crf {options.get('crf')} \
