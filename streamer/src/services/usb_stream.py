@@ -40,11 +40,16 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    # -crf {options.get('crf')} \
     # -framerate {options.get('framerate')} \
-    # -r {options.get('framerate')} \
     # -keyint_min {options.get('keyint_min')} \
     # -g {options.get('g')} \
+    # -movflags +faststart \
+    # -x264opts no-scenecut \
+    # -sc_threshold 0 \
+    # -vsync 1 \
+    # -bufsize {options.get('bufsize')} \
+    # -minrate {options.get('minrate')} \
+    # -maxrate {options.get('maxrate')} \
 
     return f"""\
     -vcodec h264 \
@@ -52,15 +57,9 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
-    -movflags +faststart \
-    -x264opts no-scenecut \
-    -sc_threshold 0 \
-    -vsync 1 \
-    -s {options.get('s')} \
-    -bufsize {options.get('bufsize')} \
-    -minrate {options.get('minrate')} \
-    -maxrate {options.get('maxrate')} \
+    -video_size {options.get('video_size')} \
     -force_key_frames "expr:gte(t,n_forced*1)" \
+    -crf {options.get('crf')} \
     """
 
 
@@ -123,7 +122,7 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 40,
         'fontsize': 50,
-        's': resolutions[-1],
+        'video_size': resolutions[-1],
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',

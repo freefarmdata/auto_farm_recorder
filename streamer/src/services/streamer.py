@@ -45,11 +45,18 @@ class Streamer(TService):
     def run_update(self, message):
         if message is not None:
             if message.get('action') == 'attach':
-                self.streams.append(self.start_stream(message.get('config')))
+                self.attach_stream(message.get('config'))
 
 
     def run_end(self):
         self.stop_streams()
+
+    
+    def attach_stream(self, config):
+        configs = state.get_service_setting('streamer', 'streams')
+        configs.append(config)
+        state.set_service_setting('streamer', 'streams', configs)
+        self.streams.append(self.start_stream(config))
 
 
     def start_stream(self, config) -> TService:
