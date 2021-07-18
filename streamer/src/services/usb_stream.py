@@ -122,13 +122,13 @@ def launch_stream(config: dict, output_directory: str):
     ]
 
     live_options = {
-        'crf': 50,
-        'fontsize': 50,
-        'vcodec': 'libx264',
-        'video_size': resolutions[-2],
-        'minrate': '128k',
-        'bufsize': '128k',
-        'maxrate': '128k',
+        'crf': 23,
+        'fontsize': 100,
+        'vcodec': 'h264',
+        'video_size': resolutions[1],
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
         'framerate': 5,
         'keyint_min': 10,
         'g': 10,
