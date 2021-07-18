@@ -126,12 +126,12 @@ def launch_stream(config: dict, output_directory: str):
         'fontsize': 50,
         'vcodec': 'h264',
         'video_size': resolutions[2],
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
-        'framerate': 5,
-        'keyint_min': 10,
-        'g': 10,
+        'minrate': '1M',
+        'bufsize': '5M',
+        'maxrate': '5M',
+        'framerate': 30,
+        'keyint_min': 120,
+        'g': 120,
     }
 
     4147200
