@@ -42,10 +42,10 @@ def get_tuned_encoding_pipeline(options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    # -vcodec {options.get('vcodec')} \
+    # -vf "drawtext=text='%{{localtime\: default --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
 
     return f"""\
-    -vf "drawtext=text='%{{localtime\: default --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
+    -vcodec copy \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -127,9 +127,9 @@ def launch_stream(config: dict, output_directory: str):
         'fontsize': 50,
         'vcodec': 'copy',
         'video_size': resolutions[2],
-        'minrate': '1M',
-        'bufsize': '5M',
-        'maxrate': '5M',
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
         'framerate': 30,
         'keyint_min': 120,
         'g': 120,
