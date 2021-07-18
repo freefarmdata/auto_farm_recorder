@@ -125,12 +125,12 @@ def launch_stream(config: dict, output_directory: str):
         'fontsize': 50,
         'vcodec': 'h264',
         'video_size': resolutions[-1],
-        'minrate': '300k',
-        'bufsize': '300k',
-        'maxrate': '500k',
-        'framerate': 30,
-        'keyint_min': 60,
-        'g': 60,
+        'minrate': '256k',
+        'bufsize': '256k',
+        'maxrate': '512k',
+        'framerate': 15,
+        'keyint_min': 30,
+        'g': 30,
     }
 
     input = get_video_input()
