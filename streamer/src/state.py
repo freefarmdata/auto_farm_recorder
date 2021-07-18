@@ -44,6 +44,8 @@ def initialize(args):
     os.makedirs(stream_directory, exist_ok=True)
 
     settings = {
+        'debug': args.get('debug'),
+        'local': args.get('local'),
         'data_dir': data_directory,
         'stream_dir': stream_directory,
         'video_dir': video_directory,
