@@ -40,12 +40,6 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    # -framerate {options.get('framerate')} \
-    # -keyint_min {options.get('keyint_min')} \
-    # -g {options.get('g')} \
-    # -bufsize {options.get('bufsize')} \
-    # -minrate {options.get('minrate')} \
-    # -maxrate {options.get('maxrate')} \
 
     return f"""\
     -vcodec h264 \
@@ -57,9 +51,15 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -x264opts no-scenecut \
     -sc_threshold 0 \
     -vsync 1 \
-    -video_size {options.get('video_size')} \
-    -force_key_frames "expr:gte(t,n_forced*1)" \
     -crf {options.get('crf')} \
+    -video_size {options.get('video_size')} \
+    -bufsize {options.get('bufsize')} \
+    -minrate {options.get('minrate')} \
+    -maxrate {options.get('maxrate')} \
+    -framerate {options.get('framerate')} \
+    -force_key_frames "expr:gte(t,n_forced*1)" \
+    -keyint_min {options.get('keyint_min')} \
+    -g {options.get('g')} \
     """
 
 
@@ -126,9 +126,9 @@ def launch_stream(config: dict, output_directory: str):
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
-        'framerate': 10,
-        'keyint_min': 20,
-        'g': 20,
+        'framerate': 30,
+        'keyint_min': 60,
+        'g': 60,
     }
 
     input = get_video_input()
