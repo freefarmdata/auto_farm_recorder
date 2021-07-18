@@ -21,7 +21,7 @@ def clean_up_stream(name: str, output: str):
 
 def get_video_input():
     return f"""\
-    -i /dev/video0 \
+    -f v4l2 -codec:v h264 -i /dev/video0 \
     """
 
 
@@ -124,7 +124,7 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 23,
         'fontsize': 50,
-        'vcodec': 'h264',
+        'vcodec': 'copy',
         'video_size': resolutions[2],
         'minrate': '1M',
         'bufsize': '5M',
