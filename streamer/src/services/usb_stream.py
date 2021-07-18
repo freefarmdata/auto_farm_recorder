@@ -21,7 +21,7 @@ def clean_up_stream(name: str, output: str):
 
 def get_video_input():
     return f"""\
-    -re -i /dev/video0 \
+    -i /dev/video0 \
     """
 
 
