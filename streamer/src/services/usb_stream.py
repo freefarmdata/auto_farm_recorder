@@ -123,16 +123,18 @@ def launch_stream(config: dict, output_directory: str):
 
     live_options = {
         'crf': 23,
-        'fontsize': 100,
+        'fontsize': 50,
         'vcodec': 'h264',
-        'video_size': resolutions[1],
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
+        'video_size': resolutions[2],
+        'minrate': '5000k',
+        'bufsize': '5000k',
+        'maxrate': '6000k',
         'framerate': 5,
         'keyint_min': 10,
         'g': 10,
     }
+
+    4147200
 
     input = get_video_input()
     encoding = get_tuned_encoding_pipeline(config.name, live_options)
