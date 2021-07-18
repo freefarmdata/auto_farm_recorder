@@ -52,6 +52,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     -x264opts no-scenecut \
     -sc_threshold 0 \
     -vsync 1 \
+    -threads 4 \
     -crf {options.get('crf')} \
     -video_size {options.get('video_size')} \
     -bufsize {options.get('bufsize')} \
@@ -124,7 +125,7 @@ def launch_stream(config: dict, output_directory: str):
         'crf': 50,
         'fontsize': 50,
         'vcodec': 'libx264',
-        'video_size': resolutions[-1],
+        'video_size': resolutions[-2],
         'minrate': '128k',
         'bufsize': '128k',
         'maxrate': '128k',
