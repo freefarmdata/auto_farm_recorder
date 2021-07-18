@@ -40,10 +40,9 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    #
+    # -vcodec {options.get('vcodec')} \
 
     return f"""\
-    -vcodec {options.get('vcodec')} \
     -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
     -preset veryfast \
     -tune zerolatency \
