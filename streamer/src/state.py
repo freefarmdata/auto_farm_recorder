@@ -20,7 +20,9 @@ _setting_lock = threading.Lock()
 services['streamer'] = {
   'create': Streamer,
   'instance': None,
-  'settings': {},
+  'settings': {
+    'streams': [],
+  },
   'lock': threading.Lock(),
 }
 
