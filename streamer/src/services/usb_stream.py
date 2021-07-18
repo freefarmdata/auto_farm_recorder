@@ -42,7 +42,7 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     # -fflags nobuffer \
 
     return f"""\
-    -vcodec h264 \
+    -vcodec {options.get('vcodec')} \
     -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
     -preset veryfast \
     -tune zerolatency \
@@ -122,10 +122,11 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 50,
         'fontsize': 50,
+        'vcodec': 'copy', # h264
         'video_size': resolutions[-1],
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
+        'minrate': '300k',
+        'bufsize': '300k',
+        'maxrate': '500k',
         'framerate': 30,
         'keyint_min': 60,
         'g': 60,
