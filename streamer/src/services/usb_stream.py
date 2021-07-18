@@ -19,11 +19,10 @@ def clean_up_stream(name: str, output: str):
         os.remove(os.path.join(output, file_name))
 
 
-def get_video_input(name: str):
+def get_video_input():
     return f"""\
     -f v4l2 \
     -codec:v h264 \
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
     -i /dev/video0 \
     """
 
@@ -46,6 +45,7 @@ def get_tuned_encoding_pipeline(options: dict):
     # 
 
     return f"""\
+    -vf "drawtext=text='%{{localtime\: default --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
     -vcodec {options.get('vcodec')} \
     -preset veryfast \
     -tune zerolatency \
