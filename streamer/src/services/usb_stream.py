@@ -19,13 +19,16 @@ def clean_up_stream(name: str, output: str):
         os.remove(os.path.join(output, file_name))
 
 
-def get_video_input():
+def get_video_input(name: str):
     return f"""\
-    -f v4l2 -codec:v h264 -i /dev/video0 \
+    -f v4l2 \
+    -codec:v h264 \
+    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=100:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
+    -i /dev/video0 \
     """
 
 
-def get_tuned_encoding_pipeline(name: str, options: dict):
+def get_tuned_encoding_pipeline(options: dict):
     """
     ffmpeg params:
         - c:v - video type
@@ -40,10 +43,10 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
 
     # -vprofile baseline \
     # -fflags nobuffer \
-    # -vcodec {options.get('vcodec')} \
+    # 
 
     return f"""\
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize={options.get('fontsize')}:fontcolor=yellow@0.8:x=10:y=10:shadowcolor=blue@0.6:shadowx=2:shadowy=2" \
+    -vcodec {options.get('vcodec')} \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
@@ -123,7 +126,7 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 23,
         'fontsize': 50,
-        'vcodec': 'h264',
+        'vcodec': 'copy',
         'video_size': resolutions[2],
         'minrate': '1M',
         'bufsize': '5M',
@@ -135,8 +138,8 @@ def launch_stream(config: dict, output_directory: str):
 
     4147200
 
-    input = get_video_input()
-    encoding = get_tuned_encoding_pipeline(config.name, live_options)
+    input = get_video_input(config.name)
+    encoding = get_tuned_encoding_pipeline(live_options)
     output_hls = get_hls_output_pipeline(output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
