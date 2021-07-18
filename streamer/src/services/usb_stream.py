@@ -120,7 +120,7 @@ def launch_stream(config: dict, output_directory: str):
     ]
 
     live_options = {
-        'crf': 40,
+        'crf': 50,
         'fontsize': 50,
         'video_size': resolutions[-1],
         'minrate': '512k',
