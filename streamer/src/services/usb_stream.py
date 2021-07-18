@@ -123,11 +123,11 @@ def launch_stream(config: dict, output_directory: str):
     live_options = {
         'crf': 50,
         'fontsize': 50,
-        'vcodec': 'h264',
+        'vcodec': 'libx264',
         'video_size': resolutions[-1],
         'minrate': '128k',
         'bufsize': '128k',
-        'maxrate': '256k',
+        'maxrate': '128k',
         'framerate': 15,
         'keyint_min': 30,
         'g': 30,
