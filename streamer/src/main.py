@@ -40,6 +40,7 @@ def attach_streams():
       .with_config({ 
         'ip': '192.168.0.170',
         'crf': 23,
+        'vsync': 0,
         'fontsize': 50,
         'vcodec': 'copy',
         'video_size': '1024x768',

@@ -53,6 +53,7 @@ def get_tuned_encoding_pipeline(options: dict):
     # -vprofile baseline \
     # -fflags nobuffer \
     # -vcodec h264 \
+    # -crf {options.get('crf')} \
     # -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
 
     return f"""\
@@ -61,10 +62,7 @@ def get_tuned_encoding_pipeline(options: dict):
     -pix_fmt yuv420p \
     -movflags +faststart \
     -x264opts no-scenecut \
-    -sc_threshold 0 \
-    -vsync 1 \
-    -threads 4 \
-    -crf {options.get('crf')} \
+    -vsync {options.get('vsync')} \
     -video_size {options.get('video_size')} \
     -bufsize {options.get('bufsize')} \
     -minrate {options.get('minrate')} \
