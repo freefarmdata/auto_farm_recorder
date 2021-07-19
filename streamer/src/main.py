@@ -17,6 +17,18 @@ def attach_streams():
       .create()
       .with_type('usb')
       .with_name('front_cam')
+      .with_config({
+        'crf': 23,
+        'fontsize': 50,
+        'vcodec': 'copy',
+        'video_size': '1280x720',
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
+        'framerate': 30,
+        'keyint_min': 120,
+        'g': 120,
+      })
   )
 
   esp_default_config = (
@@ -24,10 +36,22 @@ def attach_streams():
       .create()
       .with_type('esp32')
       .with_name('back_cam')
-      .with_config({ 'ip': '192.168.0.170' })
+      .with_config({ 
+        'ip': '192.168.0.170',
+        'crf': 23,
+        'fontsize': 50,
+        'vcodec': 'copy',
+        'video_size': '1024x768',
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
+        'framerate': 15,
+        'keyint_min': 30,
+        'g': 30,
+      })
   )
 
-  state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
+  #state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
   state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })
 
 

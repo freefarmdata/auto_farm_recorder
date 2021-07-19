@@ -118,27 +118,8 @@ def launch_stream(config, output_directory: str):
     """
     output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
 
-    resolutions = [
-        '1600x1200',
-        '1280x1024',
-        '1024x768',
-    ]
-
-    live_options = {
-        'crf': 23,
-        'fontsize': 50,
-        'vcodec': 'copy',
-        'video_size': resolutions[2],
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
-        'framerate': 15,
-        'keyint_min': 30,
-        'g': 30,
-    }
-
     input = get_video_input(config.config.get('ip'))
-    encoding = get_tuned_encoding_pipeline(live_options)
+    encoding = get_tuned_encoding_pipeline(config.config)
     output_hls = get_hls_output_pipeline(output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
