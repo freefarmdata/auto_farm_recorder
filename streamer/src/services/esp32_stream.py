@@ -23,7 +23,7 @@ def clean_up_stream(name: str, output: str):
 
 def get_video_input(ip: str):
     return f"""\
-    -codec:v h264 \
+    -codec:v mjpeg \
     -i http://{ip}:81/stream \
     """
 
