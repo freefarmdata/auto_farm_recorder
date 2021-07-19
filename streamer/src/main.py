@@ -51,7 +51,7 @@ def attach_streams():
       })
   )
 
-  #state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
+  state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
   state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })
 
 
