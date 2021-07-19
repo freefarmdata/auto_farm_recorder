@@ -27,7 +27,7 @@ def attach_streams():
       .with_config({ 'ip': '192.168.0.170' })
   )
 
-  state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
+  #state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
   state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })
 
 
