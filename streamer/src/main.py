@@ -18,10 +18,10 @@ def attach_streams():
       .with_type('usb')
       .with_name('front_cam')
       .with_config({
-        'crf': 30,
+        'crf': 35,
         'fontsize': 50,
         'vcodec': 'copy',
-        'video_size': '1280x720',
+        'video_size': '800x600',
         'minrate': '512k',
         'bufsize': '512k',
         'maxrate': '1M',
