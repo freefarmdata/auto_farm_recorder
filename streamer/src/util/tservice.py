@@ -11,7 +11,8 @@ class TService(threading.Thread):
         super().__init__(daemon=True)
         self._stop_event = threading.Event()
         self._update_event = threading.Event()
-        self._update_message = None
+        self._update_lock = threading.Lock()
+        self._update_messages = []
         self._interval = interval
         self._stopped = False
         self._has_started = False
@@ -59,16 +60,14 @@ class TService(threading.Thread):
 
     def try_update(self):
         try:
-            if self._update_event.is_set():
-                self.run_update(self._update_message)
-                self._update_event.clear()
+            with self._update_lock:
+                if len(self._update_messages) > 0:
+                    message = self._update_messages.pop()
+                    self.run_update(message)
             return True
         except:
             logger.exception('Unexpected error in update')
             return False
-        finally:
-            self._update_event.clear()
-            self._update_message = None
 
 
     def try_sleep(self, start):
@@ -109,8 +108,8 @@ class TService(threading.Thread):
 
 
     def update(self, message):
-        self._update_event.set()
-        self._update_message = message
+        with self._update_lock:
+            self._update_messages.append(message)
 
 
     def stop(self):
