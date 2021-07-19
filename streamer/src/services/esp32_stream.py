@@ -183,11 +183,9 @@ def set_stream_settings(ip: str):
 
 class ESP32Stream(TService):
 
-    def __init__(self, ip, name, config):
+    def __init__(self, config):
         super().__init__()
         self.set_interval(1E9)
-        self.ip = ip
-        self.name = name
         self.config = config
         self.process = None
 
