@@ -74,14 +74,14 @@ def get_tuned_encoding_pipeline(options: dict):
     """
 
 
-def get_hls_output_pipeline(output_file: str):
+def get_hls_output_pipeline(options: dict, output_file: str):
     return f"""\
     -f hls \
-    -hls_flags delete_segments+independent_segments \
+    -hls_flags delete_segments \
     -hls_segment_type mpegts \
     -hls_allow_cache 0 \
-    -hls_list_size 2 \
-    -hls_time 1 \
+    -hls_list_size {options.get('hls_list_size')} \
+    -hls_time {options.get('hls_time')} \
     {output_file} \
     """
 
@@ -118,7 +118,7 @@ def launch_stream(config, output_directory: str):
 
     input = get_video_input(config.config.get('ip'))
     encoding = get_tuned_encoding_pipeline(config.config)
-    output_hls = get_hls_output_pipeline(output_hls_file)
+    output_hls = get_hls_output_pipeline(config.config, output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
 

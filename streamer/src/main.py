@@ -29,6 +29,8 @@ def attach_streams():
         'framerate': 30,
         'keyint_min': 120,
         'g': 120,
+        'hls_list_size': 2,
+        'hls_time': 0.5,
       })
   )
 
@@ -50,6 +52,8 @@ def attach_streams():
         'framerate': 15,
         'keyint_min': 30,
         'g': 30,
+        'hls_list_size': 2,
+        'hls_time': 0.5,
       })
   )
 
