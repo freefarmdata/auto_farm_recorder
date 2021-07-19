@@ -6,8 +6,10 @@ import subprocess
 import requests
 
 from util.tservice import TService
+import state
 
 logger = logging.getLogger()
+
 
 def clean_up_stream(name: str, output: str):
     """
@@ -19,8 +21,10 @@ def clean_up_stream(name: str, output: str):
         os.remove(os.path.join(output, file_name))
 
 
-def get_esp_input(ip: str):
+def get_video_input(ip: str):
     return f"""\
+    -f v4l2 \
+    -codec:v h264 \
     -i http://{ip}:81/stream \
     """
 
@@ -35,7 +39,7 @@ def get_webcam_input():
     """
 
 
-def get_tuned_encoding_pipeline(name: str, options: dict):
+def get_tuned_encoding_pipeline(options: dict):
     """
     ffmpeg params:
         - c:v - video type
@@ -54,28 +58,29 @@ def get_tuned_encoding_pipeline(name: str, options: dict):
     # 
     # -fflags nobuffer \
     # 
-    # -crf {options.get('crf')} \
-    
-    
-
+    # 
+    # -vcodec h264 \
+    # -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
 
     return f"""\
-    -vcodec h264 \
-    -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
+    -vcodec copy \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
+    -movflags +faststart \
     -x264opts no-scenecut \
     -sc_threshold 0 \
     -vsync 1 \
+    -threads 4 \
+    -crf {options.get('crf')} \
+    -video_size {options.get('video_size')} \
     -bufsize {options.get('bufsize')} \
     -minrate {options.get('minrate')} \
     -maxrate {options.get('maxrate')} \
+    -framerate {options.get('framerate')} \
     -force_key_frames "expr:gte(t,n_forced*1)" \
     -keyint_min {options.get('keyint_min')} \
     -g {options.get('g')} \
-    -framerate {options.get('framerate')} \
-    -r {options.get('framerate')} \
     """
 
 
@@ -98,7 +103,7 @@ def get_mp4_output_pipeline(output_file: str):
     """
 
 
-def launch_stream(ip: str, name: str, output_directory: str):
+def launch_stream(config, output_directory: str):
     """
     params:
         - ip - the ip address of source video
@@ -119,26 +124,39 @@ def launch_stream(ip: str, name: str, output_directory: str):
     https://trac.ffmpeg.org/wiki/Creating%20multiple%20outputs
     https://hlsbook.net/category/ffmpeg/
     """
-    output_hls_file = os.path.join(output_directory, f'{name}.m3u8')
-    output_mp4_file = os.path.join(output_directory, f'{name}.mp4')
+    output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
+    output_mp4_file = os.path.join(output_directory, f'{config.name}.mp4')
 
-    live_options = { 'minrate': '512k', 'bufsize': '512k', 'maxrate': '1M', 'crf': 23, 'framerate': 60, 'keyint_min': 120, 'g': 120 }
-    #live_options = { 'minrate': '256k', 'bufsize': '512k', 'maxrate': '512k', 'crf': 23, 'framerate': 15, 'keyint_min': 30, 'g': 30 }
-    #live_options = { 'minrate': '128k', 'bufsize': '256k', 'maxrate': '256k', 'crf': 23, 'framerate': 10, 'keyint_min': 20, 'g': 20 }
+    resolutions = [
+        '1600x1200',
+        '1280x1024',
+        '1024x768',
+    ]
 
-    input = get_esp_input(ip)
-    #input = get_webcam_input()
-    # input = """\
-    # -i rtsp://10.0.9.150/axis-media/media.amp \
-    # """
-    encoding = get_tuned_encoding_pipeline(name, live_options)
+    live_options = {
+        'crf': 23,
+        'fontsize': 50,
+        'vcodec': 'copy',
+        'video_size': resolutions[2],
+        'minrate': '512k',
+        'bufsize': '512k',
+        'maxrate': '1M',
+        'framerate': 30,
+        'keyint_min': 120,
+        'g': 120,
+    }
+
+    input = get_video_input(config.config.get('ip'))
+    encoding = get_tuned_encoding_pipeline(live_options)
     output_hls = get_hls_output_pipeline(output_hls_file)
-    #output_mp4 = get_hls_output_pipeline(output_mp4_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
 
     logger.info(f'Running ffmpeg pipeline: {command}')
 
+    if state.get_global_setting('debug'):
+        return subprocess.Popen(command, shell=True)
+    
     return subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
@@ -162,6 +180,7 @@ def set_stream_settings(ip: str):
         logger.info(f'Setting {setting} to {value} for camera {ip}')
         assert requests.get(url, timeout=(5, 5)).status_code == 200
 
+
 class ESP32Stream(TService):
 
     def __init__(self, ip, name, config):
@@ -174,10 +193,10 @@ class ESP32Stream(TService):
 
 
     def run_start(self):
-        output_dir = self.config.get('stream_dir')
-        clean_up_stream(self.name, output_dir)
-        set_stream_settings(self.ip)
-        self.process = launch_stream(self.ip, self.name, output_dir)
+        output_dir = state.get_global_setting('stream_dir')
+        clean_up_stream(self.config.name, output_dir)
+        set_stream_settings(self.config.config.get('ip'))
+        self.process = launch_stream(self.config, output_dir)
 
 
     def run_loop(self):
@@ -186,4 +205,4 @@ class ESP32Stream(TService):
     
 
     def run_end(self):
-        clean_up_stream(self.name, self.config.get('video_dir'))
+        clean_up_stream(self.config.name, state.get_global_setting('stream_dir'))

@@ -11,6 +11,26 @@ import state
 
 logger = logging.getLogger()
 
+def attach_streams():
+  usb_default_config = (
+    StreamConfig
+      .create()
+      .with_type('usb')
+      .with_name('Front Cam')
+  )
+
+  esp_default_config = (
+    StreamConfig
+      .create()
+      .with_type('esp32')
+      .with_name('Back Cam')
+      .with_config({ 'ip': '192.168.0.170' })
+  )
+
+  state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
+  state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })
+
+
 if __name__ == "__main__":
   multiprocessing.set_start_method('spawn', force=True)
 
@@ -25,9 +45,7 @@ if __name__ == "__main__":
 
   state.start_services()
 
-  default_config = StreamConfig.create().with_type('usb').with_name('default')
-
-  state.update_service('streamer', { 'action': 'attach', 'config': default_config })
+  attach_streams()
 
   api = API()
   api.start()
