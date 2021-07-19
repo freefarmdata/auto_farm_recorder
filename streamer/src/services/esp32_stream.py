@@ -51,12 +51,7 @@ def get_tuned_encoding_pipeline(options: dict):
     """
 
     # -vprofile baseline \
-    # 
-    # -movflags +faststart \
-    # 
     # -fflags nobuffer \
-    # 
-    # 
     # -vcodec h264 \
     # -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
 
@@ -88,7 +83,7 @@ def get_hls_output_pipeline(output_file: str):
     -hls_flags delete_segments+independent_segments \
     -hls_segment_type mpegts \
     -hls_allow_cache 0 \
-    -hls_list_size 1 \
+    -hls_list_size 2 \
     -hls_time 1 \
     {output_file} \
     """
@@ -123,7 +118,6 @@ def launch_stream(config, output_directory: str):
     https://hlsbook.net/category/ffmpeg/
     """
     output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
-    output_mp4_file = os.path.join(output_directory, f'{config.name}.mp4')
 
     resolutions = [
         '1600x1200',
