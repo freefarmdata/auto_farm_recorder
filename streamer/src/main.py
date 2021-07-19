@@ -20,6 +20,7 @@ def attach_streams():
       .with_config({
         'crf': 35,
         'fontsize': 50,
+        'vsync': 0,
         'vcodec': 'copy',
         'video_size': '800x600',
         'minrate': '512k',
