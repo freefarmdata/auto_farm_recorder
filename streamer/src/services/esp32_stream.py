@@ -23,6 +23,7 @@ def clean_up_stream(name: str, output: str):
 
 def get_video_input(ip: str):
     return f"""\
+    -codec:v h264 \
     -i http://{ip}:81/stream \
     """
 
@@ -163,7 +164,7 @@ def set_stream_settings(ip: str):
     Sets default settings to the AI Tinker ESP32 Camera Module Board
     """
     settings_map = {
-        'framesize': 4, # set 1024x768
+        'framesize': 8, # set 1024x768
         'quality': 30,
         'brightness': 1,
         'ae_level': 1,
