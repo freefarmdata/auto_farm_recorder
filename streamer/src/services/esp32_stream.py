@@ -56,6 +56,7 @@ def get_tuned_encoding_pipeline(options: dict):
     # -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
 
     return f"""\
+    -c copy \
     -preset veryfast \
     -tune zerolatency \
     -pix_fmt yuv420p \
