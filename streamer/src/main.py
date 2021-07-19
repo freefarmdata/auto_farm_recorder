@@ -20,7 +20,7 @@ def attach_streams():
       .with_config({
         'crf': 35,
         'fontsize': 50,
-        'vsync': 0,
+        'vsync': 2,
         'vcodec': 'copy',
         'video_size': '800x600',
         'minrate': '512k',
@@ -39,10 +39,10 @@ def attach_streams():
       .create()
       .with_type('esp32')
       .with_name('back_cam')
-      .with_config({ 
+      .with_config({
         'ip': '192.168.0.170',
         'crf': 23,
-        'vsync': 0,
+        'vsync': 2,
         'fontsize': 50,
         'vcodec': 'copy',
         'video_size': '1024x768',
