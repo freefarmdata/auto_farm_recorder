@@ -16,14 +16,14 @@ def attach_streams():
     StreamConfig
       .create()
       .with_type('usb')
-      .with_name('Front Cam')
+      .with_name('front_cam')
   )
 
   esp_default_config = (
     StreamConfig
       .create()
       .with_type('esp32')
-      .with_name('Back Cam')
+      .with_name('back_cam')
       .with_config({ 'ip': '192.168.0.170' })
   )
 
