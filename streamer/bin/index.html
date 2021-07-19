@@ -45,18 +45,18 @@
                 aspectRatio: '4:3',
                 controls: false,
                 preload: 'auto',
-                // html5: {
-                //     hls: {
-                //         // maxMaxBufferLength: 1,
-                //         // liveSyncDuration: 0.5,
-                //         // liveMaxLatencyDuration: 1,
-                //         // liveBackBufferLength: 0,
-                //         // nudgeMaxRetry: 10,
-                //         // maxBufferLength: 1,
-                //         // maxStarvationDelay: 0.5,
-                //         // liveSyncDurationCount: 0,
-                //     }
-                // }
+                html5: {
+                    hls: {
+                        maxMaxBufferLength: 1,
+                        liveSyncDuration: 0.5,
+                        liveMaxLatencyDuration: 1,
+                        liveBackBufferLength: 0,
+                        nudgeMaxRetry: 10,
+                        maxBufferLength: 1,
+                        maxStarvationDelay: 0.5,
+                        liveSyncDurationCount: 0,
+                    }
+                }
             };
             
             // https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8
