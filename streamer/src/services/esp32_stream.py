@@ -175,4 +175,9 @@ class ESP32Stream(TService):
     
 
     def run_end(self):
+        try:
+            while not self.process.poll():
+                self.process.kill()
+        except:
+            pass
         clean_up_stream(self.config.name, state.get_global_setting('stream_dir'))
