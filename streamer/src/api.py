@@ -2,7 +2,7 @@ from threading import Thread
 import logging
 import os
 
-from flask import Flask, render_template, send_from_directory, send_file, request
+from flask import Flask, send_from_directory, send_file
 from flask_cors import CORS
 
 from util.no_cache import no_cache

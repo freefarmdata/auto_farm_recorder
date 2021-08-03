@@ -1,12 +1,16 @@
 import os
+import sys
 import time
 import logging
 import subprocess
 
 import requests
 
-from util.tservice import TService
 import state
+
+sys.path.append('../libs/pystate')
+
+from tservice import TService
 
 logger = logging.getLogger()
 
@@ -114,11 +118,11 @@ def launch_stream(config, output_directory: str):
     https://trac.ffmpeg.org/wiki/Creating%20multiple%20outputs
     https://hlsbook.net/category/ffmpeg/
     """
-    output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
+    output_hls_file = os.path.join(output_directory, f'{config.get("stream_name")}.m3u8')
 
-    input = get_video_input(config.config.get('ip'))
-    encoding = get_tuned_encoding_pipeline(config.config)
-    output_hls = get_hls_output_pipeline(config.config, output_hls_file)
+    input = get_video_input(config.get('ip'))
+    encoding = get_tuned_encoding_pipeline(config)
+    output_hls = get_hls_output_pipeline(config, output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
 
@@ -162,8 +166,8 @@ class ESP32Stream(TService):
 
     def run_start(self):
         output_dir = state.get_global_setting('stream_dir')
-        clean_up_stream(self.config.name, output_dir)
-        set_stream_settings(self.config.config.get('ip'))
+        clean_up_stream(self.config.get('stream_name'), output_dir)
+        set_stream_settings(self.config.get('ip'))
         self.process = launch_stream(self.config, output_dir)
 
 
@@ -178,4 +182,4 @@ class ESP32Stream(TService):
                 self.process.kill()
         except:
             pass
-        clean_up_stream(self.config.name, state.get_global_setting('stream_dir'))
+        clean_up_stream(self.config.get('stream_name'), state.get_global_setting('stream_dir'))

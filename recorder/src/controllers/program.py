@@ -68,5 +68,4 @@ def get_web_data():
         web_copy = copy.deepcopy(web_data)
         web_copy['status'] = state.get_services_status()
         web_copy['info']['settings'] = state.get_all_settings()
-        web_copy['tags']['farm_start_time'] = datetime.fromtimestamp(web_copy['tags']['farm_start_time']).ctime()
         return web_copy

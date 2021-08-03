@@ -1,57 +1,30 @@
 import os
-
-from flask import app
-
-import os
 import time
 import json
 import threading
 import logging
 
-from services.streamer import Streamer
-
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 settings = {}
 services = {}
 
 _setting_lock = threading.Lock()
 
-services['streamer'] = {
-  'create': Streamer,
-  'instance': None,
-  'settings': {
-    'streams': [],
-  },
-  'lock': threading.Lock(),
-}
+def register_service(service_name, instance):
+  global services
+  if service_name in services:
+    raise Exception(f'{service_name} already exists in services')
 
-def initialize(args):
-    global settings
-
-    sunrise = '6:0:0:0'
-    sunset = '18:0:0:0'
-    data_directory = '/usr/src/app/bin'
-
-    if args.get('local') is True:
-        data_directory = './bin'
-
-    stream_directory = os.path.join(data_directory, 'streams')
-    video_directory = os.path.join(data_directory, 'videos')
-
-    os.makedirs(data_directory, exist_ok=True)
-    os.makedirs(video_directory, exist_ok=True)
-    os.makedirs(stream_directory, exist_ok=True)
-
-    settings = {
-        'debug': args.get('debug'),
-        'local': args.get('local'),
-        'data_dir': data_directory,
-        'stream_dir': stream_directory,
-        'video_dir': video_directory,
-        'sunrise': sunrise,
-        'sunset': sunset,
-    }
+  if service_name == 'global':
+    raise Exception(f'global is a reserved service name')
+  
+  services[service_name] = {
+    'lock': threading.Lock(),
+    'create': instance,
+    'instance': None,
+    'settings': {},
+  }
 
 
 def get_services_status():
@@ -167,13 +140,3 @@ def get_all_settings():
     with services[service_name]['lock']:
       returned[service_name] = services[service_name].get('settings', {})
   return returned
-
-
-def save_settings():
-  all_settings = get_all_settings()
-  settings_file = os.path.join(all_settings['global']['data_dir'], 'settings.json')
-
-  logger.info(f'Saving settings: {all_settings}')
-
-  with open(settings_file, 'w') as f:
-    json.dump(all_settings, f)

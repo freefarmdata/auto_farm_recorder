@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  streamer:
-    container_name: 'streamer'
-    build:
-      context: ./streamer
-      dockerfile: ./dockerfile
-    restart: always
-    ports:
-      - 5454:5454
-    volumes:
-      - ./data/streamer:/usr/src/app/bin
+  # streamer:
+  #   container_name: 'streamer'
+  #   build:
+  #     context: ./streamer
+  #     dockerfile: ./dockerfile
+  #   restart: always
+  #   ports:
+  #     - 5454:5454
+  #   volumes:
+  #     - ./data/streamer:/usr/src/app/bin
   recorder:
     container_name: 'recorder'
     build:
@@ -49,7 +49,7 @@ services:
     image: grafana/grafana:7.1.5
     restart: always
     ports:
-      - 3002:3000
+      - 5656:3000
     volumes:
       - ./data/grafana:/var/lib/grafana:rw
     depends_on:

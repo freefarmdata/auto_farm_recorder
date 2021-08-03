@@ -4,7 +4,6 @@ import argparse
 import multiprocessing
 import logging
 
-from util.stream_config import StreamConfig
 from api import API
 import setup_log
 import state
@@ -12,50 +11,42 @@ import state
 logger = logging.getLogger()
 
 def attach_streams():
-  usb_default_config = (
-    StreamConfig
-      .create()
-      .with_type('usb')
-      .with_name('front_cam')
-      .with_config({
-        'crf': 35,
-        'fontsize': 50,
-        'vsync': 2,
-        'vcodec': 'copy',
-        'video_size': '800x600',
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
-        'framerate': 30,
-        'keyint_min': 120,
-        'g': 120,
-        'hls_list_size': 2,
-        'hls_time': 0.5,
-      })
-  )
+  usb_default_config = {
+    'camera_type': 'usb',
+    'stream_name': 'back_cam',
+    'crf': 35,
+    'fontsize': 50,
+    'vsync': 2,
+    'vcodec': 'copy',
+    'video_size': '800x600',
+    'minrate': '512k',
+    'bufsize': '512k',
+    'maxrate': '1M',
+    'framerate': 30,
+    'keyint_min': 120,
+    'g': 120,
+    'hls_list_size': 2,
+    'hls_time': 0.5,
+  }
 
-  esp_default_config = (
-    StreamConfig
-      .create()
-      .with_type('esp32')
-      .with_name('back_cam')
-      .with_config({
-        'ip': '192.168.0.170',
-        'crf': 23,
-        'vsync': 2,
-        'fontsize': 50,
-        'vcodec': 'copy',
-        'video_size': '1024x768',
-        'minrate': '512k',
-        'bufsize': '512k',
-        'maxrate': '1M',
-        'framerate': 15,
-        'keyint_min': 30,
-        'g': 30,
-        'hls_list_size': 2,
-        'hls_time': 0.5,
-      })
-  )
+  esp_default_config = {
+    'camera_type': 'esp32',
+    'stream_name': 'back_cam',
+    'ip': '192.168.0.170',
+    'crf': 23,
+    'vsync': 2,
+    'fontsize': 50,
+    'vcodec': 'copy',
+    'video_size': '1024x768',
+    'minrate': '512k',
+    'bufsize': '512k',
+    'maxrate': '1M',
+    'framerate': 15,
+    'keyint_min': 30,
+    'g': 30,
+    'hls_list_size': 2,
+    'hls_time': 0.5,
+  }
 
   state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
   state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })

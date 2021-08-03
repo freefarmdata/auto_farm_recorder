@@ -1,8 +1,4 @@
-import cv2
 import os
-import json
-import datetime
-import time
 import logging
 
 import controllers.alarms as alarm_controller

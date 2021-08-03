@@ -10,7 +10,7 @@ from controllers.board_manager import BoardManager
 
 logger = logging.getLogger(__name__)
 
-class Board(TService):
+class USBBoard(TService):
 
 
   def __init__(self):

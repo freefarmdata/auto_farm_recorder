@@ -5,9 +5,7 @@ import threading
 import logging
 
 from services.mqtt_board import MQTTBoard
-from services.board import Board
-from services.camera import Camera
-from services.video import Video
+from services.usb_board import USBBoard
 from services.uploader import Uploader
 from services.heartbeat import Heartbeat
 from services.soil_predictor import SoilPredictor
@@ -19,32 +17,8 @@ services = {}
 
 _setting_lock = threading.Lock()
 
-# services['board'] = {
-#   'create': Board,
-#   'instance': None,
-#   'settings': {},
-#   'lock': threading.Lock(),
-# }
 services['mqtt_board'] = {
   'create': MQTTBoard,
-  'instance': None,
-  'settings': {},
-  'lock': threading.Lock(),
-}
-services['camera'] = {
-  'create': Camera,
-  'instance': None,
-  'settings': {},
-  'lock': threading.Lock(),
-}
-services['video'] = {
-  'create': Video,
-  'instance': None,
-  'settings': {},
-  'lock': threading.Lock(),
-}
-services['uploader'] = {
-  'create': Uploader,
   'instance': None,
   'settings': {},
   'lock': threading.Lock(),
@@ -55,12 +29,36 @@ services['heartbeat'] = {
   'settings': {},
   'lock': threading.Lock(),
 }
-services['soil_predictor'] = {
-  'create': SoilPredictor,
-  'instance': None,
-  'settings': {},
-  'lock': threading.Lock(),
-}
+# services['usb_board'] = {
+#   'create': USBBoard,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
+# services['camera'] = {
+#   'create': Camera,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
+# services['video'] = {
+#   'create': Video,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
+# services['uploader'] = {
+#   'create': Uploader,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
+# services['soil_predictor'] = {
+#   'create': SoilPredictor,
+#   'instance': None,
+#   'settings': {},
+#   'lock': threading.Lock(),
+# }
 
 
 def get_services_status():

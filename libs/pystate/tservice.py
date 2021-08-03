@@ -6,7 +6,6 @@ logger = logging.getLogger()
 
 class TService(threading.Thread):
 
-
     def __init__(self, interval=1E9):
         super().__init__(daemon=True)
         self._stop_event = threading.Event()
@@ -114,6 +113,12 @@ class TService(threading.Thread):
 
     def stop(self):
         self._stop_event.set()
+
+    
+    def stop_wait(self):
+        self._stop_event.set()
+        while not self.is_stopped():
+            time.sleep(0.01)
 
 
     def is_stopped(self):

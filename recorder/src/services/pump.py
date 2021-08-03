@@ -1,16 +1,8 @@
 import logging
-import psutil
-import shutil
-import datetime
-import random
 import json
-import time
 
 import requests
 
-import controllers.watering as water_controller
-import controllers.soil_predictor as soil_controller
-import controllers.program as program_controller
 from util.tservice import TService
 from util.time_util import profile_func
 

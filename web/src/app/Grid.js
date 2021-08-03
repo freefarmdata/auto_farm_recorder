@@ -113,7 +113,7 @@ export default class Grid extends PureComponent {
         <select onChange={(event) => this.onItemAdd(event.target.value)}>
           <option value="disable">Disable Services</option>
           <option value="toggle">Toggle Services</option>
-          <option value="manual_watering">Manual Watering</option>
+          {/*<option value="manual_watering">Manual Watering</option>*/}
           {/*<option value="train_soil">Train Soil Model</option>*/}
           {/*<option value="select_soil">Select Soil Model</option>*/}
           <option value="global_settings">Global Settings</option>

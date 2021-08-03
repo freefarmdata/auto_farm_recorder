@@ -1,10 +1,14 @@
 import os
 import time
+import sys
 import logging
 import subprocess
 
-from util.tservice import TService
 import state
+
+sys.path.append('../libs/pystate')
+
+from tservice import TService
 
 logger = logging.getLogger()
 
@@ -109,12 +113,12 @@ def launch_stream(config: dict, output_directory: str):
         - lsusb -s 001:002 -v | egrep "Width|Height"
         - v4l2-ctl -d /dev/video0 --list-formats-ext
     """
-    output_hls_file = os.path.join(output_directory, f'{config.name}.m3u8')
-    output_mp4_file = os.path.join(output_directory, f'{config.name}.mp4')
+    output_hls_file = os.path.join(output_directory, f'{config.get("stream_name")}.m3u8')
+    output_mp4_file = os.path.join(output_directory, f'{config.get("stream_name")}.mp4')
 
     input = get_video_input()
-    encoding = get_tuned_encoding_pipeline(config.config)
-    output_hls = get_hls_output_pipeline(config.config, output_hls_file)
+    encoding = get_tuned_encoding_pipeline(config)
+    output_hls = get_hls_output_pipeline(config, output_hls_file)
 
     command = f"ffmpeg {input} {encoding} {output_hls}"
 
@@ -137,7 +141,7 @@ class USBStream(TService):
 
     def run_start(self):
         output_dir = state.get_global_setting('stream_dir')
-        clean_up_stream(self.config.name, output_dir)
+        clean_up_stream(self.config.get('stream_name'), output_dir)
         self.process = launch_stream(self.config, output_dir)
 
 
@@ -147,4 +151,4 @@ class USBStream(TService):
     
 
     def run_end(self):
-        clean_up_stream(self.config.name, state.get_global_setting('stream_dir'))
+        clean_up_stream(self.config.get('stream_name'), state.get_global_setting('stream_dir'))
