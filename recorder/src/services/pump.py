@@ -2,11 +2,10 @@ import logging
 import json
 
 import requests
+from fservice import state
+from fservice.tservice import TService
 
-from util.tservice import TService
 from util.time_util import profile_func
-
-import state
 import database
 
 logger = logging.getLogger(__name__)

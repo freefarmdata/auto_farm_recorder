@@ -3,8 +3,8 @@ import threading
 import logging
 
 from flask import jsonify
+from fservice import state
 
-import state
 import database
 
 import controllers.alarms as alarm_controller

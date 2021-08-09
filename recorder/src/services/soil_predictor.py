@@ -4,19 +4,18 @@ import random
 import pickle
 import os
 
+from fservice import state
+from fservice.tservice import TService
 from tensorflow import keras
 
 import controllers.watering as water_controller
 import controllers.soil_predictor as soil_predictor
 import controllers.program as program_controller
-
-from util.tservice import TService
 from util.names import random_name
 from util.time_util import min_to_nano, profile_func
-import state
 import database
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 class SoilPredictor(TService):
 

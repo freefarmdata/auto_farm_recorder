@@ -1,19 +1,18 @@
 import logging
 import time
 
+from fservice import state
+from fservice.tservice import TService
 from paho.mqtt.client import mqtt
 
 from util.time_util import profile_func
-from util.tservice import TService
 import controllers.panorama as pano_controller
 import controllers.alarms as alarm_controller
-import state
 
 logger = logging.getLogger()
 
 state_tx_route = "/panorama/pano_1/state/tx"
 state_rx_route = "/panorama/pano_1/state/rx"
-
 
 class Panorama(TService):
 
@@ -22,7 +21,7 @@ class Panorama(TService):
     super().__init__()
     self.set_interval(1E9)
     self.pano_running = False
-    self.last_pano = time.time()
+    self.last_pano = time.time_ns()
     self.state_machine = None
     self.mqtt_client = None
 
@@ -62,9 +61,9 @@ class Panorama(TService):
   def schedule_pano_image(self):
     interval = state.get_service_setting('panorama', 'pano_interval')
 
-    if not self.pano_running and time.time() - self.last_pano >= interval:
+    if not self.pano_running and time.time_ns() - self.last_pano >= interval:
       self.pano_running = True
-      self.last_pano = time.time()
+      self.last_pano = time.time_ns()
       self.state_machine = pano_controller.get_pano_state_machine()
       self.mqtt_client.publish(state_rx_route, pano_controller.get_pano_code(5))
 

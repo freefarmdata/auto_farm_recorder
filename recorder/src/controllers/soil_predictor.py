@@ -3,9 +3,9 @@ import logging
 import pickle
 from datetime import datetime, timedelta
 
+from fservice import state
 import numpy
 import pandas
-
 from tensorflow import keras
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from util.time_util import profile_func
 
 import database
-import state
+
 
 logger = logging.getLogger()
 

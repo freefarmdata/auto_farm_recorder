@@ -1,13 +1,12 @@
-from flask import Flask, redirect, render_template, request, jsonify, send_from_directory, Response
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit
 from threading import Thread
 import logging
 
-import state
-import database
+from fservice import state
+from flask import Flask, redirect, render_template, request, jsonify, send_from_directory, Response
+from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 
-import controllers.alarms as alarm_controller
+import database
 import controllers.watering as watering_controller
 import controllers.image as image_controller
 import controllers.program as program_controller
@@ -40,69 +39,19 @@ def fetch_data(message):
     emit('data', program_controller.get_web_data(), broadcast=True)
 
 
-@socketio.on('toggle_water', namespace='/')
-def toggle_water(message):
-    logger.info(f'toggle water {message}')
-    if message['state']:
-        watering_controller.set_water_time()
-    else:
-        watering_controller.clear_water_time()
-
-
-@socketio.on('select_model', namespace='/')
-def select_model(message):
-    logger.info(f'select model {message}')
-    state.update_service('soil_predictor', {
-        'action': 'select',
-        'name': message['name'],
-    })
-
-
-@socketio.on('predict_model', namespace='/')
-def predict_model(message):
-    logger.info(f'predict model')
-    state.update_service('soil_predictor', { 'action': 'predict' })
-
-
-@socketio.on('delete_model', namespace='/')
-def delete_model(message):
-    logger.info(f'delete model {message}')
-    state.update_service('soil_predictor', {
-        'action': 'delete',
-        'name': message['name']
-    })
-
-
-@socketio.on('train_model', namespace='/')
-def select_model(message):
-    logger.info(f'train model {message}')
-    state.update_service('soil_predictor', {
-        'action': 'train',
-        'start_time': message['startTime'],
-        'end_time': message['endTime']
-    })
-
-
-@socketio.on('update_setting', namespace='/')
-def update_setting(message):
-    logger.info(f'update setting {message}')
-
-    if message['service_name'] == 'global':
-        state.set_global_setting(message['key'], message['value'])
-    else:
-        state.set_service_setting(message['service_name'], message['key'], message['value'])
-
-
 @socketio.on('update_service', namespace='/')
 def update_service(message):
     logger.info(f'update service {message}')
     state.update_service(message['service_name'], message['message'])
 
 
-@socketio.on('sync_settings', namespace='/')
-def sync_settings(message):
-    logger.info(f'sync_settings {message}')
-    state.save_settings()
+@socketio.on('update_setting', namespace='/')
+def update_setting(message):
+    logger.info(f'update setting {message}')
+    if message['service_name'] == 'global':
+        state.set_global_setting(message['key'], message['value'])
+    else:
+        state.set_service_setting(message['service_name'], message['key'], message['value'])
 
 
 @socketio.on('toggle_service', namespace='/')
@@ -124,21 +73,6 @@ def disable_service(message):
         state.stop_service(message['service_name'])
 
 
-@app.route('/api/stream')
-def stream():
-    return Response(
-        image_controller.generator(),
-		mimetype="multipart/x-mixed-replace; boundary=frame"
-    )
-
-
-@app.route('/api/restart/<service_name>', methods=['GET'])
-def reset_service(service_name):
-    state.stop_service(service_name)
-    state.start_service(service_name)
-    return 'OK', 200
-
-
 @app.route('/api/status', methods=['GET'])
 def status():
     return jsonify(state.get_services_status()), 200
@@ -151,11 +85,13 @@ def watering_times():
 
 @app.route('/api/active-alarms', methods=['GET'])
 def active_alarms():
+    import controllers.alarms as alarm_controller
     return jsonify(alarm_controller.get_active_alarms()), 200
 
 
 @app.route('/api/clear-alarm/<alarm_id>', methods=['GET'])
 def clear_alarm(alarm_id):
+    import controllers.alarms as alarm_controller
     alarm_controller.clear_alarm(alarm_id)
     return 'OK', 200
 

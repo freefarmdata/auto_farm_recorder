@@ -1,21 +1,20 @@
 import time
 import os
-import sys
 import json
-import datetime
-import signal
 import argparse
 import multiprocessing
 import logging
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-import state
+from fservice import state
+
 from api import API
 import database
 import setup_log
 
-import controllers.alarms as alarm_controller
+from services.mqtt_board import MQTTBoard
+from services.heartbeat import Heartbeat
 import controllers.program as program_controller
 
 logger = logging.getLogger()
@@ -53,6 +52,7 @@ def set_default_settings(args):
   soil_threshold = 500
   camera_interval = 0.05E9
   camera_save = 30E9
+  pano_interval = 1800E9 # 30 minutes
 
   state.set_global_setting('sunrise', sunrise)
   state.set_global_setting('sunset', sunset)
@@ -65,6 +65,7 @@ def set_default_settings(args):
   state.set_service_setting('uploader', 'upload_path', upload_path)
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
   state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
+  state.get_service_setting('panorama', 'pano_interval', pano_interval)
 
   state.set_service_setting('camera', 'disabled', True)
   state.set_service_setting('video', 'disabled', True)
@@ -105,13 +106,16 @@ if __name__ == "__main__":
     time.sleep(20)
 
   setup_log.setup_logger(args.get('debug'))
+  program_controller.set_tag_key('farm_start_time', time.time())
+
+  state.register_service('mqtt_board', MQTTBoard)
+  state.register_service('heartbeat', Heartbeat)
 
   #database.reset_all()
   database.initialize()
   create_directories(args)
   set_default_settings(args)
   load_settings(args)
-  program_controller.set_tag_key('farm_start_time', time.time())
 
   API().start()
   state.start_services()
@@ -121,4 +125,3 @@ if __name__ == "__main__":
       time.sleep(1000)
   except:
     state.stop_services()
-    pass

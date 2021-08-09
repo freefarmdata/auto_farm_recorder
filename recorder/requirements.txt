@@ -13,3 +13,4 @@ tensorflow-cpu==2.4.1
 pandas==1.2.3
 Flask-Cors==3.0.10
 paho-mqtt==1.5.1
+fservice==0.0.1

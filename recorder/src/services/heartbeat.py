@@ -3,15 +3,13 @@ import psutil
 import shutil
 
 from paho.mqtt.client import mqtt
+from fservice import state
+from fservice.tservice import TService
 
 import controllers.alarms as alarm_controller
 import controllers.program as program_controller
-from util.tservice import TService
 from util.time_util import profile_func
-
-import state
 import database
-
 
 logger = logging.getLogger(__name__)
 

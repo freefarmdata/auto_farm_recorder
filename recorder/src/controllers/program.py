@@ -4,7 +4,7 @@ from datetime import datetime
 
 import controllers.watering as water_controller
 
-import state
+from fservice import state
 
 _info_lock = threading.Lock()
 

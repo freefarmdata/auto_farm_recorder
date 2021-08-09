@@ -1,14 +1,14 @@
 import os
 import logging
 
+from fservice import state
+from fservice.tservice import TService
+import boto3
+
 import controllers.alarms as alarm_controller
 import controllers.program as program_controller
 from util.file_util import file_is_being_accessed
 from util.time_util import profile_func
-from util.tservice import TService
-import state
-
-import boto3
 
 logger = logging.getLogger(__name__)
 
