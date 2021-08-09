@@ -5,12 +5,8 @@ import logging
 import subprocess
 
 import requests
-
-import state
-
-sys.path.append('../libs/pystate')
-
-from tservice import TService
+from fservice import state
+from fservice.tservice import TService
 
 logger = logging.getLogger()
 
@@ -158,7 +154,7 @@ def set_stream_settings(ip: str):
 class ESP32Stream(TService):
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(name='esp32_stream')
         self.set_interval(1E9)
         self.config = config
         self.process = None

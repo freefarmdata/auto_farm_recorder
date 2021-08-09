@@ -7,11 +7,9 @@ import logging
 from util.time_util import get_daynight_schedule
 from services.esp32_stream import ESP32Stream
 from services.usb_stream import USBStream
-import state
 
-sys.path.append('../libs/pystate')
-
-from tservice import TService
+from fservice import state
+from fservice.tservice import TService
 
 logger = logging.getLogger()
 
@@ -24,7 +22,7 @@ class Streamer(TService):
 
 
     def __init__(self):
-        super().__init__()
+        super().__init__(name='streamer')
         self.set_interval(1E9)
         self.streams = []
         self.sunrise = None
@@ -43,7 +41,7 @@ class Streamer(TService):
         for i in range(len(self.streams)):
             stream = self.streams[i]
             if stream.is_stopped():
-                logger.info(f"Restarting Stream '{stream.config.get('name')}'")
+                logger.info(f"Restarting Stream '{stream.config.get('stream_name')}'")
                 self.streams[i] = self.start_stream(stream.config)
 
     
@@ -58,9 +56,11 @@ class Streamer(TService):
 
     
     def attach_stream(self, config):
-        configs = state.get_service_setting('streamer', 'streams')
-        configs.append(config)
-        state.set_service_setting('streamer', 'streams', configs)
+        streams = state.get_service_setting('streamer', 'streams')
+        if streams is None:
+            streams = []
+        streams.append(config)
+        state.set_service_setting('streamer', 'streams', streams)
         self.streams.append(self.start_stream(config))
 
 

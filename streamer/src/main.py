@@ -4,9 +4,11 @@ import argparse
 import multiprocessing
 import logging
 
+from services.streamer import Streamer
 from api import API
 import setup_log
-import state
+
+from fservice import state
 
 logger = logging.getLogger()
 
@@ -52,6 +54,32 @@ def attach_streams():
   state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })
 
 
+def initialize_settings(args):
+  global settings
+
+  sunrise = '6:0:0:0'
+  sunset = '18:0:0:0'
+  data_directory = '/usr/src/app/bin'
+
+  if args.get('local') is True:
+      data_directory = './bin'
+
+  stream_directory = os.path.join(data_directory, 'streams')
+  video_directory = os.path.join(data_directory, 'videos')
+
+  os.makedirs(data_directory, exist_ok=True)
+  os.makedirs(video_directory, exist_ok=True)
+  os.makedirs(stream_directory, exist_ok=True)
+
+  state.set_global_setting('debug', args.get('debug'))
+  state.set_global_setting('local', args.get('local'))
+  state.set_global_setting('data_dir', data_directory)
+  state.set_global_setting('stream_dir', stream_directory)
+  state.set_global_setting('video_dir', video_directory)
+  state.set_global_setting('sunrise', sunrise)
+  state.set_global_setting('sunset', sunset)
+
+
 if __name__ == "__main__":
   multiprocessing.set_start_method('spawn', force=True)
 
@@ -62,7 +90,9 @@ if __name__ == "__main__":
 
   setup_log.setup_logger(args.get('debug'))
 
-  state.initialize(args)
+  state.register_service('streamer', Streamer)
+
+  initialize_settings(args)
 
   state.start_services()
 

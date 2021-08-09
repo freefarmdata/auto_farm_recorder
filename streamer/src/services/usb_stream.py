@@ -4,11 +4,8 @@ import sys
 import logging
 import subprocess
 
-import state
-
-sys.path.append('../libs/pystate')
-
-from tservice import TService
+from fservice import state
+from fservice.tservice import TService
 
 logger = logging.getLogger()
 
@@ -133,7 +130,7 @@ def launch_stream(config: dict, output_directory: str):
 class USBStream(TService):
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(name='usb_stream')
         self.set_interval(1E9)
         self.config = config
         self.process = None

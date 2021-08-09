@@ -5,3 +5,4 @@ psutil==5.8.0
 eventlet==0.30.2
 Flask-Cors==3.0.10
 paho-mqtt==1.5.1
+fservice==0.0.1

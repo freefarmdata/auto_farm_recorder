@@ -4,9 +4,9 @@ import os
 
 from flask import Flask, send_from_directory, send_file
 from flask_cors import CORS
+from fservice import state
 
 from util.no_cache import no_cache
-import state
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins":"*"}})
