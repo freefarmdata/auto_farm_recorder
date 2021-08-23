@@ -8,7 +8,6 @@ from fservice import state
 import database
 
 import controllers.alarms as alarm_controller
-import controllers.program as program_controller
 
 logger = logging.getLogger(__name__)
 

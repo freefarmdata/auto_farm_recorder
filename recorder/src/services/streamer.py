@@ -7,6 +7,7 @@ import logging
 from util.time_util import get_daynight_schedule
 from services.esp32_stream import ESP32Stream
 from services.usb_stream import USBStream
+import controllers.alarms as alarm_controller
 
 from fservice import state
 from fservice.tservice import TService
@@ -25,15 +26,14 @@ class Streamer(TService):
         super().__init__(name='streamer')
         self.set_interval(1E9)
         self.streams = []
-        self.sunrise = None
-        self.sunset = None
-
-
-    def run_start(self):
         self.sunrise, self.sunset = get_daynight_schedule(
             state.get_global_setting('sunrise'),
             state.get_global_setting('sunset')
         )
+
+
+    def run_start(self):
+        alarm_controller.clear_alarm('streamer_service_offline')
         self.start_streams()
 
 
@@ -41,7 +41,12 @@ class Streamer(TService):
         for i in range(len(self.streams)):
             stream = self.streams[i]
             if stream.is_stopped():
-                logger.info(f"Restarting Stream '{stream.config.get('stream_name')}'")
+                stream_name = stream.config.get('stream_name')
+                logger.info(f"Restarting Stream '{stream_name}'")
+                alarm_controller.set_info_alarm(
+                    f'streamer_stream_{stream_name}_restarted',
+                    f'Stream: {stream_name} stopped and restarted',
+                )
                 self.streams[i] = self.start_stream(stream.config)
 
     
@@ -52,6 +57,7 @@ class Streamer(TService):
 
 
     def run_end(self):
+        alarm_controller.set_warn_alarm('streamer_service_offline', 'Streamer Service is Offline')
         self.stop_streams()
 
     

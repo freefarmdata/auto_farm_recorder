@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import * as moment from 'moment';
 
-import io from '../../io.js';
+import mqtt from '../../mqtt.js';
 import service from '../../service';
 
 class Alarms extends PureComponent {
@@ -13,29 +13,32 @@ class Alarms extends PureComponent {
       alarms: {},
     };
 
-    this.onAlarm = this.onAlarm.bind(this);
+    this.fetchAlarms = this.fetchAlarms.bind(this);
+    this.onAlarms = this.onAlarms.bind(this);
   }
 
   async componentDidMount() {
     await this.fetchAlarms();
-    io.subscribe('alarm', this.onAlarm);
+    mqtt.subscribe('connected', this.fetchAlarms);
+    mqtt.subscribe('web/alarms/active', this.onAlarms);
   }
 
   componentWillUnmount() {
-    io.unsubscribe('alarm', this.onAlarm);
+    mqtt.unsubscribe('connected', this.fetchAlarms);
+    mqtt.unsubscribe('web/alarms/active', this.onAlarms);
   }
 
   async fetchAlarms() {
     const alarms = await service.fetchActiveAlarms();
-    this.setState({ alarms });
+    if (alarms) {
+      this.setState({ alarms });
+    }
   }
 
-  onAlarm(alarm) {
-    const { alarms } = this.state;
+  onAlarms(newAlarms) {
+    console.log('new alarms', newAlarms);
 
-    alarms[alarm.id] = alarm;
-
-    this.setState({ alarms });
+    this.setState({ alarms: JSON.parse(newAlarms) });
   }
 
   renderAlarms() {
@@ -50,7 +53,7 @@ class Alarms extends PureComponent {
         let message = null;
         if (alarm.message) {
           message = <p>{alarm.message}</p>;
-        } 
+        }
 
         return (
           <div className={wrapperClasses} key={i}>
@@ -58,7 +61,7 @@ class Alarms extends PureComponent {
             <div className="alarm__content">
               <div className="alarm__content__title">
                 <h4>{alarm.name}</h4>
-                <span>{moment(alarm.time*1000).format('dddd, MMM Do YYYY, h:mm:ss a')}</span>
+                <span>{moment(alarm.time).format('dddd, MMM Do YYYY, h:mm:ss a')}</span>
               </div>
               {message}
             </div>

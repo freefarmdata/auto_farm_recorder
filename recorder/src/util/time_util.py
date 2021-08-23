@@ -1,7 +1,18 @@
 import time
 import logging
+import datetime
 
 logger = logging.getLogger()
+
+def get_daynight_schedule(sunrise, sunset):
+    sunrise = sunrise.split(':')
+    sunset = sunset.split(':')
+
+    sunrise = datetime.time(*[int(n) for n in sunrise])
+    sunset = datetime.time(*[int(n) for n in sunset])
+
+    return sunrise, sunset
+
 
 def now_ms():
     return time.time() * 1E3

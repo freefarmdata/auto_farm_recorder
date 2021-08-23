@@ -1,11 +1,12 @@
 import re
 import os
-import serial
 import json
 import time
 import logging
 
-logger = logging.getLogger(__name__)
+import serial
+
+logger = logging.getLogger()
 
 class Board():
 

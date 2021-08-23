@@ -5,6 +5,21 @@ pano_state = "PANO"
 
 
 def parse_code(code):
+  """
+  From code, parse it into json digestable format. EX:
+
+  ```python
+  code = parse_code("PANO:angle_5:limit_20;")
+
+  assert code == [{
+    'state': 'PANO',
+    'settings': {
+      'angle': '5',
+      'limit': '20,
+    }
+  }]
+  ```
+  """
   commands = code.split(';')
   parsed = []
   for command in commands:
@@ -15,6 +30,25 @@ def parse_code(code):
       key, value = action.split('_')
       parse['settings'][key] = value
     parsed.append(parse)
+
+
+def compile_code(state, options=[]):
+  """
+  Compiles the code based on the state and options
+  passed. EX:
+
+  ```python
+    code = compile_code("PANO", [["angle", "5"], ["limit", "20"]])
+    assert code == "PANO:angle_5:limit_20;"
+  ```
+  """
+  command = state
+  if len(options) > 0:
+    for option in options:
+      key, value = option
+      command += f":{key}_{value}"
+  command += ";"
+  return command
 
 
 class StateMachine:
@@ -39,14 +73,6 @@ class StateMachine:
       return True
 
     return False
-
-
-def get_pano_code(angle_step):
-  return f"{pano_state}:angle_{angle_step};"
-
-
-def get_home_code():
-  return f"{home_state};"
 
 
 def is_ready(states):

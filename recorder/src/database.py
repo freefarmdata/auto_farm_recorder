@@ -1,37 +1,24 @@
 import psycopg2 as postgres
 import datetime
 
+from fservice import state
+
 def get_connection():
+  host = state.get_global_setting('database_host')
   return postgres.connect(
     database="farmdata",
     user="admin",
     password="admin",
-    host="postgres",
-    port="5432"
+    host=host,
+    port=5432
   )
 
 
 def reset_all():
   with get_connection() as connection:
     cursor = connection.cursor()
-    cursor.execute('DROP TABLE IF EXISTS models;')
-    cursor.execute('DROP TABLE IF EXISTS water;')
-    cursor.execute('DROP TABLE IF EXISTS soil;')
-    cursor.execute('DROP TABLE IF EXISTS temp;')
-    cursor.execute('DROP TABLE IF EXISTS light;')
-    cursor.execute('DROP TABLE IF EXISTS pressure;')
-    cursor.execute('DROP TABLE IF EXISTS level;')
-    connection.commit()
-
-
-def reset_data():
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute('DROP TABLE IF EXISTS soil;')
-    cursor.execute('DROP TABLE IF EXISTS temp;')
-    cursor.execute('DROP TABLE IF EXISTS light;')
-    cursor.execute('DROP TABLE IF EXISTS pressure;')
-    cursor.execute('DROP TABLE IF EXISTS level;')
+    cursor.execute('DROP TABLE IF EXISTS watering;')
+    cursor.execute('DROP TABLE IF EXISTS readings;')
     connection.commit()
 
 
@@ -40,19 +27,7 @@ def initialize():
     cursor = connection.cursor()
     cursor.execute(
       '''
-      CREATE TABLE IF NOT EXISTS models (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        active BOOLEAN NOT NULL,
-        start_time TIMESTAMP NOT NULL,
-        end_time TIMESTAMP NOT NULL,
-        error NUMERIC NOT NULL
-      );
-      '''
-    )
-    cursor.execute(
-      '''
-      CREATE TABLE IF NOT EXISTS water (
+      CREATE TABLE IF NOT EXISTS watering (
         id SERIAL PRIMARY KEY,
         start_time TIMESTAMP NOT NULL,
         end_time TIMESTAMP NOT NULL
@@ -61,55 +36,12 @@ def initialize():
     )
     cursor.execute(
       '''
-      CREATE TABLE IF NOT EXISTS level (
+      CREATE TABLE IF NOT EXISTS readings (
         id SERIAL PRIMARY KEY,
-        board_id INT NOT NULL,
+        board TEXT NOT NULL,
+        metric TEXT NOT NULL,
         sensor INT NOT NULL,
         value INT NOT NULL,
-        timestamp TIMESTAMP NOT NULL
-      );
-      '''
-    )
-    cursor.execute(
-      '''
-      CREATE TABLE IF NOT EXISTS soil (
-        id SERIAL PRIMARY KEY,
-        board_id INT NOT NULL,
-        sensor INT NOT NULL,
-        value INT NOT NULL,
-        timestamp TIMESTAMP NOT NULL
-      );
-      '''
-    )
-    cursor.execute(
-      '''
-      CREATE TABLE IF NOT EXISTS temp (
-        id SERIAL PRIMARY KEY,
-        board_id INT NOT NULL,
-        sensor INT NOT NULL,
-        value NUMERIC NOT NULL,
-        timestamp TIMESTAMP NOT NULL
-      );
-      '''
-    )
-    cursor.execute(
-      '''
-      CREATE TABLE IF NOT EXISTS light (
-        id SERIAL PRIMARY KEY,
-        board_id INT NOT NULL,
-        sensor INT NOT NULL,
-        value NUMERIC NOT NULL,
-        timestamp TIMESTAMP NOT NULL
-      );
-      '''
-    )
-    cursor.execute(
-      '''
-      CREATE TABLE IF NOT EXISTS pressure (
-        id SERIAL PRIMARY KEY,
-        board_id INT NOT NULL,
-        sensor INT NOT NULL,
-        value NUMERIC NOT NULL,
         timestamp TIMESTAMP NOT NULL
       );
       '''
@@ -121,37 +53,46 @@ def insert_watertime(start, end):
   with get_connection() as connection:
     cursor = connection.cursor()
     cursor.execute(
-      "INSERT INTO water (start_time, end_time) VALUES (%s, %s)",
+      "INSERT INTO watering (start_time, end_time) VALUES (%s, %s)",
       (start, end)
     )
     connection.commit()
 
 
-def insert_timeseries(table, readings):
+def insert_readings(readings):
+  """
+  columns:
+    id - primary key
+    board - the name of the board
+    metric - the sensor metric value
+    sensor - the sensor number
+    value - the value
+    timestamp - the timestamp
+  """
   with get_connection() as connection:
     cursor = connection.cursor()
-    now = datetime.datetime.now()
     for reading in readings:
       cursor.execute(
-        f"INSERT INTO {table} (board_id, sensor, value, timestamp) VALUES (%s, %s, %s, %s)",
-        (reading['board_id'], reading['sensor'], reading['value'], now)
+        f"INSERT INTO readings (board, metric, sensor, value, timestamp) VALUES (%s, %s, %s, %s, %s)",
+        (reading['board'], reading['metric'], reading['sensor'], reading['value'], reading['timestamp'])
       )
     connection.commit()
 
 
-def series_dict(tupl):
+def reading_dict(tupl):
   if tupl:
-    id, board_id, sensor, value, timestamp = tupl
+    id, board, metric, sensor, value, timestamp = tupl
     return {
       'id': id,
-      'board_id': board_id,
+      'board': board,
+      'metric': metric,
       'sensor': sensor,
       'value': value,
       'timestamp': float(timestamp.timestamp()),
     }
 
 
-def water_dict(tupl):
+def watering_dict(tupl):
   if tupl:
     id, start, end = tupl
     return {
@@ -161,26 +102,13 @@ def water_dict(tupl):
     }
 
 
-def model_dict(tupl):
-  if tupl:
-    id, name, active, start, end, error = tupl
-    return {
-      'id': id,
-      'name': name,
-      'active': active,
-      'start_time': float(start.timestamp()),
-      'end_time': float(end.timestamp()),
-      'error': float(error),
-    }
-
-
 def query_for_watering():
   records = None
   with get_connection() as connection:
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM water ORDER BY end_time")
+    cursor.execute("SELECT * FROM watering ORDER BY end_time")
     records = cursor.fetchall()
-    records = [water_dict(r) for r in records]
+    records = [watering_dict(r) for r in records]
   return records
 
 
@@ -189,96 +117,42 @@ def query_latest_watering(amount=1):
   with get_connection() as connection:
     cursor = connection.cursor()
     cursor.execute(
-      f"SELECT * FROM water ORDER BY end_time LIMIT %s",
+      f"SELECT * FROM watering ORDER BY end_time LIMIT %s",
       (str(amount))
     )
     records = cursor.fetchall()
-    records = [water_dict(r) for r in records]
+    records = [watering_dict(r) for r in records]
   return records
 
 
-def query_for_first_soil():
+def query_latest_soil(board='', sensor=0):
   record = None
   with get_connection() as connection:
     cursor = connection.cursor()
     cursor.execute(
-      f"SELECT * FROM soil ORDER BY timestamp LIMIT 1"
+      """
+      SELECT * FROM readings
+      WHERE metric = 'soil' AND board = %s AND sensor = %s
+      ORDER BY timestamp LIMIT 1
+      """,
+      (board, sensor)
     )
-    record = series_dict(cursor.fetchone())
+    record = reading_dict(cursor.fetchone())
   return record
 
 
-def query_for_latest_soil(amount=1):
+def query_for_soil(board='', sensor=0, start_time='', end_time=''):
   records = None
   with get_connection() as connection:
     cursor = connection.cursor()
     cursor.execute(
-      f"SELECT * FROM soil ORDER BY timestamp LIMIT %s",
-      (str(amount))
+      """
+      SELECT * FROM soil
+      WHERE metric = 'soil' AND board = %s AND sensor = %s AND timestamp BETWEEN %s AND %s 
+      ORDER BY timestamp
+      """,
+      (board, sensor, start_time, end_time)
     )
     records = cursor.fetchall()
-    records = [series_dict(r) for r in records]
+    records = [reading_dict(r) for r in records]
   return records
-
-
-def query_for_soil(start_time, end_time):
-  records = None
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute(
-      f"SELECT * FROM soil WHERE timestamp BETWEEN %s AND %s",
-      (start_time, end_time)
-    )
-    records = cursor.fetchall()
-    records = [series_dict(r) for r in records]
-  return records
-
-
-def query_for_models():
-  records = None
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM models ORDER BY end_time")
-    records = cursor.fetchall()
-    records = [model_dict(r) for r in records]
-  return records
-
-
-def delete_model(name):
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute(
-      "DELETE FROM models WHERE name = %s",
-      (name,)
-    )
-    connection.commit()
-
-
-def insert_model(name, start, end, error):
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute(
-      "INSERT INTO models (name, active, start_time, end_time, error) VALUES (%s, %s, %s, %s, %s)",
-      (name, False, start, end, error)
-    )
-    connection.commit()
-
-
-def get_active_model():
-  records = None
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM models WHERE active IS TRUE")
-    records = cursor.fetchall()
-    records = [model_dict(r) for r in records]
-  return records
-
-
-def set_model_active(name):
-  with get_connection() as connection:
-    cursor = connection.cursor()
-    cursor.execute("UPDATE models SET active = FALSE WHERE active IS TRUE")
-    cursor.execute(
-      f"UPDATE models SET active = TRUE WHERE name = '{name}'"
-    )
-    connection.commit()

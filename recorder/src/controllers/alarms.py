@@ -1,33 +1,37 @@
-from flask_socketio import emit
 import time
-import json
-from enum import Enum
 import threading
 
-from api import app
+from fservice import state
 
-alarm_dict = {}
+from util.time_util import now_ms
+
+alarm_cache = {}
 
 _alarm_lock = threading.Lock()
 
+priority_map = {
+    'info': 4,
+    'warn': 3,
+    'danger': 2,
+    'critical': 1,
+}
+
 
 def get_active_alarms():
-    global alarm_dict
+    global alarm_cache
     with _alarm_lock:
         active_alarms = {}
-        for alarm_id in alarm_dict:
-            if alarm_dict[alarm_id]['active']:
-                active_alarms[alarm_id] = alarm_dict[alarm_id]
+        for alarm_id in alarm_cache:
+            if alarm_cache[alarm_id]['active']:
+                active_alarms[alarm_id] = alarm_cache[alarm_id]
         return active_alarms
 
 
 def clear_alarm(alarm_id):
-    global alarm_dict
+    global alarm_cache
     with _alarm_lock:
-        if alarm_id in alarm_dict:
-            alarm_dict[alarm_id]['active'] = False
-            with app.app_context():
-                emit('alarm', alarm_dict[alarm_id], namespace='/', broadcast=True)
+        if alarm_id in alarm_cache:
+            alarm_cache[alarm_id]['active'] = False
 
 
 def set_info_alarm(alarm_id, name, message=None):
@@ -47,15 +51,15 @@ def set_critcal_alarm(alarm_id, name, message=None):
 
 
 def set_alarm(alarm_id, level, name, message=None):
-    global alarm_dict
+    global alarm_cache
     with _alarm_lock:
-        alarm_dict[alarm_id] = {
+        alarm = {
             'id': alarm_id,
             'active': True,
             'level': level,
-            'time': time.time(),
+            'time': now_ms(),
             'name': name,
             'message': message,
         }
-        with app.app_context():
-            emit('alarm', alarm_dict[alarm_id], namespace='/', broadcast=True)
+        alarm_cache[alarm_id] = alarm
+        state.update_trigger('alarm_notifier')

@@ -1,49 +1,45 @@
-version: '3'
+version: '3.1'
 
 services:
-  # streamer:
-  #   container_name: 'streamer'
+  # recorder:
+  #   container_name: 'recorder'
   #   build:
-  #     context: ./streamer
+  #     context: ./recorder
   #     dockerfile: ./dockerfile
   #   restart: always
   #   ports:
-  #     - 5454:5454
+  #     - 5000:5000
   #   volumes:
-  #     - ./data/streamer:/usr/src/app/bin
-  recorder:
-    container_name: 'recorder'
-    build:
-      context: ./recorder
-      dockerfile: ./dockerfile
-    restart: always
-    ports:
-      - 5000:5000
-    volumes:
-      - ./data/recorder:/usr/src/app/bin
+  #     - ./data/recorder:/usr/src/app/bin
+  #   networks:
+  #     - pi_net
   postgres:
-    container_name: 'postgres'
-    image: 'postgres:13'
+    container_name: postgres
+    image: postgres:13.1
     restart: always
     ports:
       - 5432:5432
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data:rw
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: farmdata
+    networks:
+      - pi_net
   mosquitto:
     container_name: 'mosquitto'
-    image: 'eclipse-mosquitto:2.0.10'
+    image: 'eclipse-mosquitto:2.0.11'
     restart: always
     ports:
       - 1883:1883
       - 9001:9001
     volumes:
-      - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
     depends_on:
       - postgres
+    networks:
+      - pi_net
   grafana:
     container_name: grafana
     image: grafana/grafana:7.1.5
@@ -54,4 +50,9 @@ services:
       - ./data/grafana:/var/lib/grafana:rw
     depends_on:
       - postgres
+    networks:
+      - pi_net
     user: "472"
+
+networks:
+  pi_net:

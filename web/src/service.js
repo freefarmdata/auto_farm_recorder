@@ -8,8 +8,12 @@ async function fetchWateringTimes() {
 }
 
 async function fetchActiveAlarms() {
-  const response = await axios.get(`${HTTP_FARM_URL}/api/active-alarms`);
-  return response.data;
+  try {
+    const response = await axios.get(`${HTTP_FARM_URL}/api/active-alarms`);
+    return response.data;
+  } catch(error) {
+    console.error('failed to fetch active alarms', error);
+  }
 }
 
 export default {

@@ -8,7 +8,7 @@ from fservice.tservice import TService
 from util.time_util import profile_func
 import database
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 class Pump(TService):
 

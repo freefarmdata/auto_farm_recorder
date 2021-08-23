@@ -1,7 +1,6 @@
 Flask==1.1.1
 pyserial==3.4
 requests==2.22.0
-psycopg2==2.8.6
 psycopg2-binary==2.8.6
 boto3==1.15.1
 opencv-python==4.4.0.40
@@ -13,4 +12,4 @@ tensorflow-cpu==2.4.1
 pandas==1.2.3
 Flask-Cors==3.0.10
 paho-mqtt==1.5.1
-fservice==0.0.1
+fservice==0.0.4

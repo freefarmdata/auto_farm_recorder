@@ -1,0 +1,10 @@
+.server-stats {
+  display: grid;
+  gap: 20px;
+}
+
+.server-stats__container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

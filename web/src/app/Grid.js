@@ -11,7 +11,6 @@ export default class Grid extends PureComponent {
 
     this.state = {
       edit: false,
-      data: {},
       items: [],
       itemCounter: 0,
       gridProperties: {
@@ -29,10 +28,6 @@ export default class Grid extends PureComponent {
     this.onItemRemove = this.onItemRemove.bind(this);
     this.onChangeMode = this.onChangeMode.bind(this);
     this.onLayoutChange = this.onLayoutChange.bind(this);
-  }
-
-  componentDidUpdate() {
-    this.setState({ data: this.props.data });
   }
 
   onItemAdd(type) {
@@ -100,7 +95,7 @@ export default class Grid extends PureComponent {
           >
             x
           </div>
-          <item.Component edit={edit} data={this.state.data} />
+          <item.Component edit={edit} />
         </div>
       );
     });
@@ -116,7 +111,9 @@ export default class Grid extends PureComponent {
           {/*<option value="manual_watering">Manual Watering</option>*/}
           {/*<option value="train_soil">Train Soil Model</option>*/}
           {/*<option value="select_soil">Select Soil Model</option>*/}
+          <option value="edit_settings">Edit Settings</option>
           <option value="global_settings">Global Settings</option>
+          <option value="server_stats">Server Statistics</option>
           <option value="live_stream">Live Stream</option>
           <option value="alarms">Alarms</option>
         </select>
