@@ -13,10 +13,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins":"*"}})
 
-#        -break_non_keyframes 1 \
+# -break_non_keyframes 1 \
 # -write_empty_segments 1 \
 
-def build_pipeline(fps, width, height):
+def build_archive_pipeline(fps, width, height):
     return f"""
     ffmpeg \
         -y \
@@ -35,7 +35,7 @@ def build_pipeline(fps, width, height):
         -segment_format mp4 \
         -reset_timestamps 1 \
         -strftime 1 \
-        biocamcvid45_%s000.mp4
+        biocamcvid45_%s.mp4
     """
 
 class Stream(Thread):
@@ -57,7 +57,7 @@ class Stream(Thread):
         success, frame = capture.read()
         if success and frame is not None:
             height, width, _ = frame.shape
-            pipeline = build_pipeline(fps, width, height)
+            pipeline = build_archive_pipeline(fps, width, height)
 
         archive_pipe = subprocess.Popen(pipeline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
@@ -66,7 +66,7 @@ class Stream(Thread):
 
             if success and frame is not None:
                 archive_pipe.stdin.write(frame.tobytes())
-                success, encoded = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 30])
+                success, encoded = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 10])
 
                 with self.lock:
                     self.frame = encoded
