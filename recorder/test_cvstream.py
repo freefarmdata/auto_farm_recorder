@@ -59,14 +59,14 @@ class Stream(Thread):
             height, width, _ = frame.shape
             pipeline = build_archive_pipeline(fps, width, height)
 
-        archive_pipe = subprocess.Popen(pipeline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
+        #archive_pipe = subprocess.Popen(pipeline, shell=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
 
         while True:
             success, frame = capture.read()
 
             if success and frame is not None:
-                archive_pipe.stdin.write(frame.tobytes())
-                success, encoded = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 10])
+                #archive_pipe.stdin.write(frame.tobytes())
+                success, encoded = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 5])
 
                 with self.lock:
                     self.frame = encoded
