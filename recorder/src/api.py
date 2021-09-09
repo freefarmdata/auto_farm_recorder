@@ -12,7 +12,7 @@ import database
 import controllers.alarms as alarm_controller
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*":{"origins":"http://localhost:3000"}})
+cors = CORS(app, resources={r"/*":{"origins":"*"}})
 
 logger = logging.getLogger()
 

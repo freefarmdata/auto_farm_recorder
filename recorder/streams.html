@@ -62,7 +62,7 @@
             // https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8
 
             const fbplayer = videojs('front_cam', options);
-            const fbsrc = 'http://192.168.0.190:5454/api/stream/front_cam.m3u8';
+            const fbsrc = 'http://192.168.0.124:5000/api/stream/front_cam.m3u8';
             fbplayer.src({
                 src: fbsrc,
                 type: 'application/x-mpegURL',
@@ -71,7 +71,7 @@
             fbplayer.play();
 
             const bbplayer = videojs('back_cam', options);
-            const bbsrc = 'http://192.168.0.190:5454/api/stream/back_cam.m3u8';
+            const bbsrc = 'http://192.168.0.124:5000/api/stream/back_cam.m3u8';
             bbplayer.src({
                 src: bbsrc,
                 type: 'application/x-mpegURL',

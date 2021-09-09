@@ -62,12 +62,12 @@ def insert_watertime(start, end):
 def insert_readings(readings):
   """
   columns:
-    id - primary key
-    board - the name of the board
-    metric - the sensor metric value
-    sensor - the sensor number
-    value - the value
-    timestamp - the timestamp
+    - id - primary key
+    - board - the name of the board
+    - metric - the sensor metric value
+    - sensor - the sensor number
+    - value - the value
+    - timestamp - the timestamp
   """
   with get_connection() as connection:
     cursor = connection.cursor()
