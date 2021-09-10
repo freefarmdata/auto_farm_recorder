@@ -10,12 +10,15 @@ ffmpeg \
         -c:v mpeg1video \
         -crf 32 \
         -s 640x480 \
-        -framerate 30 \
+        -framerate 15 \
         -an \
         -b:v 256k \
+        -minrate 256k \
+        -bufsize 512k \
+        -maxrate 512k \
         -bf 0 \
         -preset veryfast \
         -tune zerolatency \
         -movflags +faststart \
         -x264opts no-scenecut \
-        http://localhost:8081/stream
+        udp://localhost:8083

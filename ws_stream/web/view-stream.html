@@ -11,43 +11,77 @@
 	
 </head>
 <body>
-	<canvas id="video-canvas" height=500 width=500></canvas>
-	<script src="http://cdn.shinobi.video/js/jsmpeg.pipe.js"></script>
+	<canvas id="video-canvas"></canvas>
 	<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"></script>
-	<!-- <script type="text/javascript" src="jsmpeg.min.js"></script> -->
+	<script type="text/javascript" src="jsmpeg.min.js"></script>
 	<script type="text/javascript">
-		var canvas = document.getElementById('video-canvas');
-		var player = new JSMpeg.Player('pipe', {canvas: canvas});
 
-		var socket = io.connect('http://'+document.location.hostname+':8082/');
+		class JSMpegWritableSource {
+			constructor(url, options) {
+				this.destination = null;
+
+				this.completed = false;
+				this.established = false;
+				this.progress = 0;
+
+				// Streaming is obiously true when using a stream
+				this.streaming = true;
+			}
+
+			connect(destination) {
+				this.destination = destination;
+			}
+
+			start() {
+				this.established = true;
+				this.completed = true;
+				this.progress = 1;
+			}
+
+			resume() { // eslint-disable-line class-methods-use-this
+
+			}
+
+			destroy() { // eslint-disable-line class-methods-use-this
+			}
+
+			write(data) {
+				this.destination.write(data);
+			}
+		}
+
+		var canvas = document.getElementById('video-canvas');
+		var url = 'ws://'+document.location.hostname+':8082';
+		var player = new JSMpeg.Player(null, {
+			source: JSMpegWritableSource,
+			audio: false,
+			canvas: canvas,
+		});
+
+		// var player = new JSMpeg.Player('pipe', {canvas: canvas});
+		var socket = io.connect('ws://'+document.location.hostname+':8082/');
 		socket.on('connect',function() {
-			console.log('connected');
-	
+			console.log('connected', socket);
 			socket.on('stream', function (data) {
-				// `data.buffer` is the raw video data from FFMPEG
-				// pretend you are getting data as follows
-				// var data = {buffer:ArrayBuffer}
-				console.log('recieved buffer');
-				try {
-				player.write(data);
-				} catch(err){}
+				player.source.write(data);
 			});
-			socket.on('data', function (data) {
-				console.log('recieved data');
-			})
-			socket.on('message', function (data) {
-				console.log('recieved message');
-			})
 		});
 		socket.on('disconnect',function(){
 			console.log('connected');
 		});
-
-		function onSliderUpdate(value) {
+		function onUpdateBuffer(value) {
 			socket.emit('buffer', value);
 		}
 		
 	</script>
-	<input type="range" min="256" max="20480" value="1024" step="256" class="slider" id="buffer" onchange="onSliderUpdate(this.value)">
+	<div>
+		<button onclick="onUpdateBuffer(16*1024)">16k</button>
+		<button onclick="onUpdateBuffer(32*1024)">32k</button>
+		<button onclick="onUpdateBuffer(64*1024)">64k</button>
+		<button onclick="onUpdateBuffer(128*1024)">128k</button>
+		<button onclick="onUpdateBuffer(256*1024)">256k</button>
+		<button onclick="onUpdateBuffer(512*1024)">512k</button>
+		<button onclick="onUpdateBuffer(1024*1024)">1024k</button>
+	</div>
 </body>
 </html>

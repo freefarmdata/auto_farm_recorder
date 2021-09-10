@@ -1,17 +1,16 @@
 import time
 import os
-import eventlet
-from eventlet.green import socket
 import socketio
+import socket
 from threading import Thread
-from multiprocessing import Queue
 from flask import Flask, request, send_file, send_from_directory
 
+stream_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 http_server = Flask(__name__)
 socket_server = socketio.Server(
-    logger=True,
+    logger=False,
     async_mode='threading',
-    engineio_logger=True,
+    engineio_logger=False,
     cors_allowed_origins='*'
 )
 
@@ -22,6 +21,7 @@ def connect(sid, environ):
     print('connect ', sid)
     return True
 
+
 @socket_server.on('buffer')
 def connect(sid, value):
     global buffer_size
@@ -29,10 +29,12 @@ def connect(sid, value):
     buffer_size = int(value)
     return True
 
+
 @socket_server.on('disconnect')
 def disconnect(sid):
     print('disconnect ', sid)
     return True
+
 
 @http_server.route('/', methods=['GET'])
 def get_web():
@@ -45,17 +47,6 @@ def get_web_stuff(file_name):
     return send_from_directory(directory=full_path, filename=file_name)
 
 
-@http_server.route('/stream', methods=['POST'])
-def stream_video():
-    global buffer_size
-    while True:
-        buffer = request.stream.read(buffer_size)
-        if len(buffer) <= 0:
-            return 'OK', 200
-        print(f'recieving and emitting data: {len(buffer)}')
-        socket_server.emit('stream', data=buffer)
-
-
 def start_socket_server():
     socket_port = 8082
     server = Flask(__name__)
@@ -66,16 +57,37 @@ def start_socket_server():
     #     socketio.WSGIApp(socket_server)
     # )
 
+
 def start_http_server():
     stream_port = 8081
     http_server.run(host='0.0.0.0', port=stream_port, threaded=True)
 
 
+def start_stream_server():
+    stream_socket.bind(('0.0.0.0', 8083))
+    stream_socket.setblocking(True)
+    stream_socket.settimeout(1.0)
+
+    while True:
+        buffer = None
+        try:
+            buffer, address = stream_socket.recvfrom(buffer_size)
+        except socket.timeout:
+            print('socket timeout error')
+            pass
+        if buffer is None or len(buffer) <= 0:
+            continue
+        print(f'recieving and emitting data: {len(buffer)}')
+        socket_server.emit('stream', data=buffer)
+
+
 if __name__ == "__main__":
     t1 = Thread(target=start_socket_server, daemon=True)
     t2 = Thread(target=start_http_server, daemon=True)
+    t3 = Thread(target=start_stream_server, daemon=True)
     t1.start()
     t2.start()
+    t3.start()
 
     while True:
         time.sleep(1)
