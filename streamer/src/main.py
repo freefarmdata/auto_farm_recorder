@@ -12,14 +12,11 @@ import socketio
 
 from setup_log import setup_logger
 from controllers import clients
-from controllers import streams
+from stream_process import StreamProcess
+from config import setup_config, get_config
 
 logger = logging.getLogger()
 
-local = True
-debug = True
-stream_dir = './bin/streamer/videos'
-socket_port = 5454
 flask_server = Flask(__name__)
 socket_server = socketio.Server(
     logger=False,
@@ -75,7 +72,6 @@ def launch_relay(config: dict):
 
     while True:
         if not clients.stream_requested(stream_name):
-            logger.debug(f'No clients requesting stream: {stream_name}')
             time.sleep(0.1)
             continue
 
@@ -95,26 +91,17 @@ def launch_relay(config: dict):
                 pass
 
 
-def launch_stream(config: dict):
-    command = streams.get_pi_usb_encoding_pipeline(config, stream_dir)
-    if local:
-        command = streams.get_mac_webcam_encoding_pipeline(config, stream_dir)
-
-    logger.info(f'Running ffmpeg pipeline: {command}')
-
-    if debug:
-        return subprocess.Popen(command, shell=True)
-    
-    return subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
 def launch_server():
+    config = get_config()
     flask_server.wsgi_app = socketio.WSGIApp(socket_server, flask_server.wsgi_app)
-    flask_server.run(host='0.0.0.0', port=socket_port, threaded=True)
+    flask_server.run(host='0.0.0.0', port=config.socket_port, threaded=True)
 
 
 if __name__ == "__main__":
-    setup_logger(debug=debug)
+    setup_config()
+    setup_logger(debug=get_config().debug)
+
+    os.makedirs(get_config().stream_dir, exist_ok=True)
 
     usb_default_config = {
         'camera_type': 'usb',
@@ -132,19 +119,46 @@ if __name__ == "__main__":
         'stream_host': 'localhost',
         'stream_port': 8083,
     }
+
+    esp_default_config = {
+        'camera_type': 'esp32',
+        'stream_name': 'backcam',
+        'ip_address': '192.168.0.102',
+        'video_index': 0,
+        'threads': 1,
+        'framerate': 20,
+        'video_size': '640x480',
+        'quality': 21,
+        'bitrate': '512k',
+        'minrate': '512k',
+        'bufsize': '768k',
+        'maxrate': '768k',
+        'segment_time': 30,
+        'stream_host': 'localhost',
+        'stream_port': 8084,
+    }
+
+    stream_configs = [
+        usb_default_config,
+        esp_default_config
+    ]
+    
+    streams = []
     
     server = Thread(target=launch_server, daemon=True)
     server.start()
 
-    relay = Thread(target=launch_relay, args=(usb_default_config,), daemon=True)
-    relay.start()
-
-    stream = launch_stream(usb_default_config)
+    for stream_config in stream_configs:
+        stream = StreamProcess(stream_config)
+        stream.start()
+        streams.append(stream)
+        relay = Thread(target=launch_relay, args=(stream_config,), daemon=True)
+        relay.start()
 
     while True:
-
-        if stream.poll():
-            stream.kill()
-            stream = launch_stream(usb_default_config)
-
-        time.sleep(1)
+        for index in range(len(streams)):
+            if not streams[index].is_alive():
+                stream = StreamProcess(streams[index].stream_config)
+                stream.start()
+                streams[index] = stream
+        time.sleep(5)

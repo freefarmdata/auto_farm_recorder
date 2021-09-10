@@ -122,23 +122,23 @@ def attach_streams():
     'hls_time': 1,
   }
 
-  # esp_default_config = {
-  #   'camera_type': 'esp32',
-  #   'stream_name': 'back_cam',
-  #   'ip': '192.168.0.170',
-  #   'crf': 23,
-  #   'vsync': 2,
-  #   'vcodec': 'copy',
-  #   'video_size': '1024x768',
-  #   'minrate': '512k',
-  #   'bufsize': '512k',
-  #   'maxrate': '1M',
-  #   'framerate': 15,
-  #   'keyint_min': 30,
-  #   'g': 30,
-  #   'hls_list_size': 2,
-  #   'hls_time': 0.5,
-  # }
+  esp_default_config = {
+    'camera_type': 'esp32',
+    'stream_name': 'back_cam',
+    'ip': '192.168.0.170',
+    'crf': 23,
+    'vsync': 2,
+    'vcodec': 'copy',
+    'video_size': '1024x768',
+    'minrate': '512k',
+    'bufsize': '512k',
+    'maxrate': '1M',
+    'framerate': 15,
+    'keyint_min': 30,
+    'g': 30,
+    'hls_list_size': 2,
+    'hls_time': 0.5,
+  }
 
   state.update_service('streamer', { 'action': 'attach', 'config': usb_default_config })
   #state.update_service('streamer', { 'action': 'attach', 'config': esp_default_config })

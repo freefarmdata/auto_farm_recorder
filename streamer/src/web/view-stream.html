@@ -45,7 +45,7 @@
 		}
 
 		var canvas = document.getElementById('video-canvas');
-		var url = 'ws://127.0.0.1:5454';
+		var url = 'ws://'+document.location.hostname+':5454';
 		var player = new JSMpeg.Player(null, {
 			source: JSMpegWritableSource,
 			audio: false,
@@ -58,6 +58,11 @@
 		socket.on('connect',function() {
 			console.log('connected', socket);
 			socket.on('stream/frontcam', function (data) {
+				if (!document.hidden) {
+					player.source.write(data);
+				}
+			});
+			socket.on('stream/backcam', function (data) {
 				if (!document.hidden) {
 					player.source.write(data);
 				}
@@ -79,6 +84,8 @@
 	<div>
 		<button onclick="requestCam('frontcam')">Request 'frontcam'</button>
 		<button onclick="exitCam('frontcam')">Exit 'frontcam'</button>
+		<button onclick="requestCam('backcam')">Request 'backcam'</button>
+		<button onclick="exitCam('backcam')">Exit 'backcam'</button>
 	</div>
 </body>
 </html>
