@@ -48,7 +48,7 @@ function onMessage(message) {
 
 
 export default {
-  initialize,
-  subscribe,
-  unsubscribe,
+  initialize: initialize,
+  subscribe: subscribe,
+  unsubscribe: unsubscribe,
 };

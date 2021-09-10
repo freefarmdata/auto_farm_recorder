@@ -1,24 +1,24 @@
 
 ffmpeg \
     -re \
+    -an \
     -f avfoundation \
     -pix_fmt yuyv422 \
     -framerate 30 \
     -video_size 640x480 \
     -i "0:0" \
-    -f mpegts \
-        -c:v mpeg1video \
-        -crf 32 \
-        -s 640x480 \
-        -framerate 15 \
-        -an \
-        -b:v 256k \
-        -minrate 256k \
-        -bufsize 512k \
-        -maxrate 512k \
-        -bf 0 \
-        -preset veryfast \
-        -tune zerolatency \
-        -movflags +faststart \
-        -x264opts no-scenecut \
-        udp://localhost:8083
+    -threads 4 \
+    -vcodec mpeg1video \
+    -crf 21 \
+    -b:v 512k \
+    -minrate 512k \
+    -bufsize 768k \
+    -maxrate 768k \
+    -tune zerolatency \
+    -movflags +faststart \
+    -x264opts no-scenecut \
+    -f tee \
+    -map 0:v "[f=segment\:segment_time=30\:reset_timestamps=1\:strftime=1]./biocamcvid45_%s.mp4|[f=mpegts]udp\://127.0.0.1\:8083/"
+
+    
+        

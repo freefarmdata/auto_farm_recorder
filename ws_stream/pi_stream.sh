@@ -1,19 +1,18 @@
 ffmpeg \
     -f v4l2 \
     -i /dev/video0 \
-    -f mpegts \
-        -c:v mpeg1video \
-        -crf 32 \
-        -s 640x480 \
-        -framerate 15 \
-        -an \
-        -b:v 256k \
-        -minrate 256k \
-        -bufsize 512k \
-        -maxrate 512k \
-        -bf 0 \
-        -preset veryfast \
-        -tune zerolatency \
-        -movflags +faststart \
-        -x264opts no-scenecut \
-        udp://localhost:8083
+    -an \
+    -threads 4 \
+    -vcodec mpeg1video \
+    -framerate 15 \
+    -video_size 640x480 \
+    -crf 21 \
+    -b:v 512k \
+    -minrate 512k \
+    -bufsize 768k \
+    -maxrate 768k \
+    -tune zerolatency \
+    -movflags +faststart \
+    -x264opts no-scenecut \
+    -f tee \
+    -map 0:v "[f=segment\:segment_time=30\:reset_timestamps=1\:strftime=1]./biocamcvid45_%s.mp4|[f=mpegts]udp\://192.168.0.150\:8083/"

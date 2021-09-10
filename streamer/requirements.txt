@@ -1,0 +1,4 @@
+Flask==1.1.1
+Flask-Cors==3.0.10
+psutil==5.8.0
+python-socketio==5.4.0

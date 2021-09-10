@@ -66,14 +66,16 @@ def start_stream_server():
 
     while True:
         buffer = None
+        address = None
         try:
-            buffer, address = stream_socket.recvfrom(buffer_size)
+            buffer, address = stream_socket.recvfrom(1024*16)
         except socket.timeout:
             print('socket timeout error')
             pass
         if buffer is None or len(buffer) <= 0:
             continue
-        print(f'recieving and emitting data: {len(buffer)}')
+            
+        print(f'recieving {address} and emitting data: {len(buffer)}')
         socket_server.emit('stream', data=buffer)
 
 
