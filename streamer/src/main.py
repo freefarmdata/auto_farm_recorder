@@ -6,19 +6,21 @@ import subprocess
 import socket
 from timeit import default_timer as timer
 
-from flask import Flask
+from flask import Flask, send_from_directory
+from flask.helpers import send_file
 import socketio
 
 from setup_log import setup_logger
-import controllers.clients as client_controller
-import controllers.streams as stream_controller
+from controllers import clients
+from controllers import streams
 
 logger = logging.getLogger()
 
-local = False
-debug = False
+local = True
+debug = True
 stream_dir = './bin/streamer/videos'
 socket_port = 5454
+flask_server = Flask(__name__)
 socket_server = socketio.Server(
     logger=False,
     async_mode='threading',
@@ -26,31 +28,41 @@ socket_server = socketio.Server(
     cors_allowed_origins='*'
 )
 
-
 @socket_server.on('connect')
 def connect(sid, environ):
-    client_controller.add_client(sid)
+    clients.add_client(sid)
     return True
 
 
 @socket_server.on('request_stream')
-def stream(sid, stream_name):
+def request_stream(sid, stream_name):
     socket_server.enter_room(sid, stream_name)
-    client_controller.attach_stream(sid, stream_name)
+    clients.attach_stream(sid, stream_name)
     return True
 
 
 @socket_server.on('exit_stream')
-def stream(sid, stream_name):
+def exit_stream(sid, stream_name):
     socket_server.leave_room(sid, stream_name)
-    client_controller.detach_stream(sid, stream_name)
+    clients.detach_stream(sid, stream_name)
     return True
 
 
 @socket_server.on('disconnect')
 def disconnect(sid):
-    client_controller.delete_client(sid)
+    clients.delete_client(sid)
     return True
+
+
+@flask_server.route('/web/<string:file_name>', methods=['GET'])
+def get_web_files(file_name):
+    web_dir = os.path.abspath('./src/web')
+    return send_from_directory(directory=web_dir, filename=file_name)
+
+
+@flask_server.route('/web', methods=['GET'])
+def get_web():
+    return send_file(os.path.abspath('./src/web/view-stream.html'))
 
 
 def launch_relay(config: dict):
@@ -62,7 +74,7 @@ def launch_relay(config: dict):
     stream_socket.settimeout(1.0)
 
     while True:
-        if not client_controller.stream_requested(stream_name):
+        if not clients.stream_requested(stream_name):
             logger.debug(f'No clients requesting stream: {stream_name}')
             time.sleep(0.1)
             continue
@@ -71,7 +83,7 @@ def launch_relay(config: dict):
         while True:
             if timer() - last_check >= 10:
                 last_check = timer()
-                if not client_controller.stream_requested(stream_name):
+                if not clients.stream_requested(stream_name):
                     break
 
             try:
@@ -84,9 +96,9 @@ def launch_relay(config: dict):
 
 
 def launch_stream(config: dict):
-    command = stream_controller.get_pi_usb_encoding_pipeling(config, stream_dir)
+    command = streams.get_pi_usb_encoding_pipeline(config, stream_dir)
     if local:
-        command = stream_controller.get_mac_webcam_encoding_pipeline(config, stream_dir)
+        command = streams.get_mac_webcam_encoding_pipeline(config, stream_dir)
 
     logger.info(f'Running ffmpeg pipeline: {command}')
 
@@ -97,9 +109,8 @@ def launch_stream(config: dict):
 
 
 def launch_server():
-    server = Flask(__name__)
-    server.wsgi_app = socketio.WSGIApp(socket_server, server.wsgi_app)
-    server.run(host='0.0.0.0', port=socket_port, threaded=True)
+    flask_server.wsgi_app = socketio.WSGIApp(socket_server, flask_server.wsgi_app)
+    flask_server.run(host='0.0.0.0', port=socket_port, threaded=True)
 
 
 if __name__ == "__main__":
@@ -131,4 +142,9 @@ if __name__ == "__main__":
     stream = launch_stream(usb_default_config)
 
     while True:
+
+        if stream.poll():
+            stream.kill()
+            stream = launch_stream(usb_default_config)
+
         time.sleep(1)

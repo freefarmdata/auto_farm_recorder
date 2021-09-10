@@ -1,7 +1,7 @@
 import os
 
 
-def get_pi_usb_encoding_pipeling(config: dict, output_directory: str):
+def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
   stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
 
   return f"""ffmpeg \
