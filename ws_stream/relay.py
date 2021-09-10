@@ -3,7 +3,7 @@ import os
 import socketio
 import socket
 from threading import Thread
-from flask import Flask, request, send_file, send_from_directory
+from flask import Flask, send_file, send_from_directory
 
 stream_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 http_server = Flask(__name__)
@@ -52,10 +52,6 @@ def start_socket_server():
     server = Flask(__name__)
     server.wsgi_app = socketio.WSGIApp(socket_server, server.wsgi_app)
     server.run(host='0.0.0.0', port=socket_port, threaded=True)
-    # eventlet.wsgi.server(
-    #     eventlet.listen(('0.0.0.0', socket_port)),
-    #     socketio.WSGIApp(socket_server)
-    # )
 
 
 def start_http_server():
