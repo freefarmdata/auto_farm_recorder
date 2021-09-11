@@ -86,7 +86,13 @@ def launch_relay(config: dict):
                 buffer, address = stream_socket.recvfrom(1024*16)
                 if len(buffer) <= 0:
                     continue
-                socket_server.emit(f'stream/{stream_name}', data=buffer, room=stream_name)
+
+                socket_server.emit(
+                    f'stream/{stream_name}',
+                    data=buffer,
+                    room=stream_name,
+                    ignore_queue=True
+                )
             except socket.timeout:
                 pass
 
@@ -98,6 +104,29 @@ def launch_server():
 
 
 if __name__ == "__main__":
+    """
+    Problem A:
+        TCP Packet playback may be buffering as data is trying
+        to be sent to the user and isn't able to keep up with the data ingestion.
+        This will cause delays in the video were the playback will be several
+        seconds off. How to solve? Can I measure the length of the internal buffer
+        from the socket_server and if it gets over a certain length just ignore it?
+
+    Problem B:
+        Play, Pause, and Resume functionality. This should be in addition to stopping
+        the playback via the socket.io routes of "exit_stream". I should add some sort of
+        pause symbol and play symbol of the video itself for this. Need to just stop writing
+        frames to the video player also.
+
+    Problem C:
+        Refresh functionality. The decoder sometimes doesn't start correctly. We should need
+        to restart the stream if this happens. A page reload solves this. But I imagine there
+        is a JSMPEG way to fix this.
+
+    Problem D:
+        Buffer data on the server side and then sent it out? Or just stream out whatever is returned
+        from the UDP socket. Experiment with functionality on this.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true", default=False)
