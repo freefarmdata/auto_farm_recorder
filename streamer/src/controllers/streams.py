@@ -31,7 +31,6 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
     -f v4l2 \
     -i /dev/video{config.get('video_index')} \
     -an \
-    -vsync 2 \
     -threads {config.get('threads')} \
     -vcodec mpeg1video \
     -framerate {config.get('framerate')} \

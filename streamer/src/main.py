@@ -145,8 +145,8 @@ if __name__ == "__main__":
     }
 
     stream_configs = [
-        #usb_default_config,
-        esp_default_config
+        usb_default_config,
+        #esp_default_config
     ]
     
     streams = []
