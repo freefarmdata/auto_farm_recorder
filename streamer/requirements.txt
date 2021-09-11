@@ -3,3 +3,4 @@ Flask-Cors==3.0.10
 psutil==5.8.0
 python-socketio==5.4.0
 requests==2.22.0
+simple-websocket==0.3.0

@@ -6,6 +6,7 @@ def get_esp32_encoding_pipeling(config: dict, output_directory: str):
   return f"""ffmpeg \
     -i http://{config.get('ip_address')}:81/stream \
     -an \
+    -vsync 2 \
     -threads {config.get('threads')} \
     -vcodec mpeg1video \
     -framerate {config.get('framerate')} \
@@ -59,6 +60,7 @@ def get_mac_webcam_encoding_pipeline(config: dict, output_directory: str):
     -framerate {config.get('framerate')} \
     -video_size {config.get('video_size')} \
     -i "0:0" \
+    -vsync 2 \
     -threads {config.get('threads')} \
     -vcodec mpeg1video \
     -crf {config.get('quality')} \

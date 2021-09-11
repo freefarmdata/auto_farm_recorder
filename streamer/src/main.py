@@ -101,6 +101,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true", default=False)
+    parser.add_argument("--record", action="store_true", default=False)
     args = parser.parse_args()
 
     setup_config(args)
@@ -144,8 +145,8 @@ if __name__ == "__main__":
     }
 
     stream_configs = [
-        usb_default_config,
-        #esp_default_config
+        #usb_default_config,
+        esp_default_config
     ]
     
     streams = []

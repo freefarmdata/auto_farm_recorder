@@ -6,6 +6,7 @@ config = None
 class Config():
     local: bool
     debug: bool
+    record: bool
     stream_dir: str
     socket_port: int
 
@@ -21,6 +22,7 @@ def setup_config(args):
     config = Config(
         local=args.local,
         debug=args.debug,
+        record=args.record,
         stream_dir='./bin/streamer/videos',
         socket_port=5454
     )
