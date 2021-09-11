@@ -2,7 +2,6 @@ venv
 __pycache__
 recorder/bin
 streamer/bin
-streamer/bin
 .DS_Store
 web/node_modules
 data

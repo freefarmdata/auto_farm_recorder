@@ -15,12 +15,12 @@ def get_config():
     return config
 
 
-def setup_config():
+def setup_config(args):
     global config
     
     config = Config(
-        local=True,
-        debug=True,
+        local=args.local,
+        debug=args.debug,
         stream_dir='./bin/streamer/videos',
         socket_port=5454
     )

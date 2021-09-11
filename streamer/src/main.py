@@ -2,7 +2,7 @@ import os
 from threading import Thread
 import time
 import logging
-import subprocess
+import argparse
 import socket
 from timeit import default_timer as timer
 
@@ -98,7 +98,12 @@ def launch_server():
 
 
 if __name__ == "__main__":
-    setup_config()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--local", action="store_true", default=False)
+    parser.add_argument("--debug", action="store_true", default=False)
+    args = parser.parse_args()
+
+    setup_config(args)
     setup_logger(debug=get_config().debug)
 
     os.makedirs(get_config().stream_dir, exist_ok=True)
