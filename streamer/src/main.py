@@ -111,12 +111,12 @@ if __name__ == "__main__":
         'framerate': 20,
         'video_size': '640x480',
         'quality': 21,
-        'bitrate': '512k',
-        'minrate': '512k',
-        'bufsize': '768k',
-        'maxrate': '768k',
+        'bitrate': '256k',
+        'minrate': '256k',
+        'bufsize': '512k',
+        'maxrate': '512k',
         'segment_time': 30,
-        'stream_host': 'localhost',
+        'stream_host': '0.0.0.0',
         'stream_port': 8083,
     }
 
@@ -129,18 +129,18 @@ if __name__ == "__main__":
         'framerate': 20,
         'video_size': '640x480',
         'quality': 21,
-        'bitrate': '512k',
-        'minrate': '512k',
-        'bufsize': '768k',
-        'maxrate': '768k',
+        'bitrate': '256k',
+        'minrate': '256k',
+        'bufsize': '512k',
+        'maxrate': '512k',
         'segment_time': 30,
-        'stream_host': 'localhost',
+        'stream_host': '0.0.0.0',
         'stream_port': 8084,
     }
 
     stream_configs = [
         usb_default_config,
-        esp_default_config
+        #esp_default_config
     ]
     
     streams = []

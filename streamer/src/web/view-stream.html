@@ -60,11 +60,15 @@
 			socket.on('stream/frontcam', function (data) {
 				if (!document.hidden) {
 					player.source.write(data);
+				} else {
+					exitCam('frontcam')
 				}
 			});
 			socket.on('stream/backcam', function (data) {
 				if (!document.hidden) {
 					player.source.write(data);
+				} else {
+					exitCam('backcam')
 				}
 			});
 		});
