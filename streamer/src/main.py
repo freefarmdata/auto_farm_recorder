@@ -6,60 +6,15 @@ import argparse
 import socket
 from timeit import default_timer as timer
 
-from flask import Flask, send_from_directory
-from flask.helpers import send_file
 import socketio
 
 from setup_log import setup_logger
 from controllers import clients
 from stream_process import StreamProcess
-from config import setup_config, get_config
+from config import setup_config
+import socket_server
 
 logger = logging.getLogger()
-
-flask_server = Flask(__name__)
-socket_server = socketio.Server(
-    logger=False,
-    async_mode='threading',
-    engineio_logger=False,
-    cors_allowed_origins='*'
-)
-
-@socket_server.on('connect')
-def connect(sid, environ):
-    clients.add_client(sid)
-    return True
-
-
-@socket_server.on('play_stream')
-def play_stream(sid, stream_name):
-    socket_server.enter_room(sid, stream_name)
-    clients.attach_stream(sid, stream_name)
-    return True
-
-
-@socket_server.on('pause_stream')
-def pause_stream(sid, stream_name):
-    socket_server.leave_room(sid, stream_name)
-    clients.detach_stream(sid, stream_name)
-    return True
-
-
-@socket_server.on('disconnect')
-def disconnect(sid):
-    clients.delete_client(sid)
-    return True
-
-
-@flask_server.route('/web/<string:file_name>', methods=['GET'])
-def get_web_files(file_name):
-    web_dir = os.path.abspath('./src/web')
-    return send_from_directory(web_dir, file_name)
-
-
-@flask_server.route('/web', methods=['GET'])
-def get_web():
-    return send_file(os.path.abspath('./src/web/view-stream.html'))
 
 
 def launch_relay(config: dict):
@@ -95,12 +50,6 @@ def launch_relay(config: dict):
                 )
             except socket.timeout:
                 pass
-
-
-def launch_server():
-    config = get_config()
-    flask_server.wsgi_app = socketio.WSGIApp(socket_server, flask_server.wsgi_app)
-    flask_server.run(host='0.0.0.0', port=config.socket_port, threaded=True)
 
 
 if __name__ == "__main__":
@@ -151,14 +100,27 @@ if __name__ == "__main__":
 
     python3 src/main.py \
         --debug \
+        --bitrate 256k \
+        --minrate 128k \
+        --bufsize 1M \
+        --maxrate 2M \
+        --resolution 640x240 \
+        --framerate 30 \
+        --threads 3 \
+        --vsync 2
+        
+    
+    python3 src/main.py \
+        --local \
+        --debug \
         --grayscale \
         --bitrate 256k \
-        --minrate 256k \
-        --bufsize 256k \
-        --maxrate 512k \
-        --resolution 1280x480 \
-        --framerate 30 \
-        --threads 4
+        --minrate 128k \
+        --bufsize 1M \
+        --maxrate 2M \
+        --resolution 1280x720 \
+        --vsync 0 \
+        --framerate 30
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
@@ -173,6 +135,7 @@ if __name__ == "__main__":
     parser.add_argument("--resolution", dest='resolution', default='1280x480')
     parser.add_argument("--framerate", dest='framerate', default='30')
     parser.add_argument("--threads", dest='threads', default='1')
+    parser.add_argument("--vsync", dest='vsync', default='2')
     args = parser.parse_args()
 
     app_config = setup_config(args)
@@ -193,6 +156,7 @@ if __name__ == "__main__":
         'threads': args.threads,
         'framerate': args.framerate,
         'video_size': args.resolution,
+        'vsync': args.vsync,
         'quality': 21,
         'bitrate': args.bitrate,
         'minrate': args.minrate,
@@ -228,9 +192,9 @@ if __name__ == "__main__":
     ]
     
     streams = []
-    
-    server = Thread(target=launch_server, daemon=True)
-    server.start()
+
+    socket_server.initialize()
+    socket_server.start()
 
     for stream_config in stream_configs:
         stream = StreamProcess(stream_config)
