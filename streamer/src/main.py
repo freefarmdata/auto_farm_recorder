@@ -100,14 +100,14 @@ if __name__ == "__main__":
 
     python3 src/main.py \
         --debug \
-        --bitrate 256k \
-        --minrate 128k \
-        --bufsize 1M \
-        --maxrate 2M \
+        --bitrate 512k \
+        --minrate 512k \
+        --bufsize 512k \
+        --maxrate 1M \
         --resolution 640x240 \
         --framerate 30 \
-        --threads 3 \
-        --vsync 2
+        --threads 1 \
+        --vsync 1
         
     
     python3 src/main.py \
@@ -203,10 +203,16 @@ if __name__ == "__main__":
         relay = Thread(target=launch_relay, args=(stream_config,), daemon=True)
         relay.start()
 
-    while True:
-        for index in range(len(streams)):
-            if not streams[index].is_alive():
-                stream = StreamProcess(streams[index].stream_config)
-                stream.start()
-                streams[index] = stream
-        time.sleep(5)
+    try:
+        while True:
+            for index in range(len(streams)):
+                if not streams[index].is_alive():
+                    stream = StreamProcess(streams[index].stream_config)
+                    stream.start()
+                    streams[index] = stream
+            time.sleep(5)
+    except:
+        pass
+    finally:
+        for stream in streams:
+            stream.process.kill()
