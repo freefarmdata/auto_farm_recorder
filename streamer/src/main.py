@@ -169,7 +169,7 @@ if __name__ == "__main__":
         'camera_type': 'usb',
         'stream_name': 'frontcam',
         'archive': app_config.archive,
-        'video_index': 1,
+        'video_index': 0,
         'threads': 1,
         'framerate': 60,
         'video_size': '2560x960',
