@@ -157,7 +157,8 @@ if __name__ == "__main__":
         --bufsize 256k \
         --maxrate 512k \
         --resolution 1280x480 \
-        --framerate 30
+        --framerate 30 \
+        --threads 4
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
@@ -171,6 +172,7 @@ if __name__ == "__main__":
     parser.add_argument("--maxrate", dest='maxrate', default='512k')
     parser.add_argument("--resolution", dest='resolution', default='1280x480')
     parser.add_argument("--framerate", dest='framerate', default='30')
+    parser.add_argument("--threads", dest='threads', default='1')
     args = parser.parse_args()
 
     app_config = setup_config(args)
@@ -188,7 +190,7 @@ if __name__ == "__main__":
         'archive': app_config.archive,
         'grayscale': app_config.grayscale,
         'video_index': 0,
-        'threads': 1,
+        'threads': args.threads,
         'framerate': args.framerate,
         'video_size': args.resolution,
         'quality': 21,
