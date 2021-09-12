@@ -46,11 +46,6 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
       filters.append(f"fps={config.get('fps')}")
 
     video_filter += f'"{" , ".join(filters)}" '
-  
-  # -b:v {config.get('bitrate')} \
-  # -minrate {config.get('minrate')} \
-  # -bufsize {config.get('bufsize')} \
-  # -maxrate {config.get('maxrate')} \
 
   return f"""ffmpeg \
     -re \
@@ -63,6 +58,10 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
       -vsync {config.get('vsync')} {video_filter}\
       -threads {config.get('threads')} \
       -crf {config.get('quality')} \
+      -b:v {config.get('bitrate')} \
+      -minrate {config.get('minrate')} \
+      -bufsize {config.get('bufsize')} \
+      -maxrate {config.get('maxrate')} \
       -tune zerolatency \
       -movflags +faststart \
       -x264opts no-scenecut \
