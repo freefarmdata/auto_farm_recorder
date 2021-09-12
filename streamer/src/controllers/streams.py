@@ -31,6 +31,10 @@ def get_esp32_encoding_pipeling(config: dict, output_directory: str):
 def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
   stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
   file_pipe = f"[f=segment\:segment_time={config.get('segment_time')}\:reset_timestamps=1\:strftime=1]{stream_file}|"
+  grayscale = "-vf format=gray "
+
+  if not config.get('grayscale'):
+    grayscale = ""
 
   if not config.get('archive'):
     file_pipe = ""
@@ -39,7 +43,7 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
     -f v4l2 \
     -i /dev/video{config.get('video_index')} \
     -an \
-    -vsync 2 \
+    -vsync 2 {grayscale}\
     -threads {config.get('threads')} \
     -vcodec mpeg1video \
     -framerate {config.get('framerate')} \

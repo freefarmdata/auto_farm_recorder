@@ -148,12 +148,29 @@ if __name__ == "__main__":
         2560x720@[30.000030 30.000030]fps
         2560x960@[60.000240 60.000240]fps
         2560x960@[30.000030 30.000030]fps
+
+    python3 src/main.py \
+        --debug \
+        --grayscale \
+        --bitrate 256k \
+        --minrate 256k \
+        --bufsize 256k \
+        --maxrate 512k \
+        --resolution 1280x480 \
+        --framerate 30
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true", default=False)
     parser.add_argument("--record", action="store_true", default=False)
     parser.add_argument("--archive", action="store_true", default=False)
+    parser.add_argument("--grayscale", action="store_true", default=False)
+    parser.add_argument("--bitrate", dest='bitrate', default='256k')
+    parser.add_argument("--minrate", dest='minrate', default='256k')
+    parser.add_argument("--bufsize", dest='bufsize', default='256k')
+    parser.add_argument("--maxrate", dest='maxrate', default='512k')
+    parser.add_argument("--resolution", dest='resolution', default='1280x480')
+    parser.add_argument("--framerate", dest='framerate', default='30')
     args = parser.parse_args()
 
     app_config = setup_config(args)
@@ -169,15 +186,16 @@ if __name__ == "__main__":
         'camera_type': 'usb',
         'stream_name': 'frontcam',
         'archive': app_config.archive,
+        'grayscale': app_config.grayscale,
         'video_index': 0,
         'threads': 1,
-        'framerate': 30,
-        'video_size': '1280x480',
+        'framerate': args.framerate,
+        'video_size': args.resolution,
         'quality': 21,
-        'bitrate': '256k',
-        'minrate': '256k',
-        'bufsize': '256k',
-        'maxrate': '512k',
+        'bitrate': args.bitrate,
+        'minrate': args.minrate,
+        'bufsize': args.bufsize,
+        'maxrate': args.maxrate,
         'segment_time': 30,
         'stream_host': '0.0.0.0',
         'stream_port': 8083,

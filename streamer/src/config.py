@@ -8,6 +8,7 @@ class Config():
     debug: bool
     record: bool
     archive: bool
+    grayscale: bool
     stream_dir: str
     socket_port: int
 
@@ -25,6 +26,7 @@ def setup_config(args):
         debug=args.debug,
         record=args.record,
         archive=args.archive,
+        grayscale=args.grayscale,
         stream_dir='./bin/streamer/videos',
         socket_port=5454
     )
