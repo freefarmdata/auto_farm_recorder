@@ -192,7 +192,7 @@
 				}
 				avgkbytesTenSec = avgkbytesTenSec / 20;
 
-				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2).toFixed(4);
+				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2);
 				bufferLengthData.pop();
 				bufferLengthData.unshift(kbytesPerSec);
 				bufferLengthTotal = 0;
