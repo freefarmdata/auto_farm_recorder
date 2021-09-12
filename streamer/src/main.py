@@ -31,15 +31,15 @@ def connect(sid, environ):
     return True
 
 
-@socket_server.on('request_stream')
-def request_stream(sid, stream_name):
+@socket_server.on('play_stream')
+def play_stream(sid, stream_name):
     socket_server.enter_room(sid, stream_name)
     clients.attach_stream(sid, stream_name)
     return True
 
 
-@socket_server.on('exit_stream')
-def exit_stream(sid, stream_name):
+@socket_server.on('pause_stream')
+def pause_stream(sid, stream_name):
     socket_server.leave_room(sid, stream_name)
     clients.detach_stream(sid, stream_name)
     return True
@@ -126,30 +126,58 @@ if __name__ == "__main__":
     Problem D:
         Buffer data on the server side and then sent it out? Or just stream out whatever is returned
         from the UDP socket. Experiment with functionality on this.
+
+    Problem E:
+        ffmpeg vsync parameter seems to introduce some optimization. How? Why? Experiment and
+        find out why.
+
+    Problem F:
+        The quality of the stream is nothing fancy. How hard can I push it? How big can I get
+        the resolution? Experiment with this. What about grayscale video?
+
+    Problem G:
+        Measure the total amount of data transmitted on server side and client side. Graph it
+        in D3.js and show over time.
+
+    STEREO CAMERA SETTINGS:
+        640x240@[60.000240 60.000240]fps
+        640x240@[30.000030 30.000030]fps
+        1280x480@[60.000240 60.000240]fps
+        1280x480@[30.000030 30.000030]fps
+        2560x720@[60.000240 60.000240]fps
+        2560x720@[30.000030 30.000030]fps
+        2560x960@[60.000240 60.000240]fps
+        2560x960@[30.000030 30.000030]fps
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
     parser.add_argument("--debug", action="store_true", default=False)
     parser.add_argument("--record", action="store_true", default=False)
+    parser.add_argument("--archive", action="store_true", default=False)
     args = parser.parse_args()
 
-    setup_config(args)
-    setup_logger(debug=get_config().debug)
+    app_config = setup_config(args)
 
-    os.makedirs(get_config().stream_dir, exist_ok=True)
+    setup_logger(debug=app_config.debug)
+
+    os.makedirs(app_config.stream_dir, exist_ok=True)
+
+    # 1280x720
+    # 1280x480
 
     usb_default_config = {
         'camera_type': 'usb',
         'stream_name': 'frontcam',
-        'video_index': 0,
+        'archive': app_config.archive,
+        'video_index': 1,
         'threads': 1,
-        'framerate': 20,
-        'video_size': '640x480',
+        'framerate': 60,
+        'video_size': '2560x960',
         'quality': 21,
-        'bitrate': '256k',
-        'minrate': '256k',
-        'bufsize': '512k',
-        'maxrate': '512k',
+        'bitrate': '1M',
+        'minrate': '512k',
+        'bufsize': '2M',
+        'maxrate': '10M',
         'segment_time': 30,
         'stream_host': '0.0.0.0',
         'stream_port': 8083,
@@ -158,6 +186,7 @@ if __name__ == "__main__":
     esp_default_config = {
         'camera_type': 'esp32',
         'stream_name': 'backcam',
+        'archive': app_config.archive,
         'ip_address': '192.168.0.102',
         'video_index': 0,
         'threads': 1,
