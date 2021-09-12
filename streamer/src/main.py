@@ -100,14 +100,16 @@ if __name__ == "__main__":
 
     python3 src/main.py \
         --debug \
-        --bitrate 256k \
-        --minrate 256k \
-        --bufsize 1M \
-        --maxrate 5M \
-        --resolution 640x240 \
+        --grayscale \
+        --bitrate 3M \
+        --minrate 3M \
+        --bufsize 5M \
+        --maxrate 6M \
+        --resolution 1280x480 \
+        --quality 50 \
         --infps 30 \
         --outfps 20 \
-        --threads 2 \
+        --threads 4 \
         --vsync 1
         
     

@@ -48,7 +48,6 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
     video_filter += f'"{" , ".join(filters)}" '
 
   return f"""ffmpeg \
-    -re \
     -an \
     -f v4l2 \
       -i /dev/video{config.get('video_index')} \
