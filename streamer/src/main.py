@@ -19,9 +19,9 @@ logger = logging.getLogger()
 
 flask_server = Flask(__name__)
 socket_server = socketio.Server(
-    logger=True,
+    logger=False,
     async_mode='threading',
-    engineio_logger=True,
+    engineio_logger=False,
     cors_allowed_origins='*'
 )
 
