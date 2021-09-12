@@ -103,7 +103,7 @@ if __name__ == "__main__":
         --bitrate 512k \
         --minrate 512k \
         --bufsize 512k \
-        --maxrate 1M \
+        --maxrate 5M \
         --resolution 640x240 \
         --framerate 30 \
         --threads 1 \
