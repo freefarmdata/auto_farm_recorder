@@ -97,15 +97,34 @@ if __name__ == "__main__":
         2560x720@[30.000030 30.000030]fps
         2560x960@[60.000240 60.000240]fps
         2560x960@[30.000030 30.000030]fps
+    
+    ffmpeg \
+        -an \
+        -f v4l2 \
+        -i /dev/video0 \
+        -vcodec copy \
+        -pix_fmt yuv420p \
+        -framerate 30 \
+        -video_size 640x240 \
+        -vsync 1 \
+        -threads 4 \
+        -crf 50 \
+        -b:v 2M \
+        -minrate 2M \
+        -bufsize 4M \
+        -maxrate 6M \
+        -tune zerolatency \
+        -movflags +faststart \
+        -x264opts no-scenecut \
+        -f tee -map 0:v "[f=mpegts]udp\://192.168.0.150\:8083/"
 
     python3 src/main.py \
         --debug \
-        --grayscale \
-        --bitrate 3M \
-        --minrate 3M \
-        --bufsize 5M \
+        --bitrate 2M \
+        --minrate 2M \
+        --bufsize 4M \
         --maxrate 6M \
-        --resolution 1280x480 \
+        --resolution 640x240 \
         --quality 50 \
         --infps 30 \
         --outfps 20 \
@@ -137,7 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("--maxrate", dest='maxrate', default='512k')
     parser.add_argument("--resolution", dest='resolution', default='1280x480')
     parser.add_argument("--infps", dest='infps', default='30')
-    parser.add_argument("--outfps", dest='outfps', default='30')
+    parser.add_argument("--outfps", dest='outfps', default=None)
     parser.add_argument("--quality", dest='quality', default='30')
     parser.add_argument("--threads", dest='threads', default='1')
     parser.add_argument("--vsync", dest='vsync', default='2')
