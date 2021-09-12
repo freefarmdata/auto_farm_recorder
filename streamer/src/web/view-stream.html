@@ -128,7 +128,7 @@
 				.range([0, bb.width]);
 
 			const yScale = d3.scaleLinear()
-				.domain([0, 50000])
+				.domain([0, 100])
 				.range([bb.height, 0]);
 			
 			const svg = d3.select('#graph-buffer')
@@ -184,17 +184,17 @@
 			const delta = timestamp - startGraphBufferLength;
 
 			if (delta >= 500) {
-				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2).toFixed(4);
+				startGraphBufferLength = timestamp;
+
 				let avgkbytesTenSec = 0;
 				for (let i = 0; i < 20; i++) {
 					avgkbytesTenSec += bufferLengthData[i];
 				}
 				avgkbytesTenSec = avgkbytesTenSec / 20;
 
-
-				startGraphBufferLength = timestamp;
+				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2).toFixed(4);
 				bufferLengthData.pop();
-				bufferLengthData.unshift(bufferLengthTotal > 50000 ? 50000 : bufferLengthTotal);
+				bufferLengthData.unshift(kbytesPerSec);
 				bufferLengthTotal = 0;
 				
 				svgBufferText.text(`${kbytesPerSec} kB/s.\n${avgkbytesTenSec} avg/10s`);
