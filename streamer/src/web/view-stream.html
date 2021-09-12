@@ -188,11 +188,11 @@
 
 				let avgkbytesTenSec = 0;
 				for (let i = 0; i < 20; i++) {
-					avgkbytesTenSec += bufferLengthData[i];
+					avgkbytesTenSec += parseFloat(bufferLengthData[i]);
 				}
-				avgkbytesTenSec = avgkbytesTenSec / 20;
+				avgkbytesTenSec /= 20;
 
-				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2);
+				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2).toFixed(4);
 				bufferLengthData.pop();
 				bufferLengthData.unshift(kbytesPerSec);
 				bufferLengthTotal = 0;
