@@ -36,14 +36,14 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
   if not config.get('archive'):
     file_pipe = ""
 
-  if config.get('grayscale') or config.get('fps'):
+  if config.get('grayscale') or config.get('outfps'):
     video_filter = "-vf "
     filters = []
 
     if config.get('grayscale'):
       filters.append("format=gray")
-    if config.get('fps'):
-      filters.append(f"fps={config.get('fps')}")
+    if config.get('outfps'):
+      filters.append(f"fps={config.get('outfps')}")
 
     video_filter += f'"{" , ".join(filters)}" '
 
@@ -53,7 +53,8 @@ def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
     -f v4l2 \
       -i /dev/video{config.get('video_index')} \
       -vcodec mpeg1video \
-      -framerate {config.get('framerate')} \
+      -pix_fmt yuv420p \
+      -framerate {config.get('infps')} \
       -video_size {config.get('video_size')} \
       -vsync {config.get('vsync')} {video_filter}\
       -threads {config.get('threads')} \
