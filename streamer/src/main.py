@@ -54,7 +54,7 @@ def disconnect(sid):
 @flask_server.route('/web/<string:file_name>', methods=['GET'])
 def get_web_files(file_name):
     web_dir = os.path.abspath('./src/web')
-    return send_from_directory(directory=web_dir, filename=file_name)
+    return send_from_directory(web_dir, file_name)
 
 
 @flask_server.route('/web', methods=['GET'])
