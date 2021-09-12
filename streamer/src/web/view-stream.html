@@ -185,12 +185,19 @@
 
 			if (delta >= 500) {
 				const kbytesPerSec = parseFloat(bufferLengthTotal * 0.001 * 2).toFixed(4);
+				let avgkbytesTenSec = 0;
+				for (let i = 0; i < 20; i++) {
+					avgkbytesTenSec += bufferLengthData[i];
+				}
+				avgkbytesTenSec = avgkbytesTenSec / 20;
+
+
 				startGraphBufferLength = timestamp;
 				bufferLengthData.pop();
 				bufferLengthData.unshift(bufferLengthTotal > 50000 ? 50000 : bufferLengthTotal);
 				bufferLengthTotal = 0;
 				
-				svgBufferText.text(`${kbytesPerSec} kB/s`);
+				svgBufferText.text(`${kbytesPerSec} kB/s.\n${avgkbytesTenSec} avg/10s`);
 				svgBufferGraph.selectAll('path')
 					.data([bufferLengthData])
 					.attr('d', svgBufferLine);
