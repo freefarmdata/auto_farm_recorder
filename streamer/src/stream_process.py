@@ -33,7 +33,8 @@ class StreamProcess(Thread):
     def start_usb_stream(self):
         config = get_config()
 
-        command = streams.get_pi_usb_encoding_pipeline(self.stream_config, config.stream_dir)
+        command = streams.get_stereo_usb_encoding_pipeline(self.stream_config, config.stream_dir)
+        #command = streams.get_pi_usb_encoding_pipeline(self.stream_config, config.stream_dir)
         if config.local:
             command = streams.get_mac_webcam_encoding_pipeline(self.stream_config, config.stream_dir)            
 

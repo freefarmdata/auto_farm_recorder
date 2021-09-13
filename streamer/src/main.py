@@ -97,38 +97,37 @@ if __name__ == "__main__":
         2560x720@[30.000030 30.000030]fps
         2560x960@[60.000240 60.000240]fps
         2560x960@[30.000030 30.000030]fps
-    
+
+    vcgencmd measure_clock arm
+    vcgencmd measure_clock v3d
+    vcgencmd measure_temp
+
+    -re \
+    -vsync 1 \
+    -threads 0 \
+    -an \
+
     ffmpeg \
-        -an \
         -f v4l2 \
-        -i /dev/video0 \
-        -vcodec copy \
-        -pix_fmt yuv420p \
-        -framerate 30 \
-        -video_size 640x240 \
-        -vsync 1 \
-        -threads 4 \
-        -crf 50 \
-        -b:v 2M \
-        -minrate 2M \
-        -bufsize 4M \
-        -maxrate 6M \
-        -tune zerolatency \
-        -movflags +faststart \
-        -x264opts no-scenecut \
-        -f tee -map 0:v "[f=mpegts]udp\://192.168.0.150\:8083/"
+            -framerate 30 \
+            -video_size 640x240 \
+            -i /dev/video0 \
+        -f mpegts \
+            -vcodec mpeg1video \
+            -b:v 1000k \
+            -s 640x240 \
+            -bf 0 \
+        udp://0.0.0.0:8083/
 
     python3 src/main.py \
         --debug \
-        --bitrate 2M \
-        --minrate 2M \
-        --bufsize 4M \
+        --bitrate 256k \
+        --minrate 256k \
+        --bufsize 2M \
         --maxrate 6M \
         --resolution 640x240 \
-        --quality 50 \
         --infps 30 \
-        --outfps 20 \
-        --threads 4 \
+        --threads 0 \
         --vsync 1
         
     
