@@ -132,13 +132,13 @@ if __name__ == "__main__":
         -bf 0 \
         -f tee -map 0:v "[f=mpegts]udp\://0.0.0.0\:8083/"
 
+     ffmpeg -an -f v4l2 -framerate 30 -video_size 640x240 -i /dev/video0 -f mpegts -vcodec mpeg1video -b:v 256k -s 640x240 -bf 0 -f tee -map 0:v "[f=mpegts]udp\://0.0.0.0\:8083/"
+
     python3 src/main.py \
         --debug \
         --bitrate 256k \
         --resolution 640x240 \
-        --infps 30 \
-        --threads 0 \
-        --vsync 1
+        --infps 30
         
     
     python3 src/main.py \
