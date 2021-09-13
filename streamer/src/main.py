@@ -136,9 +136,14 @@ if __name__ == "__main__":
 
     python3 src/main.py \
         --debug \
-        --bitrate 1M \
-        --resolution 640x240 \
-        --infps 30
+        --bitrate 512k \
+        --inres 1280x480  \
+        --outres 640x240 \
+        --infps 30 \
+        --outfps 20 \
+        --threads 1 \
+        --vsync 1
+        
         
     
     python3 src/main.py \
@@ -163,7 +168,8 @@ if __name__ == "__main__":
     parser.add_argument("--minrate", dest='minrate', default='256k')
     parser.add_argument("--bufsize", dest='bufsize', default='256k')
     parser.add_argument("--maxrate", dest='maxrate', default='512k')
-    parser.add_argument("--resolution", dest='resolution', default='1280x480')
+    parser.add_argument("--inres", dest='inres', default='1280x480')
+    parser.add_argument("--outres", dest='outres', default='1280x480')
     parser.add_argument("--infps", dest='infps', default='30')
     parser.add_argument("--outfps", dest='outfps', default=None)
     parser.add_argument("--quality", dest='quality', default='30')
@@ -189,7 +195,8 @@ if __name__ == "__main__":
         'threads': args.threads,
         'infps': args.infps,
         'outfps': args.outfps,
-        'video_size': args.resolution,
+        'outres': args.outres,
+        'inres': args.inres,
         'vsync': args.vsync,
         'quality': args.quality,
         'bitrate': args.bitrate,

@@ -44,14 +44,14 @@ def get_stereo_usb_encoding_pipeline(config: dict, output_directory: str):
     -an \
     -f v4l2 \
     -framerate {config.get('infps')} \
-    -video_size {config.get('video_size')} \
+    -video_size {config.get('inres')} \
     -i /dev/video{config.get('video_index')} \
     -f mpegts \
     -vcodec mpeg1video {video_filter}\
     -threads {config.get('threads')} \
     -vsync {config.get('vsync')} \
     -b:v {config.get('bitrate')} \
-    -s {config.get('video_size')} \
+    -s {config.get('outres')} \
     -r {config.get('outfps')} \
     -bf 0 \
     -f tee -map 0:v "{file_pipe}{udp_pipe}"
