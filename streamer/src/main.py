@@ -120,23 +120,23 @@ if __name__ == "__main__":
         udp://0.0.0.0:8083/
 
     ffmpeg \
+        -re \
         -an \
         -f v4l2 \
         -framerate 30 \
-        -video_size 640x240 \
+        -video_size 1280x480 \
         -i /dev/video0 \
         -f mpegts \
         -vcodec mpeg1video \
-        -b:v 1000k \
-        -s 640x240 \
+        -b:v 128k \
+        -s 1280x480 \
+        -r 20 \
         -bf 0 \
         -f tee -map 0:v "[f=mpegts]udp\://0.0.0.0\:8083/"
 
-     ffmpeg -an -f v4l2 -framerate 30 -video_size 640x240 -i /dev/video0 -f mpegts -vcodec mpeg1video -b:v 256k -s 640x240 -bf 0 -f tee -map 0:v "[f=mpegts]udp\://0.0.0.0\:8083/"
-
     python3 src/main.py \
         --debug \
-        --bitrate 256k \
+        --bitrate 1M \
         --resolution 640x240 \
         --infps 30
         

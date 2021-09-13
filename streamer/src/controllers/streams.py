@@ -32,9 +32,13 @@ def get_stereo_usb_encoding_pipeline(config: dict, output_directory: str):
   stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
   file_pipe = f"[f=segment\:segment_time={config.get('segment_time')}\:reset_timestamps=1\:strftime=1]{stream_file}|"
   udp_pipe = f"[f=mpegts]udp\://{config.get('stream_host')}\:{config.get('stream_port')}/"
+  video_filter = ""
 
   if not config.get('archive'):
     file_pipe = ""
+  
+  if config.get('grayscale'):
+    video_filter = "-vf format=gray "
 
   return f"""ffmpeg \
     -an \
@@ -43,9 +47,12 @@ def get_stereo_usb_encoding_pipeline(config: dict, output_directory: str):
     -video_size {config.get('video_size')} \
     -i /dev/video{config.get('video_index')} \
     -f mpegts \
-    -vcodec mpeg1video \
+    -vcodec mpeg1video {video_filter}\
+    -threads {config.get('threads')} \
+    -vsync {config.get('vsync')} \
     -b:v {config.get('bitrate')} \
     -s {config.get('video_size')} \
+    -r {config.get('outfps')} \
     -bf 0 \
     -f tee -map 0:v "{file_pipe}{udp_pipe}"
   """
