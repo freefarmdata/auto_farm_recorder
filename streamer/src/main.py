@@ -122,9 +122,6 @@ if __name__ == "__main__":
     python3 src/main.py \
         --debug \
         --bitrate 256k \
-        --minrate 256k \
-        --bufsize 2M \
-        --maxrate 6M \
         --resolution 640x240 \
         --infps 30 \
         --threads 0 \
