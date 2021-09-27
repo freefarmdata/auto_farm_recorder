@@ -15,17 +15,20 @@ class Alarms extends PureComponent {
 
     this.fetchAlarms = this.fetchAlarms.bind(this);
     this.onAlarms = this.onAlarms.bind(this);
+    this.alarmInterval = undefined;
   }
 
   async componentDidMount() {
     await this.fetchAlarms();
-    mqtt.subscribe('connected', this.fetchAlarms);
-    mqtt.subscribe('web/alarms/active', this.onAlarms);
+    mqtt.subscribe('web/alarms/tx', this.onAlarms);
+    this.alarmInterval = setInterval(async () => {
+      await this.fetchAlarms();
+    }, 10000);
   }
 
   componentWillUnmount() {
-    mqtt.unsubscribe('connected', this.fetchAlarms);
-    mqtt.unsubscribe('web/alarms/active', this.onAlarms);
+    mqtt.unsubscribe('web/alarms/tx', this.onAlarms);
+    clearInterval(this.alarmInterval);
   }
 
   async fetchAlarms() {
@@ -35,10 +38,15 @@ class Alarms extends PureComponent {
     }
   }
 
-  onAlarms(newAlarms) {
-    console.log('new alarms', newAlarms);
+  onAlarms(newAlarm) {
+    const { alarms } = this.state;
+    newAlarm = JSON.parse(newAlarm);
 
-    this.setState({ alarms: JSON.parse(newAlarms) });
+    alarms[newAlarm.id] = newAlarm;
+
+    console.log(alarms);
+
+    this.setState({ alarms: {...alarms} });
   }
 
   renderAlarms() {

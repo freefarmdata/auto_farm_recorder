@@ -111,15 +111,4 @@ export default {
   initialize,
   subscribe,
   unsubscribe,
-
-  requestData,
-  toggleService,
-  disableService,
-  selectModel,
-  deleteModel,
-  toggleWater,
-  trainModel,
-  updateServiceSetting,
-  updateService,
-  syncSettingsToDisk
 };

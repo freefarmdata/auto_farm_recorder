@@ -2,23 +2,38 @@
 import JSONInput from 'react-json-editor-ajrm';
 import locale from 'react-json-editor-ajrm/locale/en';
 
-
 import React, { PureComponent } from 'react';
-import mqtt from '../../mqtt';
+import service from '../../service';
 
 class EditSettings extends PureComponent {
 
-  render() {
+  constructor(props) {
+    super(props);
 
-    const object = {
-      'hello': 'world'
+    this.state = {
+      settings: {},
+      loading: true,
+    }
+  }
+
+  async componentDidMount() {
+    const settings = await service.fetchAllSettings();
+    this.setState({ settings, loading: false })
+  }
+
+  render() {
+    const { loading } = this.state;
+
+    if (loading) {
+      return <div className="spinner"></div>;
     }
 
     return (
       <JSONInput
-        id="a_unique_id"
-        placeholder={object}
+        placeholder={this.state.settings}
         locale={locale}
+        confirmGood={false}
+        width='100%'
         height='100%'
       />
     )

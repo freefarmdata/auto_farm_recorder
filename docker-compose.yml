@@ -13,6 +13,22 @@ services:
   #     - ./data/recorder:/usr/src/app/bin
   #   networks:
   #     - pi_net
+  # relay:
+  #   container_name: relay
+  #   build:
+  #     context: ./relay
+  #     dockerfile: ./dockerfile
+  #   restart: always
+  #   environment:
+  #     NODE_ENV: prod
+  #     RECORDER_URL: http://relay:5000
+  #     MAX_WRITE_BUFFER: 100
+  #   ports:
+  #     - 5454:5454
+  #   networks:
+  #     - pi_net
+  #   depends_on:
+  #     - recorder
   postgres:
     container_name: postgres
     image: postgres:13.1

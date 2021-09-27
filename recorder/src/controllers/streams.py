@@ -1,6 +1,6 @@
 import os
 
-def clean_up_stream(name: str, output: str):
+def clean_up_hls_stream(name: str, output: str):
   """
   Removes all references to the HLS playlist for the
   given stream name
@@ -10,38 +10,96 @@ def clean_up_stream(name: str, output: str):
     os.remove(os.path.join(output, file_name))
 
 
-def get_mac_webcam_input():
-  return f"""\
-  -re \
-  -f avfoundation \
-  -pix_fmt yuyv422 \
-  -framerate 15 \
-  -i "0:0" \
+def get_esp32_encoding_pipeling(config: dict, output_directory: str):
+  stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
+  file_pipe = f"[f=segment\:segment_time={config.get('segment_time')}\:reset_timestamps=1\:strftime=1]{stream_file}|"
+  udp_pipe = f"[f=mpegts]udp\://{config.get('stream_host')}\:{config.get('stream_port')}/"
+  video_filter = ""
+
+  if not config.get('archive'):
+    file_pipe = ""
+  
+  if config.get('grayscale'):
+    video_filter = "-vf format=gray "
+
+  return f"""ffmpeg \
+    -an \
+    -framerate {config.get('infps')} \
+    -video_size {config.get('inres')} \
+    -i http://{config.get('ip_address')}:81/stream \
+    -f mpegts \
+    -vcodec mpeg1video {video_filter}\
+    -threads {config.get('threads')} \
+    -vsync {config.get('vsync')} \
+    -b:v {config.get('bitrate')} \
+    -s {config.get('outres')} \
+    -r {config.get('outfps')} \
+    -bf 0 \
+    -f tee -map 0:v "{file_pipe}{udp_pipe}"
   """
 
-def get_encoding_pipeline(options: dict):
-    # -vprofile baseline \
-    # -fflags nobuffer \
-    # -vcodec h264 \
-    # -crf {options.get('crf')} \
-    # -vf "drawtext=text='%{{localtime\: {name} --- %m/%d/%Y %I.%M.%S %p}}':fontsize=10:fontcolor=white@0.8:x=10:y=10:shadowcolor=red@0.6:shadowx=1:shadowy=1" \
 
-    return f"""\
-    -preset veryfast \
-    -tune zerolatency \
-    -pix_fmt yuv420p \
-    -movflags +faststart \
-    -x264opts no-scenecut \
-    -vsync {options.get('vsync', 1)} \
-    -video_size {options.get('video_size', '800x600')} \
-    -bufsize {options.get('bufsize', '512k')} \
-    -minrate {options.get('minrate', '512k')} \
-    -maxrate {options.get('maxrate', '1M')} \
-    -framerate {options.get('framerate', 15)} \
-    -force_key_frames "expr:gte(t,n_forced*1)" \
-    -keyint_min {options.get('keyint_min', 120)} \
-    -g {options.get('g', 120)} \
-    """
+def get_pi_usb_encoding_pipeline(config: dict, output_directory: str):
+  stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
+  file_pipe = f"[f=segment\:segment_time={config.get('segment_time')}\:reset_timestamps=1\:strftime=1]{stream_file}|"
+  udp_pipe = f"[f=mpegts]udp\://{config.get('stream_host')}\:{config.get('stream_port')}/"
+  video_filter = ""
+
+  if not config.get('archive'):
+    file_pipe = ""
+  
+  if config.get('grayscale'):
+    video_filter = "-vf format=gray "
+
+  return f"""ffmpeg \
+    -an \
+    -f v4l2 \
+    -framerate {config.get('infps')} \
+    -video_size {config.get('inres')} \
+    -i /dev/video{config.get('video_index')} \
+    -f mpegts \
+    -vcodec mpeg1video {video_filter}\
+    -threads {config.get('threads')} \
+    -vsync {config.get('vsync')} \
+    -b:v {config.get('bitrate')} \
+    -s {config.get('outres')} \
+    -r {config.get('outfps')} \
+    -bf 0 \
+    -f tee -map 0:v "{file_pipe}{udp_pipe}"
+  """
+
+
+def get_mac_webcam_encoding_pipeline(config: dict, output_directory: str):
+  stream_file = os.path.join(output_directory, config.get('stream_name')) + "_%s.mp4"
+  file_pipe = f"[f=segment\:segment_time={config.get('segment_time')}\:reset_timestamps=1\:strftime=1]{stream_file}|"
+  udp_pipe = f"[f=mpegts]udp\://{config.get('stream_host')}\:{config.get('stream_port')}/"
+  video_filter = ""
+
+  if not config.get('archive'):
+    file_pipe = ""
+  
+  if config.get('grayscale'):
+    video_filter = "-vf format=gray "
+
+  return f"""ffmpeg \
+    -re \
+    -an \
+    -f avfoundation \
+    -pix_fmt yuyv422 \
+    -framerate {config.get('infps')} \
+    -video_size {config.get('inres')} \
+    -i "0:0" \
+    -vcodec mpeg1video {video_filter}\
+    -vsync {config.get('vsync')} \
+    -threads {config.get('threads')} \
+    -b:v {config.get('bitrate')} \
+    -s {config.get('outres')} \
+    -r {config.get('outfps')} \
+    -bf 0 \
+    -f tee \
+    -map 0:v "{file_pipe}{udp_pipe}"
+  """
+
 
 def get_hls_output_pipeline(options: dict, output_file: str):
     return f"""\

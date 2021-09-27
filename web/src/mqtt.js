@@ -31,10 +31,9 @@ function onConnect() {
   mqttEmitter.emit('connected');
   client.onConnectionLost = onDisconnect;
   client.onMessageArrived = onMessage;
-  client.subscribe('web/alarms/active');
-  client.subscribe('web/heartbeat');
-
-  client.subscribe('web/board/mock_client/soil')
+  client.subscribe('web/alarms/tx');
+  client.subscribe('web/heartbeat/#');
+  client.subscribe('web/board/#');
 }
 
 function onDisconnect() {

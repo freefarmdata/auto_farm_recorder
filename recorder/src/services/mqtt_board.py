@@ -8,7 +8,6 @@ import paho.mqtt.client as mqtt
 
 from util.time_util import profile_func
 import controllers.alarms as alarm_controller
-import controllers.board_relay as relay_controller
 import database
 
 logger = logging.getLogger()
@@ -18,7 +17,7 @@ class MQTTBoard(TService):
 
   def __init__(self):
     super().__init__(name="mqtt_board")
-    self.set_interval(1E9)
+    self.set_interval(30E9)
     self.mqtt_client = mqtt.Client()
 
 
@@ -73,14 +72,18 @@ class MQTTBoard(TService):
     for metric in metrics:
       if metric in packet:
         for i,v in enumerate(packet[metric]):
-          readings.append({
+          reading = {
             'timestamp': timestamp,
             'board': board_id,
             'metric': metric,
             'sensor': i,
             'value': v,
-          })
+          }
+          readings.append(reading)
+          state.update_trigger('web_publisher', (
+            f"web/board/{reading.get('board')}/{reading.get('metric')}",
+            { **reading, 'timestamp': reading['timestamp'].timestamp() }
+          ))
 
-    relay_controller.push_readings(readings)
     database.insert_readings(readings)
 

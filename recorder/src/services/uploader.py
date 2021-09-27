@@ -6,7 +6,6 @@ from fservice.tservice import TService
 import boto3
 
 import controllers.alarms as alarm_controller
-import controllers.program as program_controller
 from util.file_util import file_is_being_accessed
 from util.time_util import profile_func
 
@@ -68,7 +67,6 @@ class Uploader(TService):
             logger.info(f'Successfully uploaded {file_path} to {object_key}')
 
             file_bytes_size = os.stat(file_path).st_size * 1E-6
-            program_controller.increment_info_key('total_mb_uploaded', file_bytes_size)
 
             return True
         except:

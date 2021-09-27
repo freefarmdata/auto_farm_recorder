@@ -1,0 +1,9 @@
+FROM node:16
+
+COPY . /usr/src
+
+RUN npm install
+
+EXPOSE 5454
+
+CMD ["npm", "start"]

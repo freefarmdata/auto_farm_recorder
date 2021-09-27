@@ -34,10 +34,34 @@ class Streamer(TService):
 
     def run_start(self):
         alarm_controller.clear_alarm('streamer_service_offline')
-        self.start_streams()
+        self.initialize_streams()
 
 
     def run_loop(self):
+        if self.is_daytime():
+            alarm_controller.clear_alarm('streamer_service_night')
+            self.check_streams()
+        else:
+            alarm_controller.set_info_alarm(
+                'streamer_service_night',
+                'Streams Offline At Night Time',
+                upsert=False
+            )
+            self.stop_streams()
+
+    
+    def run_update(self, message):
+        if message is not None:
+            if message.get('action') == 'attach':
+                self.attach_stream(message.get('config'))
+
+
+    def run_end(self):
+        self.stop_streams()
+        alarm_controller.set_warn_alarm('streamer_service_offline', 'Streamer Service is Offline')
+
+    
+    def check_streams(self):
         for i in range(len(self.streams)):
             stream = self.streams[i]
             if stream.is_stopped():
@@ -49,18 +73,7 @@ class Streamer(TService):
                 )
                 self.streams[i] = self.start_stream(stream.config)
 
-    
-    def run_update(self, message):
-        if message is not None:
-            if message.get('action') == 'attach':
-                self.attach_stream(message.get('config'))
 
-
-    def run_end(self):
-        alarm_controller.set_warn_alarm('streamer_service_offline', 'Streamer Service is Offline')
-        self.stop_streams()
-
-    
     def attach_stream(self, config):
         streams = state.get_service_setting('streamer', 'streams')
         if streams is None:
@@ -80,7 +93,7 @@ class Streamer(TService):
         return stream
 
 
-    def start_streams(self):
+    def initialize_streams(self):
         configs = state.get_service_setting('streamer', 'streams')
         if configs is not None:
             for config in configs:
@@ -89,8 +102,7 @@ class Streamer(TService):
 
     def stop_streams(self):
         for i in range(len(self.streams)):
-            self.streams[i].stop()
-        self.streams = []
+            self.streams[i].stop_wait()
 
 
     def is_daytime(self):

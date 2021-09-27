@@ -5,7 +5,6 @@ import paho.mqtt.client as mqtt
 from fservice import state
 from fservice.trigger import Trigger
 
-import controllers.board_relay as relay_controller 
 from util.time_util import profile_func
 
 logger = logging.getLogger()
@@ -29,12 +28,15 @@ MQTT_ERR_ERRNO = 14
 MQTT_ERR_QUEUE_SIZE = 15
 """
 
-class BoardRelay(Trigger):
-
+class WebPublisher(Trigger):
+  """
+  Trigger used to send a web socket messages to the
+  web using mqtt
+  """
 
   def __init__(self):
-    super().__init__(name='board_relay')
-    self.set_timeout(1)
+    super().__init__(name='web_publisher')
+    self.set_block_time(1)
     self.mqtt_client = mqtt.Client(transport='websockets')
 
 
@@ -45,13 +47,9 @@ class BoardRelay(Trigger):
     self.mqtt_client.loop_start()
 
 
-  @profile_func(name="board_relay_trigger")
-  def run_trigger(self):
-    reading = relay_controller.pop_reading()
-    topic = f"web/board/{reading.get('board')}/{reading.get('metric')}"
-
-    new_reading = { **reading, 'timestamp': reading['timestamp'].timestamp() }
-    self.mqtt_client.publish(topic, json.dumps(new_reading))
+  @profile_func(name="web_publisher_trigger")
+  def run_trigger(self, message):
+    self.mqtt_client.publish(message[0], json.dumps(message[1]))
 
 
   def run_end(self):

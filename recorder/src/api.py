@@ -49,6 +49,12 @@ def update_setting(message):
     return 'OK', 200
 
 
+@app.route('/api/settings', methods=['GET'])
+def get_settings():
+    settings = state.get_all_settings()
+    return jsonify(settings), 200
+
+
 @app.route('/api/activate-service/<service_name>', methods=['GET'])
 def toggle_on_service(service_name):
     logger.info(f'toggling service {service_name} on')

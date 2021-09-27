@@ -9,7 +9,6 @@ import './styles/graphs.css';
 
 import './styles/disable-services.css';
 import './styles/toggle-services.css';
-import './styles/global-settings.css';
 import './styles/manual-watering.css';
 import './styles/live-stream.css';
 import './styles/alarms.css';

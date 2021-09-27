@@ -12,20 +12,9 @@ import controllers.streams as stream_controller
 
 logger = logging.getLogger()
 
-def get_video_input(ip: str):
-    return f"""\
-    -i http://{ip}:81/stream \
-    """
-
 
 def launch_stream(config, output_directory: str):
-    output_hls_file = os.path.join(output_directory, f'{config.get("stream_name")}.m3u8')
-
-    input = get_video_input(config.get('ip'))
-    encoding = stream_controller.get_encoding_pipeline(config)
-    output_hls = stream_controller.get_hls_output_pipeline(config, output_hls_file)
-
-    command = f"ffmpeg {input} {encoding} {output_hls}"
+    command = stream_controller.get_esp32_encoding_pipeling(config, output_directory)
 
     logger.info(f'Running ffmpeg pipeline: {command}')
 
@@ -53,7 +42,9 @@ def set_stream_settings(ip: str):
         value = settings_map[setting]
         url = f'http://{ip}/control?var={setting}&val={value}'
         logger.info(f'Setting {setting} to {value} for camera {ip}')
-        assert requests.get(url, timeout=(5, 5)).status_code == 200
+        status = requests.get(url, timeout=(5, 5)).status_code
+        if status != 200:
+            raise Exception(f'Failed to set {setting} on esp32: {ip}')
 
 
 class ESP32Stream(TService):
@@ -67,8 +58,7 @@ class ESP32Stream(TService):
 
     def run_start(self):
         output_dir = state.get_global_setting('stream_dir')
-        stream_controller.clean_up_stream(self.config.get('stream_name'), output_dir)
-        set_stream_settings(self.config.get('ip'))
+        set_stream_settings(self.config.get('ip_address'))
         self.process = launch_stream(self.config, output_dir)
 
 
@@ -81,10 +71,6 @@ class ESP32Stream(TService):
         try:
             while not self.process.poll():
                 self.process.kill()
-                time.sleep(0.01)
+                time.sleep(0.1)
         except:
             pass
-        stream_controller.clean_up_stream(
-            self.config.get('stream_name'),
-            state.get_global_setting('stream_dir')
-        )

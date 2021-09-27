@@ -30,27 +30,29 @@ def get_active_alarms():
 def clear_alarm(alarm_id):
     global alarm_cache
     with _alarm_lock:
-        if alarm_id in alarm_cache:
+        if alarm_id in alarm_cache and alarm_cache[alarm_id]['active'] == True:
             alarm_cache[alarm_id]['active'] = False
+            state.update_trigger('web_publisher', ('web/alarms/tx', alarm_cache[alarm_id]))
 
 
-def set_info_alarm(alarm_id, name, message=None):
-    set_alarm(alarm_id, 'info', name, message)
+
+def set_info_alarm(alarm_id, name, message=None, upsert=True):
+    set_alarm(alarm_id, 'info', name, message, upsert)
 
 
-def set_warn_alarm(alarm_id, name, message=None):
-    set_alarm(alarm_id, 'warn', name, message)
+def set_warn_alarm(alarm_id, name, message=None, upsert=True):
+    set_alarm(alarm_id, 'warn', name, message, upsert)
 
 
-def set_danger_alarm(alarm_id, name, message=None):
-    set_alarm(alarm_id, 'danger', name, message)
+def set_danger_alarm(alarm_id, name, message=None, upsert=True):
+    set_alarm(alarm_id, 'danger', name, message, upsert)
 
 
-def set_critcal_alarm(alarm_id, name, message=None):
-    set_alarm(alarm_id, 'critical', name, message)
+def set_critcal_alarm(alarm_id, name, message=None, upsert=True):
+    set_alarm(alarm_id, 'critical', name, message, upsert)
 
 
-def set_alarm(alarm_id, level, name, message=None):
+def set_alarm(alarm_id, level, name, message=None, upsert=True):
     global alarm_cache
     with _alarm_lock:
         alarm = {
@@ -61,5 +63,9 @@ def set_alarm(alarm_id, level, name, message=None):
             'name': name,
             'message': message,
         }
+
+        if not upsert and alarm_id in alarm_cache and alarm_cache[alarm_id]['active'] == True:
+            return
+
         alarm_cache[alarm_id] = alarm
-        state.update_trigger('alarm_notifier')
+        state.update_trigger('web_publisher', ('web/alarms/tx', alarm))

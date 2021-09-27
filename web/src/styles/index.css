@@ -36,6 +36,14 @@ button:hover {
   cursor: pointer;
 }
 
+select {
+  background-color: #efefef;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #e3e3e3;
+  outline: none;
+}
+
 td, th {
   border: 1px solid #e3e3e3;
   text-align: left;

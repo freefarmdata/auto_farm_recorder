@@ -19,21 +19,14 @@ class Heartbeat(TService):
     def __init__(self):
         super().__init__(name='heartbeat')
         self.set_interval(5E9)
-        self.mqtt_client = mqtt.Client(transport='websockets')
 
 
     def run_start(self):
         alarm_controller.clear_alarm('heartbeat_service_offline')
-        host = state.get_global_setting('mqtt_host')
-        self.mqtt_client.connect_async(host, port=9001)
-        self.mqtt_client.ws_set_options(path="/mqtt", headers=None)
-        self.mqtt_client.loop_start()
 
 
     def run_end(self):
         alarm_controller.set_warn_alarm('heartbeat_service_offline', 'Heartbeat Service Is Offline')
-        self.mqtt_client.loop_stop()
-        self.mqtt_client.disconnect()
 
 
     @profile_func(name='heartbeat_loop')
@@ -48,4 +41,5 @@ class Heartbeat(TService):
             'memory_usage': psutil.virtual_memory().percent
         }
 
-        self.mqtt_client.publish('web/heartbeat', json.dumps(packet))
+        state.update_trigger('web_publisher', ('web/heartbeat/stats', packet))
+        state.update_trigger('web_publisher', ('web/heartbeat/status', state.get_services_status()))

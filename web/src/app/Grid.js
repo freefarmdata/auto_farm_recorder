@@ -112,7 +112,6 @@ export default class Grid extends PureComponent {
           {/*<option value="train_soil">Train Soil Model</option>*/}
           {/*<option value="select_soil">Select Soil Model</option>*/}
           <option value="edit_settings">Edit Settings</option>
-          <option value="global_settings">Global Settings</option>
           <option value="server_stats">Server Statistics</option>
           <option value="live_stream">Live Stream</option>
           <option value="alarms">Alarms</option>

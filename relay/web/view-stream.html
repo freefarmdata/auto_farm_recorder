@@ -114,8 +114,9 @@
 		console.log(`connecting to ${url}`);
 		const socket = new eio.Socket(url, {
 			upgrade: true,
-			transports: ['websocket']
+			//transports: ['websocket']
 		});
+		socket.binaryType = 'arraybuffer';
 
 		function playCam(stream_name) {
 			socket.emit('play_stream', stream_name);
@@ -166,7 +167,6 @@
 		socket.on('open', () => {
 			console.log('connected', socket);
 			socket.on('message', data => {
-				console.log(data);
 				packetsRecieved += 1;
 				if (!document.hidden && !isNaN(data.byteLength)) {
 					bufferLengthTotal += data.byteLength;
@@ -176,24 +176,12 @@
 				}
 			});
 		});
-
-		// socket.on('connect', function() {
-		// 	console.log('connected', socket);
-		// 	stream_names.forEach(stream_name => {
-		// 		socket.on(`stream/${stream_name}`, function (data) {
-		// 			packetsRecieved += 1;
-		// 			if (!document.hidden && !isNaN(data.byteLength)) {
-		// 				bufferLengthTotal += data.byteLength;
-		// 				player.source.write(data);
-		// 			} else {
-		// 				pauseCam(stream_name);
-		// 			}
-		// 		});
-		// 	});
-		// });
-		// socket.on('disconnect', function() {
-		// 	console.log('disconnected');
-		// });
+		socket.on('close', (error) => {
+			console.log('disconnected', error);
+		})
+		socket.on('error', (error) => {
+			console.log('error', error);
+		});
 
 		function animateBufferLengthTotal(timestamp) {
 			if (!startGraphBufferLength) {

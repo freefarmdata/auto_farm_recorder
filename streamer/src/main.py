@@ -6,8 +6,6 @@ import argparse
 import socket
 from timeit import default_timer as timer
 
-import socketio
-
 from setup_log import setup_logger
 from controllers import clients
 from stream_process import StreamProcess
@@ -27,30 +25,31 @@ def launch_relay(config: dict):
 
     while True:
         if not clients.stream_requested(stream_name):
-            time.sleep(0.1)
+            time.sleep(1)
             continue
-
+        
         last_check = timer()
         while True:
-            if timer() - last_check >= 10:
+            if timer() - last_check >= 1:
                 last_check = timer()
                 if not clients.stream_requested(stream_name):
                     break
 
             try:
+                #buffer = open("/dev/urandom","rb").read(1024*16)
                 buffer, address = stream_socket.recvfrom(1024*16)
                 if len(buffer) <= 0:
                     continue
-
+                
                 socket_server.emit(
                     f'stream/{stream_name}',
                     data=buffer,
                     room=stream_name,
-                    ignore_queue=True
+                    ignore_queue=False
                 )
+
             except socket.timeout:
                 pass
-
 
 if __name__ == "__main__":
     """
@@ -97,6 +96,10 @@ if __name__ == "__main__":
         2560x720@[30.000030 30.000030]fps
         2560x960@[60.000240 60.000240]fps
         2560x960@[30.000030 30.000030]fps
+    
+    https://trac.ffmpeg.org/wiki/Limiting%20the%20output%20bitrate
+    https://trac.ffmpeg.org/wiki/StreamingGuide
+    https://trac.ffmpeg.org/wiki/Encode/H.264
 
     vcgencmd measure_clock arm
     vcgencmd measure_clock v3d
@@ -136,27 +139,24 @@ if __name__ == "__main__":
 
     python3 src/main.py \
         --debug \
-        --bitrate 512k \
-        --inres 1280x480  \
+        --archive \
+        --grayscale \
+        --bitrate 2M \
+        --inres 640x240  \
         --outres 640x240 \
         --infps 30 \
         --outfps 20 \
-        --threads 1 \
+        --threads 4 \
         --vsync 1
-        
-        
     
     python3 src/main.py \
         --local \
-        --debug \
-        --grayscale \
-        --bitrate 256k \
-        --minrate 128k \
-        --bufsize 1M \
-        --maxrate 2M \
-        --resolution 1280x720 \
-        --vsync 0 \
-        --framerate 30
+        --bitrate 2M \
+        --inres 1280x720 \
+        --outres 1280x720 \
+        --infps 30 \
+        --outfps 20 \
+        --vsync 1
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--local", action="store_true", default=False)
@@ -234,18 +234,19 @@ if __name__ == "__main__":
     
     streams = []
 
-    socket_server.initialize()
+    #socket_server.initialize()
     socket_server.start()
 
     for stream_config in stream_configs:
         stream = StreamProcess(stream_config)
         stream.start()
         streams.append(stream)
-        relay = Thread(target=launch_relay, args=(stream_config,), daemon=True)
-        relay.start()
+        #relay = Thread(target=launch_relay, args=(stream_config,), daemon=True)
+        #relay.start()
 
     try:
         while True:
+            #clients.anaylze_sockets()
             for index in range(len(streams)):
                 if not streams[index].is_alive():
                     stream = StreamProcess(streams[index].stream_config)
