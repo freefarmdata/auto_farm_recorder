@@ -41,11 +41,7 @@ class Alarms extends PureComponent {
   onAlarms(newAlarm) {
     const { alarms } = this.state;
     newAlarm = JSON.parse(newAlarm);
-
     alarms[newAlarm.id] = newAlarm;
-
-    console.log(alarms);
-
     this.setState({ alarms: {...alarms} });
   }
 

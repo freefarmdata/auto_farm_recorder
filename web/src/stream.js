@@ -6,38 +6,48 @@ const RELAY_FARM_URL =  process.env.NODE_ENV === 'development' ? 'ws://127.0.0.1
 
 export default class StreamPlayer extends EventEmitter {
 
-    constructor(streamName) {
+    constructor() {
         super();
-        this.streamName = streamName;
         this.url = RELAY_FARM_URL;
+        this.streamName = undefined;
         this.socket = undefined;
+        this._isPlaying = false;
         this._onMessage = this._onMessage.bind(this);
+        this._onStop = this._onStop.bind(this);
+        this._onPlay = this._onPlay.bind(this);
+
+        this.on('play', this._onPlay);
+        this.on('stop', this._onStop);
     }
 
-    async play(callback) {
-        console.log('stream socket', this.socket)
-        if (!this.socket || this.socket.closed) {
-            this.socket = this._newSocket();
-            this.socket.send(this.streamName);
-        }
-        this.addListener('data', callback);
-    }
-
-    async refresh(callback) {
-        this.pause();
-        await this.play(callback);
-    }
-
-    pause() {
-        this.removeAllListeners();
+    play(streamName) {
+        this.streamName = streamName;
+        this.emit('play');
     }
 
     stop() {
+        this.emit('stop');
+    }
+
+    destroy() {
+        this.removeAllListeners();
+    }
+
+    _onPlay() {
         if (this.socket) {
             this.socket.close();
         }
         this.socket = undefined;
-        this.removeAllListeners();
+        this.socket = this._newSocket();
+        this.emit('update', 'loading');
+    }
+
+    _onStop() {
+        if (this.socket) {
+            this.socket.close();
+        }
+        this.socket = undefined;
+        this.emit('update', 'stopped');
     }
 
     _newSocket() {
@@ -46,20 +56,22 @@ export default class StreamPlayer extends EventEmitter {
         });
         socket.binaryType = 'arraybuffer';
         socket.on('open', () => {
-            socket.closed = false;
-            console.log('stream connected');
+            socket.send(this.streamName);
+            socket.on('message', this._onMessage);
         });
         socket.on('close', (error) => {
-            socket.closed = true;
-            console.log('stream disconnected', error);
-        })
-        socket.on('error', (error) => {
-            console.log('stream error', error);
+            this._isPlaying = false;
+            this.emit('update', 'stopped');
         });
         return socket;
     }
 
     _onMessage(message) {
+        if (!this._isPlaying) {
+            this.emit('update', 'playing');
+        }
+
+        this._isPlaying = true;
         if (!document.hidden && !isNaN(message.byteLength)) {
             this.emit('data', message);
         }

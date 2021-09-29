@@ -37,104 +37,113 @@ class LiveStream extends PureComponent {
 
     this.state = {
       streams: [],
-      stream: '',
-      play: false,
+      selectedStream: '',
+      streamError: false,
+      isLoading: false,
+      isPlaying: false,
+      showControls: false,
     }
 
-    this.player = undefined;
-    this.streamPlayer = undefined;
+    this.jsMpegPlayer = undefined;
+    this.streamPlayer = new StreamPlayer();
+    this.streamErrors = 0;
     this.onRefresh = this.onRefresh.bind(this);
     this.fetchStreams = this.fetchStreams.bind(this);
     this.onPlay = this.onPlay.bind(this);
-    this.onPause = this.onPause.bind(this);
+    this.onStop = this.onStop.bind(this);
     this.onStreamData = this.onStreamData.bind(this);
     this.onStreamChange = this.onStreamChange.bind(this);
   }
 
   async componentDidMount() {
     await this.fetchStreams();
+
     // eslint-disable-next-line no-undef
-    this.player = new JSMpeg.Player(null, {
+    this.jsMpegPlayer = new JSMpeg.Player(null, {
 			source: JSMpegWritableSource,
 			audio: false,
 			canvas: document.getElementById('stream'),
 		});
+
+    this.streamPlayer.on('update', (state) => {
+      this.setState({
+        isPlaying: state === 'playing',
+        isLoading: state === 'loading'
+      });
+    });
+    this.streamPlayer.on('data', this.onStreamData);
   }
 
   componentWillUnmount() {
-    this.player = undefined;
-    if (this.streamPlayer) {
-      this.streamPlayer.stop();
-      this.streamPlayer = undefined;
-    }
+    this.jsMpegPlayer = undefined;
+    this.streamPlayer.destroy();
   }
 
   async fetchStreams() {
     const streams = await service.fetchStreams();
     if (streams) {
-      this.setState({ streams });
+      this.setState({
+        streams: streams,
+        selectedStream: streams ? streams[0].stream_name : ''
+      });
     }
   }
 
   onStreamData(chunk) {
-    console.log(chunk);
-    if (this.player) {
-      this.player.source.write(chunk);
+    if (this.jsMpegPlayer) {
+      try {
+        this.jsMpegPlayer.source.write(chunk);
+      } catch (err) {
+        console.error(err);
+        this.streamErrors += 1;
+        if (this.streamErrors >= 100) {
+          this.streamErrors = 0;
+          this.setState({ streamError: true });
+          this.onStop();
+        }
+      } 
     }
   }
 
-  async onStreamChange(event) {
-    const stream = event.target.value;
+  onStreamChange(event) {
+    const selectedStream = event.target.value;
 
-    this.setState({ stream }, async () => {
-      await this.onRefresh();
+    this.setState({ selectedStream }, () => {
+      this.onRefresh();
     });
   }
 
-  async onRefresh() {
-    const { stream } = this.state.stream;
-
+  onRefresh() {
     // eslint-disable-next-line no-undef
-    this.player = new JSMpeg.Player(null, {
+    this.jsMpegPlayer = new JSMpeg.Player(null, {
 			source: JSMpegWritableSource,
 			audio: false,
 			canvas: document.getElementById('stream'),
 		});
 
-    if (this.streamPlayer) {
-      this.streamPlayer.stop();
-      this.streamPlayer = undefined;
-    }
-
-    if (stream && stream.length) {
-      this.streamPlayer = new StreamPlayer(stream);
-      await this.streamPlayer.play(this.onStreamData);
-    }
+    this.onPlay();
   }
 
-  onPause() {
-    if (this.streamPlayer) {
-      this.streamPlayer.pause();
-    }
+  onStop() {
+    this.streamErrors = 0;
+    this.setState({ streamError: false });
+    this.streamPlayer.stop();
   }
 
-  async onPlay() {
-    const { stream } = this.state;
-
-    if (stream && stream.length && (!this.streamPlayer || (this.streamPlayer && this.streamPlayer.streamName !== stream))) {
-      this.streamPlayer = new StreamPlayer(stream);
-    }
-
-    if (this.streamPlayer) {
-      await this.streamPlayer.play(this.onStreamData);
+  onPlay() {
+    const { selectedStream } = this.state;
+    if (selectedStream.length) {
+      this.streamErrors = 0;
+      this.setState({ streamError: false });
+      this.streamPlayer.play(selectedStream);
     }
   }
 
   renderSelections() {
-    const { streams, stream } = this.state;
+    const { streams, selectedStream } = this.state;
 
     return (
-      <select value={stream} onChange={this.onStreamChange}>
+      <select value={selectedStream} onChange={this.onStreamChange}>
         {streams.map((stream, i) => {
           return (
             <option 
@@ -147,15 +156,60 @@ class LiveStream extends PureComponent {
       </select>
     )
   }
+  
+  renderControls() {
+    const { isPlaying, showControls } = this.state;
+
+    if (showControls) {
+      let playButton = <button onClick={this.onPlay}>&#9654;</button>;
+
+      if (isPlaying) {
+        playButton = <button onClick={this.onStop}>&#9607;</button>;
+      }
+
+      return (
+        <div className="live-stream__controls">
+          {playButton}
+          <button onClick={this.onRefresh}>&#x21bb;</button>
+        </div>
+      )
+    }
+  }
+
+  renderStreamError() {
+    const { streamError } = this.state;
+
+    if (streamError) {
+      return (
+        <div className="live-stream__error">
+          Failed to play stream. Please retry.
+        </div>
+      )
+    }
+  }
+
+  renderLoader() {
+    const { isLoading } = this.state;
+
+    if (isLoading) {
+      return <div className="live-stream__loader spinner"></div>
+    }
+  }
 
   render() {
     return (
       <div className="live-stream">
-        <canvas id="stream" className="live-stream__stream"></canvas>
-        <div className="live-stream__controls">
-          <button onClick={this.onPlay}>&#9654;</button>
-          <button onClick={this.onPause}>&#9868;</button>
-          <button onClick={this.onRefresh}>&#8635;</button>
+        <div
+          className="live-stream__wrapper"
+          onMouseEnter={() => this.setState({ showControls: true })}
+          onMouseLeave={() => this.setState({ showControls: false })}>
+          <canvas id="stream" className="live-stream__stream"></canvas>
+          {this.renderControls()}
+          {this.renderStreamError()}
+          {this.renderLoader()}
+        </div>
+        
+        <div className="live-stream__streams">
           {this.renderSelections()}
         </div>
       </div>

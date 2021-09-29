@@ -1,6 +1,5 @@
 const http = require('http');
 
-const relay = require('./relay');
 const socket = require('./socket');
 const streams = require('./streams');
 const config = require('./config');
@@ -11,8 +10,7 @@ async function main() {
     const httpServer = http.createServer();
 
     await streams.initialize();
-    await relay.initialize();
-    socket.initialize(httpServer);
+    await socket.initialize(httpServer);
 
     httpServer.listen(5454, () => {
         console.log('relay started');

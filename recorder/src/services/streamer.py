@@ -38,16 +38,16 @@ class Streamer(TService):
 
 
     def run_loop(self):
-        if self.is_daytime():
-            alarm_controller.clear_alarm('streamer_service_night')
+        #if self.is_daytime():
+        #    alarm_controller.clear_alarm('streamer_service_night')
             self.check_streams()
-        else:
-            alarm_controller.set_info_alarm(
-                'streamer_service_night',
-                'Streams Offline At Night Time',
-                upsert=False
-            )
-            self.stop_streams()
+        #else:
+            # alarm_controller.set_info_alarm(
+            #     'streamer_service_night',
+            #     'Streams Offline At Night Time',
+            #     upsert=False
+            # )
+            # self.stop_streams()
 
     
     def run_update(self, message):

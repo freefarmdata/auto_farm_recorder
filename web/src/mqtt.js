@@ -41,7 +41,6 @@ function onDisconnect() {
 }
 
 function onMessage(message) {
-  console.log('mqtt packet:', message.topic);
   mqttEmitter.emit(message.topic, message.payloadString);
 }
 

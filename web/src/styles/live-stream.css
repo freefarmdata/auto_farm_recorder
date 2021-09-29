@@ -17,12 +17,61 @@
 }
 
 .live-stream__controls {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
     display: flex;
+    align-items: flex-end;
     flex-wrap: wrap;
     gap: 5px;
+    animation-name: controls_display;
+    animation-duration: 0.5s;
 }
 
 .live-stream__controls > button {
-    min-width: 40px;
-    font-weight: bold;
+    min-width: 30px;
+    height: 30px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: 1px solid #fff;
+    background-color: rgba(0,0,0,0);
 }
+
+.live-stream__wrapper {
+    position: relative;
+}
+
+.live-stream__loader {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    border: 5px solid #e3e3e3;
+    border-top: 5px solid limegreen;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+.live-stream__streams {
+    display: grid;
+}
+
+@keyframes controls_display {
+    from {
+        opacity: 0.0;
+    }
+    to {
+        opacity: 1.0;
+    }
+}
+

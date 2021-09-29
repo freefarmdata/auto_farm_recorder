@@ -14,6 +14,9 @@ export default class Grid extends PureComponent {
       items: [],
       itemCounter: 0,
       gridProperties: {
+        cols: {lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0},
+        breakpoints: {lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0},
+        rowHeight: 50,
         autoSize: true,
         compactType: null,
         margin: [10, 10],
