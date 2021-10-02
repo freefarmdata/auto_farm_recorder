@@ -46,7 +46,7 @@ class USBStream(TService):
     def run_end(self):
         try:
             while True:
-                self.process.send_signal(signal.SIGINT)
+                self.process.kill()
                 if self.process.poll():
                     break
                 time.sleep(0.1)

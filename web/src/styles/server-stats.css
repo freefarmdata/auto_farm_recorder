@@ -1,6 +1,14 @@
 .server-stats {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  grid-column: span 2;
+  background-color: #fff;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 10px;
+  height: 100%;
 }
 
 .server-stats__container {

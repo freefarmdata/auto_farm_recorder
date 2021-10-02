@@ -12,30 +12,75 @@ class EditSettings extends PureComponent {
 
     this.state = {
       settings: {},
-      loading: true,
+      editSettings: undefined,
+      loading: false,
+    }
+
+    this.onChange = this.onChange.bind(this);
+    this.onRefresh = this.onRefresh.bind(this);
+    this.onSave = this.onSave.bind(this);
+  }
+
+  componentDidMount() {
+    this.onRefresh();
+  }
+
+  onRefresh() {
+    this.setState({ loading: true }, async () => {
+      const settings = await service.fetchAllSettings();
+      if (settings) {
+        this.setState({ settings, editSettings: settings, loading: false });
+      }
+    });
+  }
+
+  onSave() {
+    if (this.state.editSettings) {
+      this.setState({ loading: true }, async () => {
+        await service.saveSettings(this.state.editSettings);
+        this.onRefresh();
+      });
     }
   }
 
-  async componentDidMount() {
-    const settings = await service.fetchAllSettings();
-    this.setState({ settings, loading: false })
+  onChange(content) {
+    console.log(content);
+    if (content.error) {
+      this.setState({ editSettings: undefined });
+      return;
+    }
+
+    this.setState({ editSettings: content.jsObject })
   }
 
-  render() {
+  renderLoader() {
     const { loading } = this.state;
 
     if (loading) {
-      return <div className="spinner"></div>;
+      return <div className="spinner edit-settings__loader"></div>;
     }
+  }
 
+  render() {
     return (
-      <JSONInput
-        placeholder={this.state.settings}
-        locale={locale}
-        confirmGood={false}
-        width='100%'
-        height='100%'
-      />
+      <div className="edit-settings">
+        {this.renderLoader()}
+        <h4>Settings</h4>
+        <div className="edit-settings__wrapper">
+          <JSONInput
+            placeholder={this.state.settings}
+            onChange={this.onChange}
+            locale={locale}
+            confirmGood={false}
+            width='100%'
+            height='100%'
+          />
+        </div>
+        <div className="edit-settings__controls">
+          <button onClick={this.onRefresh}>Refresh</button>
+          <button onClick={this.onSave}>Save Edits</button>
+        </div>
+      </div>
     )
   }
 

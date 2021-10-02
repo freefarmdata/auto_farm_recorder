@@ -13,6 +13,8 @@ import './styles/manual-watering.css';
 import './styles/live-stream.css';
 import './styles/alarms.css';
 import './styles/server-stats.css';
+import './styles/edit-settings.css';
+import './styles/sensors.css';
 
 import App from './app/App';
 

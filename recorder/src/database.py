@@ -125,6 +125,23 @@ def query_latest_watering(amount=1):
   return records
 
 
+def query_latest_data(board='', amount=1):
+  records = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      f"""
+      SELECT * FROM readings
+      WHERE board = %s
+      ORDER BY timestamp LIMIT %s
+      """,
+      (str(board), str(amount))
+    )
+    records = cursor.fetchall()
+    records = [reading_dict(r) for r in records]
+  return records
+
+
 def query_latest_soil(board='', sensor=0):
   record = None
   with get_connection() as connection:

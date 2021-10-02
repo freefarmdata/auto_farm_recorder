@@ -3,6 +3,26 @@ import axios from 'axios';
 const HTTP_FARM_URL =  process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : window.location.href;
 
 
+async function fetchLastDataPoints(boards, amount) {
+  try {
+    const encodedBoards = encodeURIComponent(boards.join(','));
+    const response = await axios.get(`${HTTP_FARM_URL}/api/last-points?boards=${encodedBoards}&amount=${amount}`);
+    return response.data;
+  } catch (error) {
+    console.error('failed to fetch sensors', error);
+  }
+}
+
+
+async function saveSettings(settings) {
+  try {
+    await axios.post(`${HTTP_FARM_URL}/api/update-settings`, settings);
+  } catch (error) {
+    console.error('failed to fetch streams', error);
+  }
+}
+
+
 async function fetchStreams() {
   try {
     const response = await axios.get(`${HTTP_FARM_URL}/api/settings`);
@@ -74,5 +94,7 @@ export default {
   fetchServiceStatus,
   fetchAllSettings,
   fetchWateringTimes,
-  fetchActiveAlarms
+  fetchActiveAlarms,
+  saveSettings,
+  fetchLastDataPoints,
 }

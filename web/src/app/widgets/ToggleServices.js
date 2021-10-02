@@ -11,6 +11,7 @@ class ToggleServices extends PureComponent {
 
     this.state = {
       status: undefined,
+      loading: false,
     }
 
     this.fetchStatus = this.fetchStatus.bind(this);
@@ -20,11 +21,11 @@ class ToggleServices extends PureComponent {
     this.statusInterval = undefined;
   }
 
-  async componentDidMount() {
-    await this.fetchStatus();
+  componentDidMount() {
+    this.fetchStatus();
     mqtt.subscribe('web/heartbeat/status', this.onStatus);
-    this.statusInterval = setInterval(async () => {
-      await this.fetchStatus();
+    this.statusInterval = setInterval(() => {
+      this.fetchStatus();
     }, 10000);
   }
 
@@ -34,15 +35,16 @@ class ToggleServices extends PureComponent {
   }
 
   onStatus(status) {
-    console.log('status', JSON.parse(status));
+    this.setState({ status: JSON.parse(status), loading: false });
   }
 
-  async fetchStatus() {
-    const status = await service.fetchServiceStatus();
-    if (status) {
-      console.log(status);
-      this.setState({ status });
-    }
+  fetchStatus() {
+    this.setState({ loading: true }, async () => {
+      const status = await service.fetchServiceStatus();
+      if (status) {
+        this.setState({ status, loading: false });
+      }
+    });
   }
 
   async onClickOff(serviceName) {
@@ -63,18 +65,23 @@ class ToggleServices extends PureComponent {
     }
   }
 
+  renderLoading() {
+    const { loading } = this.state;
+
+    if (loading) {
+      return <div className="spinner toggle-services__loader"></div>
+    }
+  }
+
   render() {
     const { status } = this.state;
-
-    if (!status) {
-      return <div className="spinner"></div>;
-    }
 
     return (
       <div className="toggle-services">
         <h4>Toggle Services</h4>
+        {this.renderLoading()}
         <div className="toggle-services__container">
-          {Object.keys(status).map((serviceName, i) => {
+          {Object.keys(status || {}).sort().map((serviceName, i) => {
             const classNames = `${status[serviceName]}`;
             return (
               <span className={classNames} key={i}>

@@ -1,0 +1,31 @@
+.sensors {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    height: 100%;
+    background-color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    grid-column: span 4;
+    box-sizing: border-box;
+}
+
+.sensors__loader {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.sensors__selection {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.sensors__graph {
+    height: 100% !important;
+    min-height: 300px;
+}

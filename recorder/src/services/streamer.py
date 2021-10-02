@@ -38,29 +38,33 @@ class Streamer(TService):
 
 
     def run_loop(self):
-        #if self.is_daytime():
-        #    alarm_controller.clear_alarm('streamer_service_night')
+        if self.is_daytime() or self.is_online_override():
+            alarm_controller.clear_alarm('streamer_service_night')
             self.check_streams()
-        #else:
-            # alarm_controller.set_info_alarm(
-            #     'streamer_service_night',
-            #     'Streams Offline At Night Time',
-            #     upsert=False
-            # )
-            # self.stop_streams()
-
-    
-    def run_update(self, message):
-        if message is not None:
-            if message.get('action') == 'attach':
-                self.attach_stream(message.get('config'))
+        elif self.is_offline_override():
+            self.stop_streams()
+        else:
+            alarm_controller.set_info_alarm(
+                'streamer_service_night',
+                'Streams Offline At Night Time',
+                upsert=False
+            )
+            self.stop_streams()
 
 
     def run_end(self):
         self.stop_streams()
         alarm_controller.set_warn_alarm('streamer_service_offline', 'Streamer Service is Offline')
 
+
+    def is_online_override(self):
+        return state.get_service_setting('streamer', 'online_override')
+
     
+    def is_offline_override(self):
+        return state.get_service_setting('streamer', 'offline_override')
+
+
     def check_streams(self):
         for i in range(len(self.streams)):
             stream = self.streams[i]
@@ -71,25 +75,17 @@ class Streamer(TService):
                     f'streamer_stream_{stream_name}_restarted',
                     f'Stream: {stream_name} stopped and restarted',
                 )
-                self.streams[i] = self.start_stream(stream.config)
+                new_stream = self.create_stream(stream.config)
+                new_stream.start()
+                self.streams[i] = new_stream
 
 
-    def attach_stream(self, config):
-        streams = state.get_service_setting('streamer', 'streams')
-        if streams is None:
-            streams = []
-        streams.append(config)
-        state.set_service_setting('streamer', 'streams', streams)
-        self.streams.append(self.start_stream(config))
-
-
-    def start_stream(self, config) -> TService:
+    def create_stream(self, config) -> TService:
         stream = None
         if config.get('camera_type') == 'esp32':
             stream = ESP32Stream(config)
         elif config.get('camera_type') == 'usb':
             stream = USBStream(config)
-        stream.start()
         return stream
 
 
@@ -97,7 +93,9 @@ class Streamer(TService):
         configs = state.get_service_setting('streamer', 'streams')
         if configs is not None:
             for config in configs:
-                self.streams.append(self.start_stream(config))
+                stream = self.create_stream(config)
+                stream._stopped = True
+                self.streams.append(stream)
 
 
     def stop_streams(self):

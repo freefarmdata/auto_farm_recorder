@@ -1,0 +1,32 @@
+.edit-settings {
+    position: relative;
+    background-color: #fff;
+    display: grid;
+    gap: 10px;
+    border-radius: 5px;
+    padding: 10px;
+    height: 100%;
+    box-sizing: border-box;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
+    align-items: flex-start;
+    grid-column: span 2;
+}
+
+.edit-settings__controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edit-settings__loader {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.edit-settings__wrapper {
+    height: 500px;
+    overflow: auto;
+}

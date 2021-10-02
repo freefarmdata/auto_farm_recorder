@@ -109,9 +109,7 @@ async function initialize(httpServer) {
     eioServer.on('connection', onConnection);
     eioServer.on('flush', conflator(conflate));
 
-    relays = await Promise.all(
-        streams.getStreams().map(createRelay)
-    );
+    relays = await Promise.all(streams.getStreams().map(createRelay));
 
     setInterval(toggleRelays, 1000);
 }

@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-
 import mqtt from '../mqtt';
 
-import Grid from './Grid';
+import LiveStream from './widgets/LiveStream';
+import EditSettings from './widgets/EditSettings';
+import ToggleServices from './widgets/ToggleServices';
+import Alarms from './widgets/Alarms';
+import ServerStats from './widgets/ServerStats';
+import Sensors from './widgets/Sensors';
 
 class App extends Component {
   constructor(props) {
@@ -49,10 +53,19 @@ class App extends Component {
 
   render() {
     return (
-      <div>
+      <>
         {this.renderConnectionLabel()}
-        <Grid />
-      </div>
+        <div className="grid">
+          <div className="grid__layout">
+            <Alarms />
+            <ServerStats />
+            <LiveStream />
+            <ToggleServices />
+            <EditSettings />
+            <Sensors />
+          </div>
+        </div>
+      </>
     );
   }
 }

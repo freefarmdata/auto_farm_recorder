@@ -1,6 +1,14 @@
 .live-stream {
-    display: grid;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
     gap: 10px;
+    border-radius: 5px;
+    padding: 10px;
+    height: 100%;
+    grid-column: span 4;
 }
 
 .live-stream > button {
@@ -44,6 +52,7 @@
 
 .live-stream__wrapper {
     position: relative;
+    overflow: hidden;
 }
 
 .live-stream__loader {

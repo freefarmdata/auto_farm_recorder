@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import * as mqtt from 'paho-mqtt';
+import { format } from 'path';
 
 const MQTT_FARM_URL = process.env.NODE_ENV === 'development' ? '127.0.0.1' : window.location.hostname;
 
@@ -31,9 +32,7 @@ function onConnect() {
   mqttEmitter.emit('connected');
   client.onConnectionLost = onDisconnect;
   client.onMessageArrived = onMessage;
-  client.subscribe('web/alarms/tx');
-  client.subscribe('web/heartbeat/#');
-  client.subscribe('web/board/#');
+  client.subscribe('web/#');
 }
 
 function onDisconnect() {
@@ -41,7 +40,19 @@ function onDisconnect() {
 }
 
 function onMessage(message) {
-  mqttEmitter.emit(message.topic, message.payloadString);
+  const splits = message.topic.split('/');
+
+  //web/board/mock_client/soil
+  //web/board/mock_client
+  //web/board
+
+  for (let i = 0; i < splits.length; i++) {
+    const parts = splits.slice(0, splits.length - i);
+    if (parts.length === 1) {
+      break;
+    }
+    mqttEmitter.emit(parts.join('/'), message.payloadString);
+  }
 }
 
 

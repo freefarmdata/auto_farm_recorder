@@ -13,6 +13,10 @@ services:
   #     - ./data/recorder:/usr/src/app/bin
   #   networks:
   #     - pi_net
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+  #     timeout: 10s
+  #     interval: 30s
   # relay:
   #   container_name: relay
   #   build:
@@ -21,14 +25,15 @@ services:
   #   restart: always
   #   environment:
   #     NODE_ENV: prod
-  #     RECORDER_URL: http://relay:5000
+  #     RECORDER_URL: http://recorder:5000
   #     MAX_WRITE_BUFFER: 100
   #   ports:
   #     - 5454:5454
   #   networks:
   #     - pi_net
   #   depends_on:
-  #     - recorder
+  #     recorder:
+  #       condition: service_healthy
   postgres:
     container_name: postgres
     image: postgres:13.1

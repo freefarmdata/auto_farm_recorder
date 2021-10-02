@@ -199,6 +199,7 @@ class LiveStream extends PureComponent {
   render() {
     return (
       <div className="live-stream">
+        <h4>Live Streams</h4>
         <div
           className="live-stream__wrapper"
           onMouseEnter={() => this.setState({ showControls: true })}

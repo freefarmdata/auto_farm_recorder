@@ -13,6 +13,8 @@ from api import API
 import database
 import setup_log
 
+import controllers.settings as settings_controller
+
 from services.mock_mqtt import MockMQTT
 from services.mqtt_board import MQTTBoard
 from services.heartbeat import Heartbeat
@@ -122,37 +124,12 @@ def set_default_settings(args):
   state.set_service_setting('streamer', 'streams', [usb_default_config, esp_default_config])
 
 
-def load_settings(args):
-  try:
-    data_directory = state.get_global_setting('data_dir')
-    settings_path = os.path.join(data_directory, 'settings.json')
-    settings = {}
-    if os.path.exists(settings_path):
-      with open(settings_path, 'r') as f:
-        settings = json.load(f)
-    
-    logger.info(f'Loaded Settings: {settings}')
-
-    for service_name in settings:
-      for setting in settings[service_name]:
-        if service_name == 'global':
-          state.set_global_setting(setting, settings[service_name][setting])
-        else:
-          state.set_service_setting(service_name, setting, settings[service_name][setting])
-  except:
-    logger.exception('failed to load settings from file')
-
-
 if __name__ == "__main__":
   multiprocessing.set_start_method('spawn', force=True)
   parser = argparse.ArgumentParser()
   parser.add_argument("--local", action="store_true", default=False)
   parser.add_argument("--debug", action="store_true", default=False)
   args = parser.parse_args().__dict__
-
-  # Twenty second delay start up for postgres
-  if not args.get('local'):
-    time.sleep(20)
 
   setup_log.setup_logger(args.get('debug'))
 
@@ -167,7 +144,7 @@ if __name__ == "__main__":
 
   create_directories(args)
   set_default_settings(args)
-  load_settings(args)
+  settings_controller.load_settings()
   
   settings = state.get_all_settings()
 

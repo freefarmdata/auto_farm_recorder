@@ -1,10 +1,5 @@
 .grid {
-    max-width: 100vw;
-    max-height: 100vh;
-    height: 100vh;
-    width: 100vw;
     display: grid;
-    grid-template-rows: auto 1fr;
 }
 
 .grid__menu {
@@ -15,6 +10,33 @@
 }
 
 .grid__layout {
-    height: 100%;
-    overflow-y: auto;
+    display: grid;
+    padding-top: 10px;
+    gap: 10px;
+    grid-template-columns: repeat(6, 1fr);
+}
+
+@media only screen and (max-width: 1000px) {
+    .grid__layout {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+    .alarms {
+        grid-column: span 1 !important;
+    }
+    .server-stats {
+        grid-column: span 1 !important;
+    }
+    .live-stream {
+        grid-column: span 1 !important;
+    }
+    .toggle-services {
+        grid-column: span 1 !important;
+    }
+    .edit-settings {
+        grid-column: span 1 !important;
+    }
+    .sensors {
+        grid-column: span 1 !important;
+    }
 }

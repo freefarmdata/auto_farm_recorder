@@ -15,11 +15,11 @@ class ServerStats extends PureComponent {
   }
 
   async componentDidMount() {
-    mqtt.subscribe('web/heartbeat', this.onHeartbeat);
+    mqtt.subscribe('web/heartbeat/stats', this.onHeartbeat);
   }
 
   componentWillUnmount() {
-    mqtt.unsubscribe('web/heartbeat', this.onHeartbeat);
+    mqtt.unsubscribe('web/heartbeat/stats', this.onHeartbeat);
   }
 
   onHeartbeat(stats) {

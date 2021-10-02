@@ -10,6 +10,7 @@ from util.no_cache import no_cache
 
 import database
 import controllers.alarms as alarm_controller
+import controllers.settings as settings_controller
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*":{"origins":"*"}})
@@ -39,13 +40,28 @@ def update_service(message):
 
 
 @app.route('/api/update-setting', methods=['POST'])
-def update_setting(message):
+def update_setting():
     message = request.get_json(force=True)
     logger.info(f'update setting {message}')
     if message['service_name'] == 'global':
         state.set_global_setting(message['key'], message['value'])
     else:
         state.set_service_setting(message['service_name'], message['key'], message['value'])
+    return 'OK', 200
+
+
+@app.route('/api/update-settings', methods=['POST'])
+def update_settings():
+    message = request.get_json(force=True)
+    logger.info(f'update settings {message}')
+    for service_name in message:
+        if service_name == 'global':
+            for key in message[service_name]:
+                state.set_global_setting(key, message[service_name][key])
+        else:
+            for key in message[service_name]:
+                state.set_service_setting(service_name, key, message[service_name][key])
+    settings_controller.save_settings(message)
     return 'OK', 200
 
 
@@ -84,6 +100,20 @@ def enable_service(service_name):
     return 'OK', 200
 
 
+@app.route('/api/last-points', methods=['GET'])
+def last_points():
+    boards = request.args.get('boards').split(',')
+    amount = request.args.get('amount')
+    logger.info(f'last data {amount} points for: {boards}')
+
+    results = []
+    for board in boards:
+        data = database.query_latest_data(board=board, amount=amount)
+        results.extend(data)
+
+    return jsonify(results), 200
+
+
 @app.route('/api/streams', methods=['GET'])
 def streams():
     return state.get_service_setting('streamer', 'streams'), 200
@@ -117,6 +147,6 @@ def clear_alarm(alarm_id):
     return 'OK', 200
 
 
-@app.route('/', methods=['GET'])
-def index():
-    return send_file('index.html')
+@app.route('/health', methods=['GET'])
+def health():
+    return 'OK', 200
