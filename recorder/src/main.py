@@ -19,7 +19,8 @@ from services.mock_mqtt import MockMQTT
 from services.mqtt_board import MQTTBoard
 from services.heartbeat import Heartbeat
 from services.streamer import Streamer
-from services.usb_camera import USBCamera
+from services.uploader import Uploader
+from services.archiver import Archiver
 
 from triggers.web_publisher import WebPublisher
 
@@ -33,21 +34,21 @@ def create_directories(args):
 
   image_directory = os.path.join(data_directory, 'images')
   video_directory = os.path.join(data_directory, 'videos')
-  temp_directory = os.path.join(data_directory, 'temp')
   model_directory = os.path.join(data_directory, 'model')
   stream_directory = os.path.join(data_directory, 'streams')
+  archive_directory = os.path.join(data_directory, 'archive')
 
   os.makedirs(data_directory, exist_ok=True)
   os.makedirs(image_directory, exist_ok=True)
   os.makedirs(video_directory, exist_ok=True)
-  os.makedirs(temp_directory, exist_ok=True)
+  os.makedirs(archive_directory, exist_ok=True)
   os.makedirs(model_directory, exist_ok=True)
   os.makedirs(stream_directory, exist_ok=True)
 
   state.set_global_setting('data_dir', data_directory)
   state.set_global_setting('image_dir', image_directory)
   state.set_global_setting('video_dir', video_directory)
-  state.set_global_setting('temp_dir', temp_directory)
+  state.set_global_setting('archive_dir', archive_directory)
   state.set_global_setting('model_dir', model_directory)
   state.set_global_setting('stream_dir', stream_directory)
   state.set_global_setting('video_dir', video_directory)
@@ -56,13 +57,15 @@ def create_directories(args):
 def set_default_settings(args):
   localhost = '127.0.0.1'
   bucket_name = 'jam-general-storage'
-  upload_path = 'datasets/auto_farm/experiment_hawaii_2021/images/'
+  upload_path = 'datasets/auto_farm/test_experiment'
   sunrise = '6:0:0:0' 
   sunset = '18:0:0:0'
   resolution = [1920, 1080]
   soil_threshold = 500
   camera_interval = 60E9
   pano_interval = 1800E9 # 30 minutes
+  upload_concurrency = 10
+  expire_time = 30
   mqtt_boards = ['mock_client']
 
   usb_default_config = {
@@ -119,6 +122,8 @@ def set_default_settings(args):
   state.set_service_setting('video', 'resolution', resolution)
   state.set_service_setting('uploader', 'upload_path', upload_path)
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
+  state.set_service_setting('uploader', 'concurrency', upload_concurrency)
+  state.set_service_setting('archiver', 'expire_time', expire_time)
   state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
   state.set_service_setting('panorama', 'pano_interval', pano_interval)
   state.set_service_setting('streamer', 'streams', [usb_default_config, esp_default_config])
@@ -139,6 +144,8 @@ if __name__ == "__main__":
   state.register_service('mqtt_board', MQTTBoard)
   state.register_service('heartbeat', Heartbeat)
   state.register_service('streamer', Streamer)
+  state.register_service('uploader', Uploader)
+  state.register_service('archiver', Archiver)
 
   state.register_trigger('web_publisher', WebPublisher)
 

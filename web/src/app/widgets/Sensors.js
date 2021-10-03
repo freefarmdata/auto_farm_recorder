@@ -86,7 +86,7 @@ export default class Sensors extends PureComponent {
       getOptions() {
         const { selectedBoard, selectedMetric, data } = this.state;
 
-        const telem = data[selectedBoard]?.[selectedMetric] || {};
+        const telem = data?.[selectedBoard]?.[selectedMetric] || {};
 
         const series = Object.keys(telem).map(sensor => {
           const points = (telem[sensor] || {}).map(point => {
@@ -136,7 +136,7 @@ export default class Sensors extends PureComponent {
       renderSelections() {
         const { boards, data, selectedBoard, selectedMetric } = this.state;
 
-        const metrics = Object.keys(data[selectedBoard] || {});
+        const metrics = Object.keys(data?.[selectedBoard] || {});
 
         return (
           <div className="sensors__selection">

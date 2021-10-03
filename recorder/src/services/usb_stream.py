@@ -34,7 +34,7 @@ class USBStream(TService):
 
 
     def run_start(self):
-        output_dir = state.get_global_setting('stream_dir')
+        output_dir = state.get_global_setting('video_dir')
         self.process = launch_stream(self.config, output_dir)
 
 

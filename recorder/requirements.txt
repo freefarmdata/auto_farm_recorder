@@ -2,7 +2,8 @@ Flask==1.1.1
 pyserial==3.4
 requests==2.22.0
 psycopg2-binary==2.8.6
-boto3==1.15.1
+boto3==1.18.53
+botocore==1.21.53
 psutil==5.8.0
 Flask-SocketIO==5.0.1
 opencv-python==4.4.0.40

@@ -125,6 +125,37 @@ def query_latest_watering(amount=1):
   return records
 
 
+def copy_readings_to_disk(file_path, start_date, end_date):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      """
+      COPY (
+        SELECT * FROM readings 
+        WHERE timestamp BETWEEN %s AND %s
+        ORDER BY timestamp
+      ) TO '%s' DELIMITER ',' CSV HEADER
+      """,
+      (start_date, end_date, file_path)
+    )
+    connection.commit()
+    
+
+
+def query_oldest_reading():
+  record = None
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      """
+      SELECT * FROM readings
+      ORDER BY timestamp ASC LIMIT 1
+      """
+    )
+    record = reading_dict(cursor.fetchone())
+  return record
+
+
 def query_latest_data(board='', amount=1):
   records = None
   with get_connection() as connection:

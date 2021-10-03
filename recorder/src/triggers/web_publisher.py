@@ -47,7 +47,6 @@ class WebPublisher(Trigger):
     self.mqtt_client.loop_start()
 
 
-  @profile_func(name="web_publisher_trigger")
   def run_trigger(self, message):
     self.mqtt_client.publish(message[0], json.dumps(message[1]))
 
