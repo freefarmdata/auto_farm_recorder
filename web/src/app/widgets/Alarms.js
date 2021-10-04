@@ -14,6 +14,7 @@ class Alarms extends PureComponent {
       loading: false,
     };
 
+    this.onClearAlarm = this.onClearAlarm.bind(this);
     this.fetchAlarms = this.fetchAlarms.bind(this);
     this.onAlarms = this.onAlarms.bind(this);
     this.alarmInterval = undefined;
@@ -48,6 +49,13 @@ class Alarms extends PureComponent {
     this.setState({ alarms: {...alarms}, loading: false });
   }
 
+  onClearAlarm(alarm) {
+    this.setState({ loading: true }, async () => {
+      await service.clearAlarm(alarm.id);
+      this.setState({ loading: false });
+    });
+  }
+
   renderAlarms() {
     const { alarms } = this.state;
 
@@ -77,6 +85,9 @@ class Alarms extends PureComponent {
               <div className="alarm__content__title">
                 <h4>{alarm.name}</h4>
                 <span>{moment(alarm.time).fromNow()}</span>
+                <button onClick={() => this.onClearAlarm(alarm)}>
+                  x
+                </button>
               </div>
               {message}
             </div>

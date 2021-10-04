@@ -1,4 +1,5 @@
 import psycopg2 as postgres
+import psycopg2.sql as sql
 import datetime
 
 from fservice import state
@@ -128,18 +129,30 @@ def query_latest_watering(amount=1):
 def copy_readings_to_disk(file_path, start_date, end_date):
   with get_connection() as connection:
     cursor = connection.cursor()
-    cursor.execute(
-      """
+    cursor.copy_expert(
+      f"""
       COPY (
         SELECT * FROM readings 
-        WHERE timestamp BETWEEN %s AND %s
+        WHERE timestamp BETWEEN ('{start_date.strftime("%Y-%m-%d")}') AND ('{end_date.strftime("%Y-%m-%d")}')
         ORDER BY timestamp
-      ) TO '%s' DELIMITER ',' CSV HEADER
+      ) TO STDOUT WITH CSV HEADER
       """,
-      (start_date, end_date, file_path)
+      open(file_path, 'w')
     )
     connection.commit()
     
+
+def delete_readings(start_date, end_date):
+  with get_connection() as connection:
+    cursor = connection.cursor()
+    cursor.execute(
+      """
+      DELETE FROM readings
+      WHERE timestamp BETWEEN %s AND %s
+      """,
+      (start_date, end_date)
+    )
+    connection.commit()
 
 
 def query_oldest_reading():

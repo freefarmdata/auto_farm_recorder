@@ -7,8 +7,9 @@ from fservice import state
 logger = logging.getLogger()
 
 
-def save_settings(settings):
+def save_settings():
   try:
+    settings = state.get_all_settings()
     data_directory = state.get_global_setting('data_dir')
     settings_path = os.path.join(data_directory, 'settings.json')
     with open(settings_path, 'w') as f:

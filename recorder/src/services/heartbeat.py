@@ -34,9 +34,9 @@ class Heartbeat(TService):
         total, used, free = shutil.disk_usage("/")
 
         packet = {
-            'disk_space_usage': used * 1E-6,
-            'disk_space_total': total * 1E-6,
-            'disk_space_free': free * 1E-6,
+            'disk_space_usage': round(used * 1E-6, 2),
+            'disk_space_total': round(total * 1E-6, 2),
+            'disk_space_free': round(free * 1E-6, 2),
             'cpu_usage': psutil.cpu_percent(),
             'memory_usage': psutil.virtual_memory().percent
         }

@@ -61,7 +61,7 @@ def update_settings():
         else:
             for key in message[service_name]:
                 state.set_service_setting(service_name, key, message[service_name][key])
-    settings_controller.save_settings(message)
+    settings_controller.save_settings()
     return 'OK', 200
 
 
@@ -69,6 +69,13 @@ def update_settings():
 def get_settings():
     settings = state.get_all_settings()
     return jsonify(settings), 200
+
+
+@app.route('/api/clear-alarm/<alarm_id>', methods=['GET'])
+def clear_alarm(alarm_id):
+    logger.info(f'clearing alarm {alarm_id}')
+    alarm_controller.clear_alarm(alarm_id)
+    return 'OK', 200
 
 
 @app.route('/api/activate-service/<service_name>', methods=['GET'])
@@ -139,12 +146,6 @@ def watering_times():
 @app.route('/api/active-alarms', methods=['GET'])
 def get_active_alarms():
     return jsonify(alarm_controller.get_active_alarms()), 200
-
-
-@app.route('/api/clear-alarm/<alarm_id>', methods=['GET'])
-def clear_alarm(alarm_id):
-    alarm_controller.clear_alarm(alarm_id)
-    return 'OK', 200
 
 
 @app.route('/health', methods=['GET'])

@@ -3,6 +3,14 @@ import axios from 'axios';
 const HTTP_FARM_URL =  process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : window.location.href;
 
 
+async function clearAlarm(alarm_id) {
+  try {
+    await axios.get(`${HTTP_FARM_URL}/api/clear-alarm/${alarm_id}`);
+  } catch (error) {
+    console.error('failed to clear alarm', error);
+  }
+}
+
 async function fetchLastDataPoints(boards, amount) {
   try {
     const encodedBoards = encodeURIComponent(boards.join(','));
@@ -13,7 +21,6 @@ async function fetchLastDataPoints(boards, amount) {
   }
 }
 
-
 async function saveSettings(settings) {
   try {
     await axios.post(`${HTTP_FARM_URL}/api/update-settings`, settings);
@@ -21,7 +28,6 @@ async function saveSettings(settings) {
     console.error('failed to fetch streams', error);
   }
 }
-
 
 async function fetchStreams() {
   try {
@@ -97,4 +103,5 @@ export default {
   fetchActiveAlarms,
   saveSettings,
   fetchLastDataPoints,
+  clearAlarm,
 }

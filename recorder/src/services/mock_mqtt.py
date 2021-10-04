@@ -42,7 +42,7 @@ class MockMQTT(TService):
         random.randint(300, 900),
         random.randint(300, 900)
       ],
-      'dsb': [
+      'dsb_temp': [
         random.randint(20, 40),
         random.randint(20, 40),
       ],

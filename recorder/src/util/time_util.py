@@ -4,6 +4,13 @@ import datetime
 
 logger = logging.getLogger()
 
+def sec_to_date(seconds):
+    date = datetime.datetime.fromtimestamp(seconds)
+    date = datetime.date(date.year, date.month, date.day)
+    date = datetime.datetime.combine(date, datetime.datetime.min.time())
+    return date
+
+
 def get_daynight_schedule(sunrise, sunset):
     sunrise = sunrise.split(':')
     sunset = sunset.split(':')

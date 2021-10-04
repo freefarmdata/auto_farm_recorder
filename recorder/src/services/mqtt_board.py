@@ -52,17 +52,7 @@ class MQTTBoard(TService):
   
   def on_tx_message(self, message):
     board_id = message.topic.split('/')[1]
-
-    metrics = [
-      'soil',
-      'dsb',
-      'dht11_temp',
-      'dht11_humid',
-      'bmp_temp',
-      'bmp_pressue',
-      'light'
-    ]
-
+    metrics = state.get_service_setting('mqtt_board', 'metrics')
     readings = []
   
     packet = message.payload.decode()

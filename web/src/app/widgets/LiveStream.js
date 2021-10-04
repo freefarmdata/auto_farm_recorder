@@ -114,11 +114,19 @@ class LiveStream extends PureComponent {
   }
 
   onRefresh() {
+    const canvas = document.getElementById('stream')
+    const context = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    if (context) {
+      context.viewport(0, 0, context.drawingBufferWidth, context.drawingBufferHeight);
+      context.clearColor(0.0, 0.0, 0.0, 1.0);
+      context.clear(context.COLOR_BUFFER_BIT);
+    }
+  
     // eslint-disable-next-line no-undef
     this.jsMpegPlayer = new JSMpeg.Player(null, {
 			source: JSMpegWritableSource,
 			audio: false,
-			canvas: document.getElementById('stream'),
+			canvas: canvas,
 		});
 
     this.onPlay();

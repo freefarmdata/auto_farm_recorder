@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import * as moment from 'moment';
 import ReactECharts from 'echarts-for-react';
 
 import mqtt from '../../mqtt.js';
@@ -38,6 +37,7 @@ export default class Sensors extends PureComponent {
         this.state = {
           data: {},
           boards: [],
+          metrics: [],
           selectedBoard: '',
           selectedMetric: '',
           loading: false,
@@ -72,9 +72,11 @@ export default class Sensors extends PureComponent {
           const settings = await service.fetchAllSettings();
           this.setState({
             boards: settings?.mqtt_board?.boards || [],
+            metrics: settings?.mqtt_board?.metrics || [],
             selectedBoard: settings?.mqtt_board?.boards[0] || '',
           }, async () => {
-            let data = await service.fetchLastDataPoints(this.state.boards, 200);
+            const { boards, metrics } = this.state;
+            let data = await service.fetchLastDataPoints(boards, metrics.length*50);
             data = data?.reduce((object, point) => {
               return appendPointToObject(object, point, 50);
             }, {});
@@ -134,9 +136,7 @@ export default class Sensors extends PureComponent {
       }
 
       renderSelections() {
-        const { boards, data, selectedBoard, selectedMetric } = this.state;
-
-        const metrics = Object.keys(data?.[selectedBoard] || {});
+        const { boards, metrics, selectedBoard, selectedMetric } = this.state;
 
         return (
           <div className="sensors__selection">

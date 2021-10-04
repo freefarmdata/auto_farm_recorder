@@ -1,3 +1,4 @@
+import datetime
 import time
 import os
 import json
@@ -12,6 +13,7 @@ from fservice import state
 from api import API
 import database
 import setup_log
+from util.time_util import sec_to_date
 
 import controllers.settings as settings_controller
 
@@ -65,14 +67,14 @@ def set_default_settings(args):
   camera_interval = 60E9
   pano_interval = 1800E9 # 30 minutes
   upload_concurrency = 10
-  expire_time = 30
   mqtt_boards = ['mock_client']
+  mqtt_metrics = ['soil', 'dsb_temp', 'dht11_temp', 'dht11_humid', 'bmp_temp', 'bmp_pressue', 'light']
+  start_date = sec_to_date(time.time()).timestamp()
+  expire_time = 7 * 24 * 60 * 60 # 7 days in seconds
 
   usb_default_config = {
     'camera_type': 'usb',
     'stream_name': 'frontcam',
-    #'archive': app_config.archive,
-    #'grayscale': app_config.grayscale,
     'aspect_ratio': 8/3,
     'video_index': 0,
     'threads': 1,
@@ -90,8 +92,6 @@ def set_default_settings(args):
   esp_default_config = {
     'camera_type': 'esp32',
     'stream_name': 'backcam',
-    #'archive': app_config.archive,
-    #'grayscale': app_config.grayscale,
     'ip_address': '192.168.0.102',
     'aspect_ratio': 4/3,
     'threads': 1,
@@ -115,8 +115,10 @@ def set_default_settings(args):
   state.set_global_setting('local', args.get('local'))
   state.set_global_setting('database_host', database_host)
   state.set_global_setting('mqtt_host', mqtt_host)
+  state.set_global_setting('start_date', start_date)
 
   state.set_service_setting('mqtt_board', 'boards', mqtt_boards)
+  state.set_service_setting('mqtt_board', 'metrics', mqtt_metrics)
   state.set_service_setting('usb_camera', 'interval', camera_interval)
   state.set_service_setting('usb_camera', 'resolution', resolution)
   state.set_service_setting('video', 'resolution', resolution)
@@ -124,6 +126,8 @@ def set_default_settings(args):
   state.set_service_setting('uploader', 'bucket_name', bucket_name)
   state.set_service_setting('uploader', 'concurrency', upload_concurrency)
   state.set_service_setting('archiver', 'expire_time', expire_time)
+  state.set_service_setting('archiver', 'last_archive', None)
+
   state.set_service_setting('soil_predictor', 'threshold', soil_threshold)
   state.set_service_setting('panorama', 'pano_interval', pano_interval)
   state.set_service_setting('streamer', 'streams', [usb_default_config, esp_default_config])
@@ -157,7 +161,6 @@ if __name__ == "__main__":
 
   logger.info(f"recorder launched with settings: {settings}")
 
-  database.reset_all()
   database.initialize()
 
   API().start()
